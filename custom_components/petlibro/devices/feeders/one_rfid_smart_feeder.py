@@ -20,6 +20,27 @@ class OneRFIDSmartFeeder(GranaryFeeder):
             "realInfo": real_info or {}  # Ensure a fallback to an empty dict if None
         })
 
+    # Property for todayFeedingQuantities (list of quantities fed today)
+    @property
+    def today_feeding_quantities(self) -> list[int]:
+        return self._data.get("grainStatus", {}).get("todayFeedingQuantities", [])  # Default to an empty list
+
+    # Property for todayFeedingQuantity (total quantity fed today)
+    @property
+    def today_feeding_quantity(self) -> int:
+        return self._data.get("grainStatus", {}).get("todayFeedingQuantity", 0)  # Default to 0
+
+    # Property for todayFeedingTimes (total times the feeder dispensed food today)
+    @property
+    def today_feeding_times(self) -> int:
+        return self._data.get("grainStatus", {}).get("todayFeedingTimes", 0)  # Default to 0
+
+    # Property for todayEatingTimes (total times pet has eaten today)
+    @property
+    def today_eating_times(self) -> int:
+        return self._data.get("grainStatus", {}).get("todayEatingTimes", 0)  # Default to 0
+
+    # Property for todayEatingTime (total time spent eating today)
     @property
     def today_eating_time(self) -> int:
         eating_time_str = self._data.get("grainStatus", {}).get("eatingTime", "0'0''")
@@ -33,10 +54,6 @@ class OneRFIDSmartFeeder(GranaryFeeder):
             return 0
 
         return total_seconds
-
-    @property
-    def today_eating_times(self) -> int:
-        return self._data.get("grainStatus", {}).get("todayEatingTimes", 0)
 
     @property
     def battery_state(self) -> str:
@@ -64,12 +81,10 @@ class OneRFIDSmartFeeder(GranaryFeeder):
 
     @property
     def unit_type(self) -> int:
-        # Handle UnitType, provide default value if not present
         return self._data.get("realInfo", {}).get("unitType", 1)  # Default to 1 (assuming a standard unit type)
 
     @property
     def battery_display_type(self) -> str:
-        # Handle BatteryDisplayType, default to 'percentage' if not present
         return cast(str, self._data.get("realInfo", {}).get("batteryDisplayType", "percentage"))
 
     # New binary sensors for connectivity and state
