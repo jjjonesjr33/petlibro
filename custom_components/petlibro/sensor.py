@@ -1,4 +1,5 @@
 """Support for PETLIBRO sensors."""
+# Disabled features currently show Unknown, until updated they will be disabled.
 
 from __future__ import annotations
 
@@ -83,7 +84,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                 return "Battery Power"
             else:
                 return "Unknown"  # Handle cases where power_mode is not 1 or 2
-
+    
         # Handle grain_outlet_state mapping with True/False values
         elif self.entity_description.key == "grain_outlet_state":
             grain_outlet_state = getattr(self.device, self.entity_description.key, None)
@@ -93,12 +94,21 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                 return "Blocked"
             else:
                 return "Unknown"  # Handle cases where the attribute is missing or not recognized
-
+    
         # Handle volume with a default value if missing
         elif self.entity_description.key == "volume":
             volume = getattr(self.device, self.entity_description.key, None)
             return volume if volume is not None else "Unknown"
-
+    
+        # Handle today_eating_time in minutes and seconds format
+        elif self.entity_description.key == "today_eating_time":
+            eating_time_seconds = getattr(self.device, self.entity_description.key, 0)
+            if eating_time_seconds:
+                minutes = eating_time_seconds // 60
+                seconds = eating_time_seconds % 60
+                return f"{minutes}m {seconds}s"  # Return formatted string in minutes and seconds
+            return "0m 0s"  # Fallback if there are no eating seconds
+    
         # Default behavior for other sensors, with fallback if key doesn't exist
         if self.entity_description.should_report(self.device):
             val = getattr(self.device, self.entity_description.key, None)
@@ -179,20 +189,20 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:package",
             name="Remaining Desiccant Days"
         ),
-        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="power_mode",
-            translation_key="power_mode",
-            icon="mdi:power-plug",
-            name="Power Mode"
-        ),
-        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="volume",
-            translation_key="volume",
-            icon="mdi:volume-high",
-            native_unit_of_measurement="%",
-            should_report=lambda device: hasattr(device, 'volume') and device.volume is not None,
-            name="Volume"
-        ),
+#        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
+#            key="power_mode",
+#            translation_key="power_mode",
+#            icon="mdi:power-plug",
+#            name="Power Mode"
+#        ),
+#        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
+#            key="volume",
+#            translation_key="volume",
+#            icon="mdi:volume-high",
+#            native_unit_of_measurement="%",
+#            should_report=lambda device: hasattr(device, 'volume') and device.volume is not None,
+#            name="Volume"
+#        ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="battery_state",
             translation_key="battery_state",
@@ -237,30 +247,38 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Today Eating Time"
         ),
+#        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
+#            key="grain_outlet_state",
+#            translation_key="grain_outlet_state",
+#            icon="mdi:alert",
+#            should_report=lambda device: hasattr(device, 'grain_outlet_state') and device.grain_outlet_state is not None,
+#            name="Dispenser Status"
+#        ),
+#        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
+#            key="door_error_state",
+#            translation_key="door_error_state",
+#            icon="mdi:alert",
+#            name="Door State"
+#        ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="grain_outlet_state",
-            translation_key="grain_outlet_state",
-            icon="mdi:alert",
-            should_report=lambda device: hasattr(device, 'grain_outlet_state') and device.grain_outlet_state is not None,
-            name="Dispenser Status"
-        ),
-        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="door_error_state",
-            translation_key="door_error_state",
-            icon="mdi:alert",
-            name="Door State"
-        ),
-        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="enable_light",
-            translation_key="enable_light",
+            key="screenDisplaySwitch",
+            translation_key="screen_display_switch",
             icon="mdi:lightbulb",
             name="Display Enabled"
         ),
+        # Would like to change child_lock_switch to a dropdown switch
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="child_lock_switch",
             translation_key="child_lock_switch",
             icon="mdi:lock",
             name="Child Lock"
+        ),
+        # Would like to change coverCloseSpeed to a dropdown switch
+        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
+            key="coverCloseSpeed",
+            translation_key="cover_close_speed",
+            icon="mdi:run-fast",
+            name="Lid Speed"
         ),
     ]
 }
