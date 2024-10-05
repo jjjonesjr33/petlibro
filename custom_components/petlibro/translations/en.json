@@ -28,7 +28,7 @@
     "entity": {
         "sensor": {
             "device_sn": {
-                "name": "Device Serial Number"
+                "name": "Device SN"
             },
             "mac_address": {
                 "name": "MAC Address"
