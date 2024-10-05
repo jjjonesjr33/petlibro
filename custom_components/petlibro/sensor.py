@@ -70,7 +70,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     def native_value(self) -> float | datetime | str | None:
         """Return the state."""
         if self.entity_description.should_report(self.device):
-            val = getattr(self.device, self.entity_description.key)
+            val = getattr(self.device, self.entity_description.key, None)
             if isinstance(val, str):
                 return val.lower()
             return val
@@ -118,33 +118,33 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     ],
     OneRFIDSmartFeeder: [
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="device_sn",
+            key="deviceSn",
             translation_key="device_sn",
             icon="mdi:identifier"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="mac_address",
+            key="mac",
             translation_key="mac_address",
             icon="mdi:network"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="wifi_ssid",
+            key="wifiSsid",
             translation_key="wifi_ssid",
             icon="mdi:wifi"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="wifi_rssi",
+            key="wifiRssi",
             translation_key="wifi_rssi",
             icon="mdi:wifi",
             native_unit_of_measurement="dBm"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="remaining_desiccant",
+            key="remainingDesiccantDays",
             translation_key="remaining_desiccant",
             icon="mdi:package"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="power_mode",
+            key="powerMode",
             translation_key="power_mode",
             icon="mdi:power-plug"
         ),
@@ -155,18 +155,18 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             native_unit_of_measurement="%"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="battery_state",
+            key="batteryState",
             translation_key="battery_state",
             icon="mdi:battery"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="electric_quantity",
+            key="electricQuantity",
             translation_key="electric_quantity",
             icon="mdi:battery",
             native_unit_of_measurement="%"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="today_feeding_quantity",
+            key="todayFeedingQuantity",
             translation_key="today_feeding_quantity",
             icon="mdi:scale",
             native_unit_of_measurement_fn=unit_of_measurement_feeder,
@@ -174,23 +174,43 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             state_class=SensorStateClass.TOTAL_INCREASING
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="today_feeding_times",
+            key="todayFeedingTimes",
             translation_key="today_feeding_times",
             icon="mdi:history",
             state_class=SensorStateClass.TOTAL_INCREASING
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="today_eating_times",
+            key="todayEatingTimes",
             translation_key="today_eating_times",
             icon="mdi:history",
             state_class=SensorStateClass.TOTAL_INCREASING
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="today_eating_time",
+            key="todayEatingTime",
             translation_key="today_eating_time",
             native_unit_of_measurement="s",
             icon="mdi:history",
             state_class=SensorStateClass.TOTAL_INCREASING
+        ),
+        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
+            key="grainOutletState",  # Corrected key
+            translation_key="grain_outlet_state",
+            icon="mdi:alert"
+        ),
+        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
+            key="doorErrorState",
+            translation_key="door_error_state",
+            icon="mdi:alert"
+        ),
+        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
+            key="enableLight",
+            translation_key="enable_light",
+            icon="mdi:lightbulb"
+        ),
+        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
+            key="childLockSwitch",
+            translation_key="child_lock_switch",
+            icon="mdi:lock"
         ),
     ]
 }
