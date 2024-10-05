@@ -197,14 +197,14 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="battery_state",
             translation_key="battery_state",
             icon="mdi:battery",
-            name="Battery State"
+            name="Battery Level"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="electric_quantity",
             translation_key="electric_quantity",
             icon="mdi:battery",
             native_unit_of_measurement="%",
-            name="Electric Quantity"
+            name="Battery / AC %"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="today_feeding_quantity",
@@ -242,19 +242,19 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="grain_outlet_state",
             icon="mdi:alert",
             should_report=lambda device: hasattr(device, 'grain_outlet_state') and device.grain_outlet_state is not None,
-            name="Grain Outlet State"
+            name="Dispenser Status"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="door_error_state",
             translation_key="door_error_state",
             icon="mdi:alert",
-            name="Door Error State"
+            name="Door State"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="enable_light",
             translation_key="enable_light",
             icon="mdi:lightbulb",
-            name="Enable Display"
+            name="Display Enabled"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="child_lock_switch",
