@@ -130,7 +130,7 @@
                 "name": "Battery Status"
             },
             "enable_power_change_notice": {
-                "name": "Power Change Notice"
+                "name": "Plugged In"
             },
             "enable_grain_outlet_blocked_notice": {
                 "name": "Dispenser Outlet"
