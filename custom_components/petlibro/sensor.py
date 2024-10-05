@@ -107,6 +107,24 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         # Default behavior for other sensors
         return super().native_value
 
+    @property
+    def native_value(self) -> str | None:
+        """Return the state."""
+        if self.entity_description.key == "grain_outlet_state":
+            # Handle specific mapping for grain_outlet_state
+            val = getattr(self.device, self.entity_description.key)
+            if val is True:
+                return "Cleared"
+            elif val is False:
+                return "Blocked"
+            return None  # If the value is neither True nor False
+        elif self.entity_description.should_report(self.device):
+            val = getattr(self.device, self.entity_description.key)
+            if isinstance(val, str):
+                return val.lower()
+            return val
+        return None
+
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     GranaryFeeder: [
         PetLibroSensorEntityDescription[GranaryFeeder](
