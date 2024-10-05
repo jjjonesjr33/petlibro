@@ -53,7 +53,7 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
             key="enable_light",
             translation_key="enable_light",
             set_fn=lambda device, value: device.set_light_enable(value),
-            name="Enable Light"
+            name="Enable Display"
         ),
         PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
             key="enable_sound",
