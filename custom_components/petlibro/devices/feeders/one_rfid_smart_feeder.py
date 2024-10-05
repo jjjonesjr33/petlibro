@@ -44,54 +44,49 @@ class OneRFIDSmartFeeder(GranaryFeeder):
 
     @property
     def door_state(self) -> bool:
-        # Accessing the realInfo section from _data
         return bool(self._data.get("realInfo", {}).get("barnDoorState", False))  # Default to False
 
     @property
+    def door_error_state(self) -> str:
+        # Accessing the realInfo section for doorErrorState
+        return cast(str, self._data.get("realInfo", {}).get("doorErrorState", "NORMAL"))  # Default to 'NORMAL'
+
+    @property
     def food_dispenser_state(self) -> bool:
-        # Accessing the realInfo section from _data
         return not bool(self._data.get("realInfo", {}).get("grainOutletState", True))  # Default to True
 
     @property
     def door_blocked(self) -> bool:
-        # Accessing the realInfo section from _data
         return bool(self._data.get("realInfo", {}).get("barnDoorError", False))  # Default to False
 
     @property
     def food_low(self) -> bool:
-        # Accessing the realInfo section from _data
         return not bool(self._data.get("realInfo", {}).get("surplusGrain", True))  # Default to True
 
     # New binary sensors for connectivity and state
 
     @property
     def online(self) -> bool:
-        # Check online status from realInfo
         return bool(self._data.get("realInfo", {}).get("online", False))  # Default to False
 
     @property
     def running_state(self) -> bool:
-        # Check if device is running from realInfo
         return self._data.get("realInfo", {}).get("runningState", "IDLE") == "RUNNING"  # Default to 'IDLE'
 
     @property
     def whether_in_sleep_mode(self) -> bool:
-        # Check if device is in sleep mode
         return bool(self._data.get("realInfo", {}).get("whetherInSleepMode", False))  # Default to False
 
     @property
     def enable_low_battery_notice(self) -> bool:
-        # Check if low battery notice is enabled
         return bool(self._data.get("realInfo", {}).get("enableLowBatteryNotice", False))  # Default to False
 
     @property
     def enable_power_change_notice(self) -> bool:
-        # Check if power change notice is enabled
         return bool(self._data.get("realInfo", {}).get("enablePowerChangeNotice", False))  # Default to False
 
     @property
     def enable_grain_outlet_blocked_notice(self) -> bool:
-        # Check if grain outlet blocked notice is enabled
         return bool(self._data.get("realInfo", {}).get("enableGrainOutletBlockedNotice", False))  # Default to False
 
     # Switch methods for managing features
