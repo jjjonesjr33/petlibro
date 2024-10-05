@@ -1,4 +1,4 @@
-from ..device import Device
+from .device import Device
 
 class DockstreamSmartRFIDFountain(Device):
     """Represents the Dockstream Smart RFID Fountain device."""
