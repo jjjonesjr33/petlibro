@@ -45,7 +45,7 @@ def unit_of_measurement_feeder(device: Feeder) -> str | None:
 def device_class_feeder(device: Feeder) -> SensorDeviceClass | None:
     if device.unit_type in [UnitOfMass.OUNCES, UnitOfMass.GRAMS]:
         return SensorDeviceClass.WEIGHT
-    if device.unit_type in ["cup", UnitOfVolume.MILLILITERS]:
+    if device.unit_type in [UnitOfVolume.MILLILITERS]:
         return SensorDeviceClass.VOLUME
 
 
