@@ -113,14 +113,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.enable_low_battery_notice is not None,
             name="Battery Status"
         ),
-        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
-            key="enable_power_change_notice",
-            translation_key="enable_power_change_notice",
-            icon="mdi:power-plug",
-            device_class=BinarySensorDeviceClass.PLUG,
-            should_report=lambda device: device.enable_power_change_notice is not None,
-            name="Plugged In"
-        ),
+#        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+#            key="enable_power_change_notice",
+#            translation_key="enable_power_change_notice",
+#            icon="mdi:power-plug",
+#            device_class=BinarySensorDeviceClass.PLUG,
+#            should_report=lambda device: device.enable_power_change_notice is not None,
+#            name="Plugged In"
+#        ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="enable_grain_outlet_blocked_notice",
             translation_key="enable_grain_outlet_blocked_notice",
