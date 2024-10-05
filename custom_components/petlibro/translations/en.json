@@ -70,13 +70,16 @@
                 "name": "Water Remaining"
             },
             "use_water_interval": {
-                "name": "Water Working Interval"
+                "name": "Water Interval"
             },
             "use_water_duration": {
-                "name": "Water Working Time Duration"
+                "name": "Water Time Duration"
+            },
+            "remaining_filter_days": {
+                "name": "Remaining Filter Day"
             },
             "remaining_cleaning_days": {
-                "name": "Cleaning Days Remaining"
+                "name": "Remaining Cleaning Days"
             }
         },
         "switch": {
