@@ -47,8 +47,7 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity): 
         return bool(state)
 
 DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDescription]] = {
-    GranaryFeeder: [
-    ],
+    GranaryFeeder: [],
     OneRFIDSmartFeeder: [
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="door_state",
@@ -77,6 +76,48 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-mix-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_low is not None,
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="online",
+            translation_key="online",
+            icon="mdi:wifi",
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
+            should_report=lambda device: device.online is not None,
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="running_state",
+            translation_key="running_state",
+            icon="mdi:run",
+            device_class=BinarySensorDeviceClass.RUNNING,
+            should_report=lambda device: device.running_state is not None,
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="whether_in_sleep_mode",
+            translation_key="whether_in_sleep_mode",
+            icon="mdi:sleep",
+            device_class=BinarySensorDeviceClass.POWER,
+            should_report=lambda device: device.whether_in_sleep_mode is not None,
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="enable_low_battery_notice",
+            translation_key="enable_low_battery_notice",
+            icon="mdi:battery-alert",
+            device_class=BinarySensorDeviceClass.SAFETY,
+            should_report=lambda device: device.enable_low_battery_notice is not None,
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="enable_power_change_notice",
+            translation_key="enable_power_change_notice",
+            icon="mdi:power-plug-alert",
+            device_class=BinarySensorDeviceClass.SAFETY,
+            should_report=lambda device: device.enable_power_change_notice is not None,
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="enable_grain_outlet_blocked_notice",
+            translation_key="enable_grain_outlet_blocked_notice",
+            icon="mdi:grain-off",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.enable_grain_outlet_blocked_notice is not None,
         )
     ]
 }
