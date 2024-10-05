@@ -93,6 +93,19 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         """Return the device class to use in the frontend, if any."""
         return self.entity_description.device_class_fn(self.device)
 
+    @property
+    def native_value(self) -> str | None:
+        """Return the state."""
+        if self.entity_description.key == "power_mode":
+            power_mode = getattr(self.device, self.entity_description.key)
+            if power_mode == 1:
+                return "AC Power"
+            elif power_mode == 2:
+                return "Battery Power"
+            else:
+                return "Unknown"
+        # Default behavior for other sensors
+        return super().native_value
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     GranaryFeeder: [
