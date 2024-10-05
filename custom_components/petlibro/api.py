@@ -176,18 +176,34 @@ class PetLibroAPI:
         })
 
     async def set_child_lock(self, serial: str, enable: bool):
-        """Set the child lock on/off"""
-        await self.session.post("/device/setting/updateChildLockSwitch", json={
-            "deviceSn": serial,
-            "enable": enable
-        })
+        """Enable or disable the child lock functionality."""
+        try:
+            response = await self.session.post(
+                "/device/setting/updateChildLockSwitch", 
+                json={
+                    "deviceSn": serial,
+                    "enable": enable
+                }
+            )
+            response.raise_for_status()
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set child lock for device {serial}: {err}")
+            raise PetLibroAPIError(f"Error setting child lock: {err}")
 
     async def set_light_enable(self, serial: str, enable: bool):
-        """Enable or disable the light functionality"""
-        await self.session.post("/device/setting/updateLightEnableSwitch", json={
-            "deviceSn": serial,
-            "enable": enable
-        })
+        """Enable or disable the light functionality with error handling."""
+        try:
+            response = await self.session.post(
+                "/device/setting/updateLightEnableSwitch",
+                json={
+                    "deviceSn": serial,
+                    "enable": enable
+                }
+            )
+            response.raise_for_status()
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set light enable for device {serial}: {err}")
+            raise PetLibroAPIError(f"Error setting light enable: {err}")
 
     async def set_light_switch(self, serial: str, enable: bool):
         """Turn the light on or off"""
@@ -197,11 +213,19 @@ class PetLibroAPI:
         })
 
     async def set_sound_enable(self, serial: str, enable: bool):
-        """Enable or disable the sound functionality"""
-        await self.session.post("/device/setting/updateSoundEnableSwitch", json={
-            "deviceSn": serial,
-            "enable": enable
-        })
+        """Enable or disable the sound functionality."""
+        try:
+            response = await self.session.post(
+                "/device/setting/updateSoundEnableSwitch", 
+                json={
+                    "deviceSn": serial,
+                    "enable": enable
+                }
+            )
+            response.raise_for_status()  # Raises an HTTPError if the status is 4xx or 5xx
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set sound enable for device {serial}: {err}")
+            raise PetLibroAPIError(f"Error setting sound enable: {err}")
 
     async def set_sound_switch(self, serial: str, enable: bool):
         """Turn the sound on or off"""
