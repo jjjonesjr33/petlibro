@@ -19,6 +19,7 @@ from .devices import Device
 from .devices.feeders.feeder import Feeder
 from .devices.feeders.granary_feeder import GranaryFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
+from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from . import PetLibroHubConfigEntry
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
@@ -214,6 +215,88 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="child_lock_switch",
             icon="mdi:lock",
             name="Buttons Lock"
+        ),
+    DockstreamSmartRFIDFountain: [
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="device_sn",
+            translation_key="device_sn",
+            icon="mdi:identifier",
+            name="Device SN"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="mac",
+            translation_key="mac_address",
+            icon="mdi:network",
+            name="MAC Address"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="wifi_ssid",
+            translation_key="wifi_ssid",
+            icon="mdi:wifi",
+            name="Wi-Fi SSID"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="wifi_rssi",
+            translation_key="wifi_rssi",
+            icon="mdi:wifi",
+            native_unit_of_measurement="dBm",
+            name="Wi-Fi Signal Strength"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="remaining_cleaning_days",
+            translation_key="remaining_cleaning_days",
+            icon="mdi:package",
+            name="Remaining Cleaning Days"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="remaining_replacement_days",
+            translation_key="remaining_replacement_days",
+            icon="mdi:package",
+            name="Remaining Filter Replacement Days"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="weight",
+            translation_key="weight",
+            icon="mdi:scale",
+            native_unit_of_measurement="g",
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Current Weight"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="weight_percent",
+            translation_key="weight_percent",
+            icon="mdi:scale",
+            native_unit_of_measurement="%",
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Current Weight Percent"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="use_water_interval",
+            translation_key="use_water_interval",
+            icon="mdi:water",
+            native_unit_of_measurement="min",
+            name="Water Usage Interval"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="use_water_duration",
+            translation_key="use_water_duration",
+            icon="mdi:water",
+            native_unit_of_measurement="min",
+            name="Water Usage Duration"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="today_total_ml",
+            translation_key="today_total_ml",
+            icon="mdi:water",
+            native_unit_of_measurement="mL",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Total Water Used Today"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="running_state",
+            translation_key="running_state",
+            icon="mdi:history",
+            name="Running State"
         ),
     ]
 }
