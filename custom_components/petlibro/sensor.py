@@ -64,8 +64,12 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     def __init__(self, device, hub, description):
         """Initialize the sensor."""
         super().__init__(device, hub, description)
-        # Ensure unique_id includes both the device serial and the specific sensor key
-        self._attr_unique_id = f"{device.serial}-{description.key}-{hub.instance_id}"
+        # Ensure unique_id includes the device serial, specific sensor key, and the MAC address from the device attributes
+        mac_address = getattr(device, "mac", None)  # Fetch the MAC address from the device
+        if mac_address:
+            self._attr_unique_id = f"{device.serial}-{description.key}-{mac_address.replace(':', '')}"
+        else:
+            self._attr_unique_id = f"{device.serial}-{description.key}"
 
     @property
     def native_value(self) -> float | datetime | str | None:
