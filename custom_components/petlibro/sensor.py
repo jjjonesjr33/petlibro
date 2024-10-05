@@ -190,7 +190,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="volume",
             icon="mdi:volume-high",
             native_unit_of_measurement="%",
-            should_report=lambda device: device.volume is not None
+            should_report=lambda device: device.volume is not None,
             name="Volume"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
@@ -241,7 +241,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="grain_outlet_state",
             translation_key="grain_outlet_state",
             icon="mdi:alert",
-            should_report=lambda device: device.grain_outlet_state is not None
+            should_report=lambda device: device.grain_outlet_state is not None,
             name="Grain Outlet State"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
