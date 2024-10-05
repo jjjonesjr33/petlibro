@@ -250,12 +250,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Remaining Cleaning Days"
         ),
         PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
-            key="remaining_replacement_days",
-            translation_key="remaining_replacement_days",
-            icon="mdi:package",
-            name="Remaining Filter Replacement Days"
-        ),
-        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
             key="weight",
             translation_key="weight",
             icon="mdi:scale",
