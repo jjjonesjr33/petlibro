@@ -72,7 +72,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         if self.entity_description.should_report(self.device):
             val = getattr(self.device, self.entity_description.key, None)
             if isinstance(val, str):
-                return val.lower()
+                return val
             return val
         return None
 
