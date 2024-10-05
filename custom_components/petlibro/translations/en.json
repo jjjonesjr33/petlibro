@@ -42,12 +42,6 @@
             "remaining_desiccant": {
                 "name": "Desiccant Remaining Days"
             },
-            "power_mode": {
-                "name": "Power Mode"
-            },
-            "volume": {
-                "name": "Volume"
-            },
             "battery_state": {
                 "name": "Battery Level"
             },
@@ -66,23 +60,11 @@
             "today_eating_time": {
                 "name": "Today's Total Eating Time"
             },
-            "grain_outlet_state": {
-                "name": "Dispenser Status"
-            },
-            "door_error_state": {
-                "name": "Door State"
-            },
-            "screen_display_switch": {
-                "name": "Display Enabled"
-            },
             "child_lock_switch": {
-                "name": "Child Lock"
+                "name": "Buttons Lock"
             }
         },
         "switch": {
-            "enable_feeding_plan": {
-                "name": "Enable Feeding Plan"
-            },
             "child_lock_switch": {
                 "name": "Child Lock"
             },
@@ -91,12 +73,6 @@
             },
             "enable_sound": {
                 "name": "Enable Sound"
-            },
-            "feeding_plan": {
-                "name": "Feeding Plan"
-            },
-            "feeding_plan_today_all": {
-                "name": "Today's Feeding Plan (All)"
             }
         },
         "button": {
@@ -106,13 +82,13 @@
         },
         "binary_sensor": {
             "door_state": {
-                "name": "Door"
+                "name": "Lid"
             },
             "food_dispenser_state": {
                 "name": "Food Dispenser"
             },
             "door_blocked": {
-                "name": "Door Status"
+                "name": "Lid Status"
             },
             "food_low": {
                 "name": "Food Status"
@@ -120,20 +96,11 @@
             "online": {
                 "name": "Wi-Fi"
             },
-            "running_state": {
-                "name": "Running State"
-            },
             "whether_in_sleep_mode": {
                 "name": "Sleep Mode"
             },
             "enable_low_battery_notice": {
                 "name": "Battery Status"
-            },
-            "enable_power_change_notice": {
-                "name": "Plugged In"
-            },
-            "enable_grain_outlet_blocked_notice": {
-                "name": "Dispenser Outlet"
             }
         }
     }
