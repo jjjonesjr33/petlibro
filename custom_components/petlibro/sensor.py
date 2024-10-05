@@ -75,42 +75,19 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     @property
     def native_value(self) -> float | datetime | str | None:
         """Return the state."""
-        # Handle the power_mode specifically
-        if self.entity_description.key == "power_mode":
-            power_mode = getattr(self.device, self.entity_description.key, None)
-            if power_mode == 1:
-                return "AC Power"
-            elif power_mode == 2:
-                return "Battery Power"
-            else:
-                return "Unknown"  # Handle cases where power_mode is not 1 or 2
-
-        # Handle grain_outlet_state mapping with True/False values
-        elif self.entity_description.key == "grain_outlet_state":
-            grain_outlet_state = getattr(self.device, self.entity_description.key, None)
-            if grain_outlet_state is True:
-                return "Cleared"
-            elif grain_outlet_state is False:
-                return "Blocked"
-            else:
-                return "Unknown"  # Handle cases where the attribute is missing or not recognized
-
-        # Handle volume with a default value if missing
-        elif self.entity_description.key == "volume":
-            volume = getattr(self.device, self.entity_description.key, None)
-            return volume if volume is not None else "Unknown"
-
-        # Handle today_eating_time in raw numeric value (in seconds)
-        elif self.entity_description.key == "today_eating_time":
+        
+        # Handle today_eating_time in minutes and seconds format, but keep raw value in seconds for Home Assistant
+        if self.entity_description.key == "today_eating_time":
             eating_time_seconds = getattr(self.device, self.entity_description.key, 0)
-            return eating_time_seconds  # Return the numeric value in seconds (e.g., 337)
+            minutes, seconds = divmod(eating_time_seconds, 60)  # Convert seconds to minutes and seconds
+            return f"{minutes}m {seconds}s"  # Display the value as minutes and seconds for the user
 
-        # Handle today_feeding_quantity in raw numeric value (without appending 'cups')
+        # Handle today_feeding_quantity in numeric value with 'cups' label
         elif self.entity_description.key == "today_feeding_quantity":
             # Assuming the raw quantity is in milliliters, and 1 cup equals 236.588 milliliters
             feeding_quantity = getattr(self.device, self.entity_description.key, 0)
             cups = feeding_quantity / 236.588
-            return round(cups, 2)  # Return the numeric value (e.g., 0.01)
+            return f"{round(cups, 0)} cups"  # Return the numeric value without decimals with 'cups' label
 
         # Default behavior for other sensors, with fallback if key doesn't exist
         if self.entity_description.should_report(self.device):
@@ -119,28 +96,30 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                 return val
             return val
         return None
-
+    
     @property
     def icon(self) -> str | None:
         """Return the icon to use in the frontend, if any."""
         if (icon := self.entity_description.icon_fn(self.state)) is not None:
             return icon
         return super().icon
-
+    
     @property
     def native_unit_of_measurement(self) -> str | None:
         """Return the native unit of measurement to use in the frontend, if any."""
         # For today_feeding_quantity, display as cups in the frontend
         if self.entity_description.key == "today_feeding_quantity":
             return "cups"
+        # For today_eating_time, display as seconds in the frontend
+        elif self.entity_description.key == "today_eating_time":
+            return "s"  # Display seconds as the unit for eating time
+        # Default behavior for other sensors
         return self.entity_description.native_unit_of_measurement_fn(self.device)
-
+    
     @property
     def device_class(self) -> SensorDeviceClass | None:
         """Return the device class to use in the frontend, if any."""
         return self.entity_description.device_class_fn(self.device)
-
-
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     GranaryFeeder: [
@@ -157,13 +136,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             device_class_fn=device_class_feeder,
             state_class=SensorStateClass.TOTAL_INCREASING
         )
-# Error, field is already defind in OneRFIDSmartFeeder, but tries to show up twice even though coded as GranaryFeeder
-#        PetLibroSensorEntityDescription[GranaryFeeder](
-#            key="today_feeding_times",
-#            translation_key="today_feeding_times",
-#            icon="mdi:history",
-#            state_class=SensorStateClass.TOTAL_INCREASING
-#        )
     ],
     OneRFIDSmartFeeder: [
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
@@ -197,20 +169,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:package",
             name="Remaining Desiccant Days"
         ),
-#        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-#            key="power_mode",
-#            translation_key="power_mode",
-#            icon="mdi:power-plug",
-#            name="Power Mode"
-#        ),
-#        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-#            key="volume",
-#            translation_key="volume",
-#            icon="mdi:volume-high",
-#            native_unit_of_measurement="%",
-#            should_report=lambda device: hasattr(device, 'volume') and device.volume is not None,
-#            name="Volume"
-#        ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="battery_state",
             translation_key="battery_state",
@@ -255,38 +213,12 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Today Eating Time"
         ),
-#        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-#            key="grain_outlet_state",
-#            translation_key="grain_outlet_state",
-#            icon="mdi:alert",
-#            should_report=lambda device: hasattr(device, 'grain_outlet_state') and device.grain_outlet_state is not None,
-#            name="Dispenser Status"
-#        ),
-#        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-#            key="door_error_state",
-#            translation_key="door_error_state",
-#            icon="mdi:alert",
-#            name="Door State"
-#        ),
-        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="screenDisplaySwitch",
-            translation_key="screen_display_switch",
-            icon="mdi:lightbulb",
-            name="Display Enabled"
-        ),
         # Would like to change child_lock_switch to a dropdown switch
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="child_lock_switch",
             translation_key="child_lock_switch",
             icon="mdi:lock",
-            name="Child Lock"
-        ),
-        # Would like to change coverCloseSpeed to a dropdown switch
-        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="coverCloseSpeed",
-            translation_key="cover_close_speed",
-            icon="mdi:run-fast",
-            name="Lid Speed"
+            name="Buttons Lock"
         ),
     ]
 }
