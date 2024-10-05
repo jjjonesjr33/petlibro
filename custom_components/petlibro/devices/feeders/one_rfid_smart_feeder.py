@@ -159,6 +159,10 @@ class OneRFIDSmartFeeder(GranaryFeeder):
     def close_door_time_sec(self) -> int:
         return self._data.get("realInfo", {}).get("closeDoorTimeSec", 0)
 
+    @property
+    def screen_display_switch(self) -> bool:
+        return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
+
     # Switch methods
     async def set_feeding_plan(self, value: bool) -> None:
         _LOGGER.debug(f"Setting feeding plan to {value} for {self.serial}")
