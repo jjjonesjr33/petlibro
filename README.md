@@ -1,4 +1,5 @@
 [![version](https://img.shields.io/github/manifest-json/v/flifloo/ha_petlibro?filename=custom_components%2Fpetlibro%2Fmanifest.json&color=slateblue)](https://github.com/jjjonesjr33/ha_petlibro/releases)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/jjjonesjr33/ha_petlibro)
 ![GitHub all releases](https://img.shields.io/github/downloads/jjjonesjr33/ha_petlibro/total)
 [![Community Forum](https://img.shields.io/static/v1.svg?label=Community&message=Forum&color=41bdf5&logo=HomeAssistant&logoColor=white)](https://community.home-assistant.io/t/petlibro-cloud-integration-non-tuya-wip/759978)
 
