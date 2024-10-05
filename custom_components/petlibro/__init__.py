@@ -9,6 +9,7 @@ from custom_components.petlibro.devices.feeders.feeder import Feeder
 from .devices import Device
 from .devices.feeders.granary_feeder import GranaryFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
+from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .const import DOMAIN
 from .hub import PetLibroHub
 
@@ -27,6 +28,10 @@ PLATFORMS_BY_TYPE = {
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
         Platform.SWITCH,
+    ),
+    DockstreamSmartRFIDFountain: (
+        Platform.SENSOR,
+        Platform.BINARY_SENSOR,  
     ),
 }
 
