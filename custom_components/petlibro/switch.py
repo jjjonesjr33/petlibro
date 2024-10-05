@@ -1,4 +1,5 @@
 """Support for PETLIBRO switches."""
+# Disabled features currently don't enable via the API, until updated they will be disabled.
 
 from __future__ import annotations
 
@@ -43,24 +44,24 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
         )
     ],
     OneRFIDSmartFeeder: [
-        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
-            key="child_lock_switch",
-            translation_key="child_lock_switch",
-            set_fn=lambda device, value: device.set_child_lock(value),
-            name="Child Lock"
-        ),
-        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
-            key="enable_light",
-            translation_key="enable_light",
-            set_fn=lambda device, value: device.set_light_enable(value),
-            name="Enable Display"
-        ),
-        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
-            key="enable_sound",
-            translation_key="enable_sound",
-            set_fn=lambda device, value: device.set_sound_enable(value),
-            name="Enable Sound"
-        )
+#        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
+#            key="child_lock_switch",
+#            translation_key="child_lock_switch",
+#            set_fn=lambda device, value: device.set_child_lock(value),
+#            name="Child Lock"
+#        ),
+#        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
+#            key="enable_light",
+#            translation_key="enable_light",
+#            set_fn=lambda device, value: device.set_light_enable(value),
+#            name="Enable Display"
+#        ),
+#        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
+#            key="enable_sound",
+#            translation_key="enable_sound",
+#            set_fn=lambda device, value: device.set_sound_enable(value),
+#            name="Enable Sound"
+#        )
     ]
 }
 
