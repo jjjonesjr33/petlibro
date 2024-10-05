@@ -48,7 +48,6 @@ class OneRFIDSmartFeeder(GranaryFeeder):
 
     @property
     def door_error_state(self) -> str:
-        # Accessing the realInfo section for doorErrorState
         return cast(str, self._data.get("realInfo", {}).get("doorErrorState", "NORMAL"))  # Default to 'NORMAL'
 
     @property
@@ -62,6 +61,16 @@ class OneRFIDSmartFeeder(GranaryFeeder):
     @property
     def food_low(self) -> bool:
         return not bool(self._data.get("realInfo", {}).get("surplusGrain", True))  # Default to True
+
+    @property
+    def unit_type(self) -> int:
+        # Handle UnitType, provide default value if not present
+        return self._data.get("realInfo", {}).get("unitType", 1)  # Default to 1 (assuming a standard unit type)
+
+    @property
+    def battery_display_type(self) -> str:
+        # Handle BatteryDisplayType, default to 'percentage' if not present
+        return cast(str, self._data.get("realInfo", {}).get("batteryDisplayType", "percentage"))
 
     # New binary sensors for connectivity and state
 
