@@ -55,7 +55,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:door",
             device_class=BinarySensorDeviceClass.DOOR,
             should_report=lambda device: device.door_state is not None,
-            name="Door State"
+            name="Door"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="food_dispenser_state",
@@ -63,7 +63,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_dispenser_state is not None,
-            name="Food Dispenser State"
+            name="Food Dispenser"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="door_blocked",
@@ -71,7 +71,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:door",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.door_blocked is not None,
-            name="Door Blocked"
+            name="Door Status"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="food_low",
@@ -79,7 +79,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-mix-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_low is not None,
-            name="Food Low"
+            name="Food Status"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="online",
@@ -87,7 +87,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:wifi",
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
-            name="Online"
+            name="Wi-Fi"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="running_state",
@@ -111,7 +111,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:battery-alert",
             device_class=BinarySensorDeviceClass.BATTERY,
             should_report=lambda device: device.enable_low_battery_notice is not None,
-            name="Low Battery Notice"
+            name="Battery Status"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="enable_power_change_notice",
@@ -127,7 +127,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:grain-off",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.enable_grain_outlet_blocked_notice is not None,
-            name="Grain Outlet Blocked"
+            name="Dispenser Outlet"
         )
     ]
 }
