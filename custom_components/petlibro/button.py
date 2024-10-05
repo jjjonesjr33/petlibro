@@ -1,7 +1,6 @@
 """Support for PETLIBRO buttons."""
 
 from __future__ import annotations
-
 from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
 from typing import Any, Generic
@@ -18,23 +17,29 @@ from .devices.device import Device
 from .devices.feeders.feeder import Feeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 
+_LOGGER = getLogger(__name__)
 
 @dataclass(frozen=True)
 class RequiredKeysMixin(Generic[_DeviceT]):
     """A class that describes devices button entity required keys."""
-
     set_fn: Callable[[_DeviceT], Coroutine[Any, Any, None]]
 
 
 @dataclass(frozen=True)
 class PetLibroButtonEntityDescription(ButtonEntityDescription, PetLibroEntityDescription[_DeviceT], RequiredKeysMixin[_DeviceT]):
     """A class that describes device button entities."""
-
     entity_category: EntityCategory = EntityCategory.CONFIG
 
 
+# Map buttons to their respective device types
 DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
     Feeder: [
+        PetLibroButtonEntityDescription[Feeder](
+            key="manual_feed",
+            translation_key="manual_feed",
+            set_fn=lambda device: device.set_manual_feed(),
+            name="Manual Feed"
+        )
     ],
     OneRFIDSmartFeeder: [
         PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
@@ -48,12 +53,6 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
-        ),
-        PetLibroButtonEntityDescription[Feeder](
-            key="manual_feed",
-            translation_key="manual_feed",
-            set_fn=lambda device: device.set_manual_feed(),
-            name="Manual Feed"
         )
     ]
 }
@@ -61,15 +60,15 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
 
 class PetLibroButtonEntity(PetLibroEntity[_DeviceT], ButtonEntity):  # type: ignore [reportIncompatibleVariableOverride]
     """PETLIBRO button entity."""
-
     entity_description: PetLibroButtonEntityDescription[_DeviceT]  # type: ignore [reportIncompatibleVariableOverride]
 
     async def async_press(self) -> None:
         """Handle the button press."""
         await self.entity_description.set_fn(self.device)
 
+
 async def async_setup_entry(
-    _: HomeAssistant,
+    hass: HomeAssistant,
     entry: PetLibroHubConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
@@ -83,4 +82,3 @@ async def async_setup_entry(
         for description in entity_descriptions
     ]
     async_add_entities(entities)
- 
