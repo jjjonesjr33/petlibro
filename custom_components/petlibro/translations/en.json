@@ -52,7 +52,7 @@
                 "name": "Battery Level"
             },
             "electric_quantity": {
-                "name": "Electric Quantity"
+                "name": "Battery / AC %"
             },
             "today_feeding_quantity": {
                 "name": "Today's Feeding Quantity"
@@ -67,13 +67,13 @@
                 "name": "Today's Total Eating Time"
             },
             "grain_outlet_state": {
-                "name": "Grain Outlet State"
+                "name": "Dispenser Status"
             },
             "door_error_state": {
-                "name": "Door Error State"
+                "name": "Door State"
             },
             "enable_light": {
-                "name": "Enable Light"
+                "name": "Display Enabled"
             },
             "child_lock_switch": {
                 "name": "Child Lock"
@@ -106,19 +106,19 @@
         },
         "binary_sensor": {
             "door_state": {
-                "name": "Door State"
+                "name": "Door"
             },
             "food_dispenser_state": {
-                "name": "Food Dispenser State"
+                "name": "Food Dispenser"
             },
             "door_blocked": {
-                "name": "Door Blocked"
+                "name": "Door Status"
             },
             "food_low": {
-                "name": "Food Low"
+                "name": "Food Status"
             },
             "online": {
-                "name": "Online"
+                "name": "Wi-Fi"
             },
             "running_state": {
                 "name": "Running State"
@@ -127,13 +127,13 @@
                 "name": "Sleep Mode"
             },
             "enable_low_battery_notice": {
-                "name": "Low Battery Notice"
+                "name": "Battery Status"
             },
             "enable_power_change_notice": {
                 "name": "Power Change Notice"
             },
             "enable_grain_outlet_blocked_notice": {
-                "name": "Grain Outlet Blocked Notice"
+                "name": "Dispenser Outlet"
             }
         }
     }
