@@ -67,7 +67,7 @@
                 "name": "Today's Water Consumption (mL)"
             },
             "weight_percent": {
-                "name": "Water Remaining"
+                "name": "Remaining Water"
             },
             "use_water_interval": {
                 "name": "Water Interval"
