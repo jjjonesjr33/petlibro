@@ -75,7 +75,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     @property
     def native_value(self) -> float | datetime | str | None:
         """Return the state."""
-        
+
         # Handle today_eating_time in minutes and seconds format, but keep raw value in seconds for Home Assistant
         if self.entity_description.key == "today_eating_time":
             eating_time_seconds = getattr(self.device, self.entity_description.key, 0)
@@ -88,6 +88,12 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
             feeding_quantity = getattr(self.device, self.entity_description.key, 0)
             cups = feeding_quantity / 236.588
             return f"{round(cups, 0)} cups"  # Return the numeric value without decimals with 'cups' label
+
+        # Handle wifi_rssi to display dBm value
+        elif self.entity_description.key == "wifi_rssi":
+            wifi_rssi = getattr(self.device, self.entity_description.key, None)
+            if wifi_rssi is not None:
+                return f"{wifi_rssi} dBm"  # Append 'dBm' to the signal strength value
 
         # Default behavior for other sensors, with fallback if key doesn't exist
         if self.entity_description.should_report(self.device):
