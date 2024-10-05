@@ -13,7 +13,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import PetLibroHubConfigEntry
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
-from .feeder import Feeder
 from .devices.device import Device
 from .devices.feeders.feeder import Feeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
