@@ -12,6 +12,11 @@ class DockstreamSmartRFIDFountain(Device):
 
     # Properties for Sensors
     @property
+    def online(self) -> bool:
+        """Return the online status of the fountain."""
+        return bool(self._data.get("online", False))
+
+    @property
     def battery_state(self) -> str:
         """Get the battery state."""
         return self._data.get("batteryState", "unknown")
