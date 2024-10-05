@@ -69,9 +69,6 @@
             "weight_percent": {
                 "name": "Water Remaining %"
             },
-            "remaining_replacement_days": {
-                "name": "Filter Replacement Days"
-            },
             "remaining_cleaning_days": {
                 "name": "Cleaning Days Remaining"
             }
