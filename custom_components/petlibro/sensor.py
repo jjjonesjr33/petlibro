@@ -254,7 +254,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="enable_light",
             translation_key="enable_light",
             icon="mdi:lightbulb",
-            name="Enable Light"
+            name="Enable Display"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="child_lock_switch",
