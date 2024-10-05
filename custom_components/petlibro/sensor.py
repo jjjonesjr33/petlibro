@@ -131,19 +131,6 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     GranaryFeeder: [
-        PetLibroSensorEntityDescription[GranaryFeeder](
-            key="remaining_desiccant",
-            translation_key="remaining_desiccant",
-            icon="mdi:package"
-        ),
-        PetLibroSensorEntityDescription[GranaryFeeder](
-            key="today_feeding_quantity",
-            translation_key="today_feeding_quantity",
-            icon="mdi:scale",
-            native_unit_of_measurement_fn=unit_of_measurement_feeder,
-            device_class_fn=device_class_feeder,
-            state_class=SensorStateClass.TOTAL_INCREASING
-        )
     ],
     OneRFIDSmartFeeder: [
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
