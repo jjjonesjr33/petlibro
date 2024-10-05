@@ -36,25 +36,13 @@ class PetLibroSwitchEntityDescription(SwitchEntityDescription, PetLibroEntityDes
 DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
     Feeder: [
         PetLibroSwitchEntityDescription[Feeder](
-            key="feeding_plan",
-            translation_key="feeding_plan",
-            set_fn=lambda device, value: device.set_feeding_plan(value),  # Added comma
-            name="Feeding Plan"
-        ),
-        PetLibroSwitchEntityDescription[Feeder](
             key="feeding_plan_today_all",
             translation_key="feeding_plan_today_all",
-            set_fn=lambda device, value: device.set_feeding_plan_today_all(value),  # Added comma
+            set_fn=lambda device, value: device.set_feeding_plan_today_all(value),
             name="Today's Feeding Plan (All)"
         )
     ],
     OneRFIDSmartFeeder: [
-        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
-            key="enable_feeding_plan",
-            translation_key="enable_feeding_plan",
-            set_fn=lambda device, value: device.set_feeding_plan(value),
-            name="Enable Feeding Plan"
-        ),
         PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
             key="child_lock_switch",
             translation_key="child_lock_switch",
@@ -75,7 +63,6 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
         )
     ]
 }
-
 
 
 class PetLibroSwitchEntity(PetLibroEntity[_DeviceT], SwitchEntity):
