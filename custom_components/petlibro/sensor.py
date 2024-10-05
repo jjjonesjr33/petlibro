@@ -76,12 +76,10 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     def native_value(self) -> float | datetime | str | None:
         """Return the state."""
     
-        # Handle today_eating_time as raw seconds value and display it in hh:mm:ss format
+        # Handle today_eating_time as raw seconds value
         if self.entity_description.key == "today_eating_time":
             eating_time_seconds = getattr(self.device, self.entity_description.key, 0)
-            hours, remainder = divmod(eating_time_seconds, 3600)  # Convert seconds to hours
-            minutes, seconds = divmod(remainder, 60)  # Convert remaining seconds to minutes and seconds
-            return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"  # Display as hh:mm:ss
+            return eating_time_seconds  # Return raw seconds as numeric
     
         # Handle today_feeding_quantity as raw numeric value, multiplying by 100 to move the decimal places
         elif self.entity_description.key == "today_feeding_quantity":
@@ -117,9 +115,9 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         # For today_feeding_quantity, display as cups in the frontend
         if self.entity_description.key == "today_feeding_quantity":
             return "cups"
-        # Remove the unit of measurement for today_eating_time to avoid conflicts
+        # For today_eating_time, display as seconds in the frontend
         elif self.entity_description.key == "today_eating_time":
-            return None  # No unit to maintain compatibility with previous statistics
+            return "s"  # Display seconds as the unit for eating time
         # For wifi_rssi, display as dBm
         elif self.entity_description.key == "wifi_rssi":
             return "dBm"
@@ -130,6 +128,20 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     def device_class(self) -> SensorDeviceClass | None:
         """Return the device class to use in the frontend, if any."""
         return self.entity_description.device_class_fn(self.device)
+
+    @property
+    def extra_state_attributes(self) -> dict | None:
+        """Return additional attributes."""
+        
+        if self.entity_description.key == "today_eating_time":
+            eating_time_seconds = getattr(self.device, self.entity_description.key, 0)
+            hours, remainder = divmod(eating_time_seconds, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            formatted_time = f"{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
+            
+            return {"formatted_eating_time": formatted_time}
+        
+        return None  # Default behavior for other sensors
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     GranaryFeeder: [
@@ -209,6 +221,14 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:history",
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Today Eating Time"
+        ),
+        # Add a new entity description for formatted_eating_time
+        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
+            key="formatted_eating_time",
+            translation_key="formatted_eating_time",
+            native_unit_of_measurement=None,  # No unit, as this is a formatted string
+            icon="mdi:clock",
+            name="Formatted Eating Time"
         ),
         # Would like to change child_lock_switch to a dropdown switch
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
