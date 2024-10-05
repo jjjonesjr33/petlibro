@@ -5,12 +5,27 @@ class DockstreamSmartRFIDFountain(Device):
 
     async def refresh(self):
         """Refresh the device data from the API."""
-        await super().refresh()
+        await super().refresh()  # Call the refresh method from the parent class (Device)
+        
+        # Fetch real info from the API
+        real_info = await self.api.device_real_info(self.serial)
+
+        # Update internal data with fetched API data
         self.update_data({
-            "realInfo": await self.api.device_real_info(self.serial)
+            "realInfo": real_info or {}
         })
 
     # Properties for Sensors
+    @property
+    def device_sn(self) -> str:
+        """Return the device serial number."""
+        return self._data.get("realInfo", {}).get("deviceSn", "unknown")
+
+    @property
+    def wifi_ssid(self) -> str:
+        """Return the Wi-Fi SSID of the device."""
+        return self._data.get("realInfo", {}).get("wifiSsid", "unknown")
+
     @property
     def online(self) -> bool:
         """Return the online status of the fountain."""
