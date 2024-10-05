@@ -26,6 +26,7 @@ PLATFORMS_BY_TYPE = {
     OneRFIDSmartFeeder: (
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
+        Platform.SWITCH,
     ),
 }
 
