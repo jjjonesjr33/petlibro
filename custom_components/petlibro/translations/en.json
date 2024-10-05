@@ -89,14 +89,14 @@
             "enable_light": {
                 "name": "Enable Light"
             },
-            "light_switch": {
-                "name": "Light Switch"
-            },
             "enable_sound": {
                 "name": "Enable Sound"
             },
-            "sound_switch": {
-                "name": "Sound Switch"
+            "feeding_plan": {
+                "name": "Feeding Plan"
+            },
+            "feeding_plan_today_all": {
+                "name": "Today's Feeding Plan (All)"
             }
         },
         "button": {
