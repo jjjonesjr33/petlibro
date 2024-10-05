@@ -72,7 +72,7 @@
             "door_error_state": {
                 "name": "Door State"
             },
-            "enable_light": {
+            "screen_display_switch": {
                 "name": "Display Enabled"
             },
             "child_lock_switch": {
