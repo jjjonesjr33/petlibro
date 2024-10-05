@@ -81,12 +81,12 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
             eating_time_seconds = getattr(self.device, self.entity_description.key, 0)
             return eating_time_seconds  # Return the raw value in seconds
     
-        # Handle today_feeding_quantity as raw numeric value in cups
+        # Handle today_feeding_quantity as raw numeric value, multiplying by 100 to move the decimal places
         elif self.entity_description.key == "today_feeding_quantity":
             # Assuming the raw quantity is in milliliters, and 1 cup equals 236.588 milliliters
             feeding_quantity = getattr(self.device, self.entity_description.key, 0)
-            cups = feeding_quantity / 236.588
-            return round(cups, 2)  # Return the numeric value with two decimal places
+            cups = (feeding_quantity / 236.588) * 100  # Multiply by 100 to shift decimal
+            return f"{round(cups, 2)}"  # Return the value with two decimal places
     
         # Handle wifi_rssi to display only the numeric value
         elif self.entity_description.key == "wifi_rssi":
