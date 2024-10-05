@@ -12,6 +12,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .devices import Device
+from .devices.device import Device
+from .devices.feeders.feeder import Feeder
 from .devices.feeders.granary_feeder import GranaryFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
