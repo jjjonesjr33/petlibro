@@ -109,11 +109,18 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                 return f"{minutes}m {seconds}s"  # Return formatted string in minutes and seconds
             return "0m 0s"  # Fallback if there are no eating seconds
     
+        # Convert today_feeding_quantity to cups
+        elif self.entity_description.key == "today_feeding_quantity":
+            # Assuming the raw quantity is in grams, and 1 cup equals 236.588 grams
+            feeding_quantity = getattr(self.device, self.entity_description.key, 0)
+            cups = feeding_quantity / 236.588
+            return f"{cups:.2f} cups"  # Format the result to 2 decimal places
+    
         # Default behavior for other sensors, with fallback if key doesn't exist
         if self.entity_description.should_report(self.device):
             val = getattr(self.device, self.entity_description.key, None)
             if isinstance(val, str):
-                return val.lower()
+                return val
             return val
         return None
 
@@ -174,14 +181,14 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="wifi_ssid",
             translation_key="wifi_ssid",
             icon="mdi:wifi",
-            name="WiFi SSID"
+            name="Wi-Fi SSID"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="wifi_rssi",
             translation_key="wifi_rssi",
             icon="mdi:wifi",
             native_unit_of_measurement="dBm",
-            name="WiFi Signal Strength (RSSI)"
+            name="Wi-Fi Signal Strength"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="remaining_desiccant",
