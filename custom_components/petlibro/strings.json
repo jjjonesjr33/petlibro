@@ -47,7 +47,11 @@
     "food_low": "Food Status",
     "online": "Wi-Fi",
     "whether_in_sleep_mode": "Sleep Mode",
-    "enable_low_battery_notice": "Battery Status"
+    "enable_low_battery_notice": "Battery Status",
+    "today_total_ml": "Today's Water Consumption (mL)",
+    "weight_percent": "Water Remaining %",
+    "remaining_replacement_days": "Filter Replacement Days",
+    "remaining_cleaning_days": "Cleaning Days Remaining"
   }
 }
 
