@@ -12,29 +12,30 @@ class Device(Event):
         self._data: dict = {}
         self.api = api
 
-        self.update_data(data)
+        self.update_data(data)  # Call the update_data method to initialize the device data
 
-def update_data(self, data: dict) -> None:
-    """Save the device info from a data dictionary."""
-    try:
-        # Log at debug level instead of error level, show full data for better context
-        _LOGGER.debug("Updating data with new information: %s", data)
+    def update_data(self, data: dict) -> None:
+        """Save the device info from a data dictionary."""
+        try:
+            # Log at debug level instead of error level, show full data for better context
+            _LOGGER.debug("Updating data with new information: %s", data)
 
-        # Automatically update _data with any new keys, ensuring no data loss
-        for key, value in data.items():
-            if isinstance(value, dict):
-                # If the value is a dictionary, merge it deeply
-                self._data[key] = {**self._data.get(key, {}), **value}
-            else:
-                # Otherwise, simply update or add the key
-                self._data[key] = value
+            # Automatically update _data with any new keys, ensuring no data loss
+            for key, value in data.items():
+                if isinstance(value, dict):
+                    # If the value is a dictionary, merge it deeply
+                    self._data[key] = {**self._data.get(key, {}), **value}
+                else:
+                    # Otherwise, simply update or add the key
+                    self._data[key] = value
 
-        self.emit(EVENT_UPDATE)
-        _LOGGER.debug("Data updated successfully: %s", self._data)
+            # Emit an event after updating data
+            self.emit(EVENT_UPDATE)
+            _LOGGER.debug("Data updated successfully: %s", self._data)
 
-    except Exception as e:
-        _LOGGER.error(f"Error updating data: {e}")
-        _LOGGER.debug(f"Partial data update: {data.get('deviceSn', 'Unknown Serial')}")
+        except Exception as e:
+            _LOGGER.error(f"Error updating data: {e}")
+            _LOGGER.debug(f"Partial data update: {data.get('deviceSn', 'Unknown Serial')}")
 
 async def refresh(self):
     """Refresh the device data from the API."""
