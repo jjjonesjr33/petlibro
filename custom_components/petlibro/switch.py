@@ -36,12 +36,6 @@ class PetLibroSwitchEntityDescription(SwitchEntityDescription, PetLibroEntityDes
 
 DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
     Feeder: [
-#        PetLibroSwitchEntityDescription[Feeder](
-#            key="feeding_plan_today_all",
-#            translation_key="feeding_plan_today_all",
-#            set_fn=lambda device, value: device.set_feeding_plan_today_all(value),
-#            name="Today's Feeding Plan (All)"
-#        )
     ],
     OneRFIDSmartFeeder: [
 #        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
