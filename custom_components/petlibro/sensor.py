@@ -64,7 +64,8 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     def __init__(self, device, hub, description):
         """Initialize the sensor."""
         super().__init__(device, hub, description)
-        self._attr_unique_id = f"{device.serial}-{description.key}"
+        # Ensure unique_id includes both the device serial and the specific sensor key
+        self._attr_unique_id = f"{device.serial}-{description.key}-{hub.instance_id}"
 
     @property
     def native_value(self) -> float | datetime | str | None:
