@@ -4,7 +4,7 @@ from hashlib import md5
 from urllib.parse import urljoin
 from typing import Any, Dict, List, TypeAlias
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientError
 from homeassistant.exceptions import ConfigEntryAuthFailed
 
 from .exceptions import PetLibroAPIError, PetLibroInvalidAuth
@@ -23,7 +23,7 @@ class PetLibroSession:
         self.headers = {
             "source": "ANDROID",
             "language": "EN",
-            "timezone": "Europe/Paris",
+            "timezone": "America/Chicago",
             "version": "1.3.45",
         }
 
