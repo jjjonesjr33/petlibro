@@ -129,20 +129,6 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         """Return the device class to use in the frontend, if any."""
         return self.entity_description.device_class_fn(self.device)
 
-    @property
-    def extra_state_attributes(self) -> dict | None:
-        """Return additional attributes."""
-        
-        if self.entity_description.key == "today_eating_time":
-            eating_time_seconds = getattr(self.device, self.entity_description.key, 0)
-            hours, remainder = divmod(eating_time_seconds, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            formatted_time = f"{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
-            
-            return {"formatted_eating_time": formatted_time}
-        
-        return None  # Default behavior for other sensors
-
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     GranaryFeeder: [
     ],
@@ -221,14 +207,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:history",
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Today Eating Time"
-        ),
-        # Add a new entity description for formatted_eating_time
-        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="formatted_eating_time",
-            translation_key="formatted_eating_time",
-            native_unit_of_measurement=None,  # No unit, as this is a formatted string
-            icon="mdi:clock",
-            name="Formatted Eating Time"
         ),
         # Would like to change child_lock_switch to a dropdown switch
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
