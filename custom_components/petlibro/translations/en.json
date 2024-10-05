@@ -62,6 +62,18 @@
             },
             "child_lock_switch": {
                 "name": "Buttons Lock"
+            },
+            "today_total_ml": {
+                "name": "Today's Water Consumption (mL)"
+            },
+            "weight_percent": {
+                "name": "Water Remaining %"
+            },
+            "remaining_replacement_days": {
+                "name": "Filter Replacement Days"
+            },
+            "remaining_cleaning_days": {
+                "name": "Cleaning Days Remaining"
             }
         },
         "switch": {
@@ -78,6 +90,9 @@
         "button": {
             "manual_feed": {
                 "name": "Manual Feed"
+            },
+            "manual_cleaning": {
+                "name": "Manual Cleaning"
             }
         },
         "binary_sensor": {
