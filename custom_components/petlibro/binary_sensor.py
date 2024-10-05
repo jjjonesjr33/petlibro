@@ -55,6 +55,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:door",
             device_class=BinarySensorDeviceClass.DOOR,
             should_report=lambda device: device.door_state is not None,
+            name="Door State"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="food_dispenser_state",
@@ -62,6 +63,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_dispenser_state is not None,
+            name="Food Dispenser State"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="door_blocked",
@@ -69,6 +71,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:door",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.door_blocked is not None,
+            name="Door Blocked"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="food_low",
@@ -76,6 +79,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-mix-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_low is not None,
+            name="Food Low"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="online",
@@ -83,6 +87,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:wifi",
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
+            name="Online"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="running_state",
@@ -90,6 +95,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:run",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.running_state is not None,
+            name="Running State"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="whether_in_sleep_mode",
@@ -97,20 +103,23 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:sleep",
             device_class=BinarySensorDeviceClass.POWER,
             should_report=lambda device: device.whether_in_sleep_mode is not None,
+            name="Sleep Mode"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="enable_low_battery_notice",
             translation_key="enable_low_battery_notice",
             icon="mdi:battery-alert",
-            device_class=BinarySensorDeviceClass.BATTERY,  # Changed to BATTERY to differentiate
+            device_class=BinarySensorDeviceClass.BATTERY,
             should_report=lambda device: device.enable_low_battery_notice is not None,
+            name="Low Battery Notice"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="enable_power_change_notice",
             translation_key="enable_power_change_notice",
             icon="mdi:power-plug-alert",
-            device_class=BinarySensorDeviceClass.SAFETY,  # Kept as SAFETY
+            device_class=BinarySensorDeviceClass.SAFETY,
             should_report=lambda device: device.enable_power_change_notice is not None,
+            name="Power Change Notice"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="enable_grain_outlet_blocked_notice",
@@ -118,6 +127,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:grain-off",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.enable_grain_outlet_blocked_notice is not None,
+            name="Grain Outlet Blocked"
         )
     ]
 }
