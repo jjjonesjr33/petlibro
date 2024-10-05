@@ -62,6 +62,9 @@
             },
             "child_lock_switch": {
                 "name": "Buttons Lock"
+            },
+            "formatted_eating_time": {
+                "name": "Formatted Eating Time"
             }
         },
         "switch": {
