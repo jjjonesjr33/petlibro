@@ -1,6 +1,7 @@
 from typing import cast
 from logging import getLogger
 from ..device import Device
+from .feeder import Feeder
 
 _LOGGER = getLogger(__name__)
 
