@@ -3,7 +3,6 @@ from logging import getLogger
 
 from .granary_feeder import GranaryFeeder
 
-
 # Configure the logger
 _LOGGER = getLogger(__name__)
 
@@ -70,3 +69,35 @@ class OneRFIDSmartFeeder(GranaryFeeder):
         # Accessing the realInfo section from _data
         state = not bool(self._data.get("realInfo", {}).get("surplusGrain"))
         return state
+
+    # New switch methods for managing features
+
+    async def set_feeding_plan(self, value: bool) -> None:
+        """Enable or disable the feeding plan."""
+        _LOGGER.debug(f"Setting feeding plan to {value} for {self.serial}")
+        await self.api.set_feeding_plan(self.serial, value)
+
+    async def set_child_lock(self, value: bool) -> None:
+        """Enable or disable the child lock."""
+        _LOGGER.debug(f"Setting child lock to {value} for {self.serial}")
+        await self.api.set_child_lock(self.serial, value)
+
+    async def set_light_enable(self, value: bool) -> None:
+        """Enable or disable the light functionality."""
+        _LOGGER.debug(f"Setting light enable to {value} for {self.serial}")
+        await self.api.set_light_enable(self.serial, value)
+
+    async def set_light_switch(self, value: bool) -> None:
+        """Turn the light on or off."""
+        _LOGGER.debug(f"Setting light switch to {value} for {self.serial}")
+        await self.api.set_light_switch(self.serial, value)
+
+    async def set_sound_enable(self, value: bool) -> None:
+        """Enable or disable the sound functionality."""
+        _LOGGER.debug(f"Setting sound enable to {value} for {self.serial}")
+        await self.api.set_sound_enable(self.serial, value)
+
+    async def set_sound_switch(self, value: bool) -> None:
+        """Turn the sound on or off."""
+        _LOGGER.debug(f"Setting sound switch to {value} for {self.serial}")
+        await self.api.set_sound_switch(self.serial, value)
