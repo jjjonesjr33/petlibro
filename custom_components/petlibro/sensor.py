@@ -210,13 +210,13 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Today Eating Time"
         ),
-        # Would like to change child_lock_switch to a dropdown switch
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="child_lock_switch",
             translation_key="child_lock_switch",
             icon="mdi:lock",
             name="Buttons Lock"
         ),
+    ],
     DockstreamSmartRFIDFountain: [
         PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
             key="device_sn",
@@ -295,7 +295,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
         ),
     ]
 }
-
 
 async def async_setup_entry(
     _: HomeAssistant,
