@@ -3,6 +3,7 @@ from logging import getLogger
 
 from aiohttp import ClientSession, ClientError  # Import aiohttp and ClientError
 
+from .feeders.feeder import Feeder
 from ..feeders.granary_feeder import GranaryFeeder  # Correct import from GranaryFeeder
 
 _LOGGER = getLogger(__name__)
