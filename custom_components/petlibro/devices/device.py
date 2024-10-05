@@ -1,6 +1,5 @@
 from logging import getLogger
 from typing import cast
-
 from ..api import PetLibroAPI
 from .event import Event, EVENT_UPDATE
 
@@ -12,12 +11,13 @@ class Device(Event):
         self._data: dict = {}
         self.api = api
 
-        self.update_data(data)  # Call the update_data method to initialize the device data
+        # Initialize the device data with the update_data method
+        self.update_data(data)
 
     def update_data(self, data: dict) -> None:
         """Save the device info from a data dictionary."""
         try:
-            # Log at debug level instead of error level, show full data for better context
+            # Log the update at debug level for better context
             _LOGGER.debug("Updating data with new information: %s", data)
 
             # Automatically update _data with any new keys, ensuring no data loss
@@ -37,24 +37,23 @@ class Device(Event):
             _LOGGER.error(f"Error updating data: {e}")
             _LOGGER.debug(f"Partial data update: {data.get('deviceSn', 'Unknown Serial')}")
 
-async def refresh(self):
-    """Refresh the device data from the API."""
-    try:
-        data = {}
+    async def refresh(self):
+        """Refresh the device data from the API."""
+        try:
+            data = {}
 
-        # Fetch base info and real info from API
-        base_info = await self.api.device_base_info(self.serial)
-        real_info = await self.api.device_real_info(self.serial)
+            # Fetch base info and real info from API
+            base_info = await self.api.device_base_info(self.serial)
+            real_info = await self.api.device_real_info(self.serial)
 
-        # Update with whatever data we fetch
-        data.update(base_info)
-        data.update(real_info)
+            # Update with the fetched data
+            data.update(base_info)
+            data.update(real_info)
 
-        self.update_data(data)
+            self.update_data(data)
 
-    except Exception as e:
-        _LOGGER.error(f"Failed to refresh device data: {e}")
-
+        except Exception as e:
+            _LOGGER.error(f"Failed to refresh device data: {e}")
 
     @property
     def serial(self) -> str:
