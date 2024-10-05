@@ -100,21 +100,17 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
             volume = getattr(self.device, self.entity_description.key, None)
             return volume if volume is not None else "Unknown"
 
-        # Handle today_eating_time in minutes and seconds format
+        # Handle today_eating_time in raw numeric value (in seconds)
         elif self.entity_description.key == "today_eating_time":
             eating_time_seconds = getattr(self.device, self.entity_description.key, 0)
-            if eating_time_seconds:
-                minutes = eating_time_seconds // 60
-                seconds = eating_time_seconds % 60
-                return f"{minutes}m {seconds}s"  # Return formatted string in minutes and seconds
-            return "0m 0s"  # Fallback if there are no eating seconds
+            return eating_time_seconds  # Return the numeric value in seconds (e.g., 337)
 
-        # Convert today_feeding_quantity from milliliters to cups
+        # Handle today_feeding_quantity in raw numeric value (without appending 'cups')
         elif self.entity_description.key == "today_feeding_quantity":
-            # Assuming the raw quantity is in milliliters, convert to cups (1 cup = 236.588 ml)
-            feeding_quantity_ml = getattr(self.device, self.entity_description.key, 0)
-            cups = feeding_quantity_ml / 236.588
-            return f"{cups:.2f} cups"  # Return the value in cups, formatted to 2 decimal places
+            # Assuming the raw quantity is in milliliters, and 1 cup equals 236.588 milliliters
+            feeding_quantity = getattr(self.device, self.entity_description.key, 0)
+            cups = feeding_quantity / 236.588
+            return round(cups, 2)  # Return the numeric value (e.g., 0.01)
 
         # Default behavior for other sensors, with fallback if key doesn't exist
         if self.entity_description.should_report(self.device):
