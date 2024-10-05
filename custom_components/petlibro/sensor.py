@@ -10,7 +10,6 @@ from functools import cached_property
 from typing import Any, cast
 
 from homeassistant.components.sensor.const import SensorStateClass, SensorDeviceClass
-
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 from homeassistant.const import UnitOfMass, UnitOfVolume
 from homeassistant.core import HomeAssistant
@@ -22,7 +21,6 @@ from .devices.feeders.granary_feeder import GranaryFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from . import PetLibroHubConfigEntry
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
-
 
 _LOGGER = getLogger(__name__)
 
@@ -63,6 +61,11 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):  # type: ign
     """PETLIBRO sensor entity."""
 
     entity_description: PetLibroSensorEntityDescription[_DeviceT]  # type: ignore [reportIncompatibleVariableOverride]
+
+    def __init__(self, device, hub, description):
+        """Initialize the sensor."""
+        super().__init__(device, hub, description)
+        self._attr_unique_id = f"{device.serial}-{description.key}"
 
     @cached_property
     def native_value(self) -> float | datetime | str | None:
@@ -121,59 +124,50 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="device_sn",
             translation_key="device_sn",
-            icon="mdi:identifier",
-            unique_id_fn=lambda device: f"{device.id}-device_sn"
+            icon="mdi:identifier"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="mac_address",
             translation_key="mac_address",
-            icon="mdi:network",
-            unique_id_fn=lambda device: f"{device.id}-mac_address"
+            icon="mdi:network"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="wifi_ssid",
             translation_key="wifi_ssid",
-            icon="mdi:wifi",
-            unique_id_fn=lambda device: f"{device.id}-wifi_ssid"
+            icon="mdi:wifi"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="wifi_rssi",
             translation_key="wifi_rssi",
             icon="mdi:wifi",
-            native_unit_of_measurement="dBm",
-            unique_id_fn=lambda device: f"{device.id}-wifi_rssi"
+            native_unit_of_measurement="dBm"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="remaining_desiccant",
             translation_key="remaining_desiccant",
-            icon="mdi:package",
-            unique_id_fn=lambda device: f"{device.id}-remaining_desiccant"
+            icon="mdi:package"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="power_mode",
             translation_key="power_mode",
-            icon="mdi:power-plug",
-            unique_id_fn=lambda device: f"{device.id}-power_mode"
+            icon="mdi:power-plug"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="volume",
             translation_key="volume",
             icon="mdi:volume-high",
-            native_unit_of_measurement="%",
-            unique_id_fn=lambda device: f"{device.id}-volume"
+            native_unit_of_measurement="%"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="battery_state",
             translation_key="battery_state",
-            icon="mdi:battery",
-            unique_id_fn=lambda device: f"{device.id}-battery_state"
+            icon="mdi:battery"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="electric_quantity",
             translation_key="electric_quantity",
             icon="mdi:battery",
-            native_unit_of_measurement="%",
-            unique_id_fn=lambda device: f"{device.id}-electric_quantity"
+            native_unit_of_measurement="%"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="today_feeding_quantity",
@@ -181,30 +175,26 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:scale",
             native_unit_of_measurement_fn=unit_of_measurement_feeder,
             device_class_fn=device_class_feeder,
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            unique_id_fn=lambda device: f"{device.id}-today_feeding_quantity"
+            state_class=SensorStateClass.TOTAL_INCREASING
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="today_feeding_times",
             translation_key="today_feeding_times",
             icon="mdi:history",
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            unique_id_fn=lambda device: f"{device.id}-today_feeding_times"
+            state_class=SensorStateClass.TOTAL_INCREASING
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="today_eating_times",
             translation_key="today_eating_times",
             icon="mdi:history",
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            unique_id_fn=lambda device: f"{device.id}-today_eating_times"
+            state_class=SensorStateClass.TOTAL_INCREASING
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="today_eating_time",
             translation_key="today_eating_time",
             native_unit_of_measurement="s",
             icon="mdi:history",
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            unique_id_fn=lambda device: f"{device.id}-today_eating_time"
+            state_class=SensorStateClass.TOTAL_INCREASING
         ),
     ]
 
