@@ -76,10 +76,12 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     def native_value(self) -> float | datetime | str | None:
         """Return the state."""
     
-        # Handle today_eating_time as raw seconds value
+        # Handle today_eating_time as raw seconds value and display it in hh:mm:ss format
         if self.entity_description.key == "today_eating_time":
             eating_time_seconds = getattr(self.device, self.entity_description.key, 0)
-            return eating_time_seconds  # Return the raw value in seconds
+            hours, remainder = divmod(eating_time_seconds, 3600)  # Convert seconds to hours
+            minutes, seconds = divmod(remainder, 60)  # Convert remaining seconds to minutes and seconds
+            return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"  # Display as hh:mm:ss
     
         # Handle today_feeding_quantity as raw numeric value, multiplying by 100 to move the decimal places
         elif self.entity_description.key == "today_feeding_quantity":
