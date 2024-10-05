@@ -88,11 +88,11 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
             cups = feeding_quantity / 236.588
             return round(cups, 2)  # Return the numeric value with two decimal places
     
-        # Handle wifi_rssi to display dBm value
+        # Handle wifi_rssi to display only the numeric value
         elif self.entity_description.key == "wifi_rssi":
             wifi_rssi = getattr(self.device, self.entity_description.key, None)
             if wifi_rssi is not None:
-                return f"{wifi_rssi} dBm"  # Append 'dBm' to the signal strength value
+                return wifi_rssi  # Return just the numeric value for signal strength
     
         # Default behavior for other sensors, with fallback if key doesn't exist
         if self.entity_description.should_report(self.device):
