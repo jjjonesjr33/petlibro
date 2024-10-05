@@ -129,6 +129,9 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         # For wifi_rssi, display as dBm
         elif self.entity_description.key == "wifi_rssi":
             return "dBm"
+        # For weight, display as ounces in the frontend
+        elif self.entity_description.key == "weight":
+            return "oz"
         # For use_water_interval and use_water_duration, display as minutes
         elif self.entity_description.key in ["use_water_interval", "use_water_duration"]:
             return "min" 
@@ -282,23 +285,24 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="use_water_interval",
             icon="mdi:water",
             native_unit_of_measurement="min",
-            name="Water Working Interval"
+            name="Water Interval"
         ),
         PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
             key="use_water_duration",
             translation_key="use_water_duration",
             icon="mdi:water",
             native_unit_of_measurement="min",
-            name="Water Working Time Duration"
+            name="Water Time Duration"
         ),
-        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
-            key="today_total_ml",
-            translation_key="today_total_ml",
-            icon="mdi:water",
-            native_unit_of_measurement="mL",
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            name="Total Water Used Today"
-        ),
+# Does not work with multi pet tracking, but may use this code later once I have the API info for the RFID tags.
+#        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+#            key="today_total_ml",
+#            translation_key="today_total_ml",
+#            icon="mdi:water",
+#            native_unit_of_measurement="mL",
+#            state_class=SensorStateClass.TOTAL_INCREASING,
+#            name="Total Water Used Today"
+#        ),
         PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
             key="remaining_filter_days",
             translation_key="remaining_filter_days",
