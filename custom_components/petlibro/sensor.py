@@ -159,6 +159,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="volume",
             icon="mdi:volume-high",
             native_unit_of_measurement="%",
+            should_report=lambda device: device.volume is not None
             name="Volume"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
