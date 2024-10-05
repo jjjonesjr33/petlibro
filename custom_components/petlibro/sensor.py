@@ -292,12 +292,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Total Water Used Today"
         ),
-        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
-            key="running_state",
-            translation_key="running_state",
-            icon="mdi:history",
-            name="Running State"
-        ),
     ]
 }
 
