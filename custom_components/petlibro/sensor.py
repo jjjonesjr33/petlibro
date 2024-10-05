@@ -75,26 +75,25 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     @property
     def native_value(self) -> float | datetime | str | None:
         """Return the state."""
-
-        # Handle today_eating_time in minutes and seconds format, but keep raw value in seconds for Home Assistant
+    
+        # Handle today_eating_time as raw seconds value
         if self.entity_description.key == "today_eating_time":
             eating_time_seconds = getattr(self.device, self.entity_description.key, 0)
-            minutes, seconds = divmod(eating_time_seconds, 60)  # Convert seconds to minutes and seconds
-            return f"{minutes}m {seconds}s"  # Display the value as minutes and seconds for the user
-
-        # Handle today_feeding_quantity in numeric value with 'cups' label
+            return eating_time_seconds  # Return the raw value in seconds
+    
+        # Handle today_feeding_quantity as raw numeric value in cups
         elif self.entity_description.key == "today_feeding_quantity":
             # Assuming the raw quantity is in milliliters, and 1 cup equals 236.588 milliliters
             feeding_quantity = getattr(self.device, self.entity_description.key, 0)
             cups = feeding_quantity / 236.588
-            return f"{round(cups, 0)} cups"  # Return the numeric value without decimals with 'cups' label
-
+            return round(cups, 2)  # Return the numeric value with two decimal places
+    
         # Handle wifi_rssi to display dBm value
         elif self.entity_description.key == "wifi_rssi":
             wifi_rssi = getattr(self.device, self.entity_description.key, None)
             if wifi_rssi is not None:
                 return f"{wifi_rssi} dBm"  # Append 'dBm' to the signal strength value
-
+    
         # Default behavior for other sensors, with fallback if key doesn't exist
         if self.entity_description.should_report(self.device):
             val = getattr(self.device, self.entity_description.key, None)
@@ -119,6 +118,9 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         # For today_eating_time, display as seconds in the frontend
         elif self.entity_description.key == "today_eating_time":
             return "s"  # Display seconds as the unit for eating time
+        # For wifi_rssi, display as dBm
+        elif self.entity_description.key == "wifi_rssi":
+            return "dBm"
         # Default behavior for other sensors
         return self.entity_description.native_unit_of_measurement_fn(self.device)
     
