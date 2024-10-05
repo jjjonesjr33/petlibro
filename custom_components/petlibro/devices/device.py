@@ -14,28 +14,46 @@ class Device(Event):
 
         self.update_data(data)
 
-    def update_data(self, data: dict) -> None:
-        """Save the device info from a data dictionary."""
-        try:
-            # Log at debug level instead of error level
-            _LOGGER.debug("Updating data with new information.")
-            self._data.update(data)
-            self.emit(EVENT_UPDATE)
-            _LOGGER.debug("Data updated successfully.")
-        except Exception as e:
-            _LOGGER.error(f"Error updating data: {e}")
-            # Optionally log specific fields instead of the entire data
-            _LOGGER.debug(f"Partial data: {data.get('deviceSn', 'Unknown Serial')}")
+def update_data(self, data: dict) -> None:
+    """Save the device info from a data dictionary."""
+    try:
+        # Log at debug level instead of error level, show full data for better context
+        _LOGGER.debug("Updating data with new information: %s", data)
 
-    async def refresh(self):
-        """Refresh the device data from the API."""
-        try:
-            data = {}
-            data.update(await self.api.device_base_info(self.serial))
-            data.update(await self.api.device_real_info(self.serial))
-            self.update_data(data)
-        except Exception as e:
-            _LOGGER.error(f"Failed to refresh device data: {e}")
+        # Automatically update _data with any new keys, ensuring no data loss
+        for key, value in data.items():
+            if isinstance(value, dict):
+                # If the value is a dictionary, merge it deeply
+                self._data[key] = {**self._data.get(key, {}), **value}
+            else:
+                # Otherwise, simply update or add the key
+                self._data[key] = value
+
+        self.emit(EVENT_UPDATE)
+        _LOGGER.debug("Data updated successfully: %s", self._data)
+
+    except Exception as e:
+        _LOGGER.error(f"Error updating data: {e}")
+        _LOGGER.debug(f"Partial data update: {data.get('deviceSn', 'Unknown Serial')}")
+
+async def refresh(self):
+    """Refresh the device data from the API."""
+    try:
+        data = {}
+
+        # Fetch base info and real info from API
+        base_info = await self.api.device_base_info(self.serial)
+        real_info = await self.api.device_real_info(self.serial)
+
+        # Update with whatever data we fetch
+        data.update(base_info)
+        data.update(real_info)
+
+        self.update_data(data)
+
+    except Exception as e:
+        _LOGGER.error(f"Failed to refresh device data: {e}")
+
 
     @property
     def serial(self) -> str:
