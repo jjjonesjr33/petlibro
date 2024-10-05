@@ -50,32 +50,38 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
         PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
             key="enable_feeding_plan",
             translation_key="enable_feeding_plan",
-            set_fn=lambda device, value: device.set_feeding_plan(value)
+            set_fn=lambda device, value: device.set_feeding_plan(value),
+            name="Enable Feeding Plan"
         ),
         PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
             key="child_lock_switch",
             translation_key="child_lock_switch",
-            set_fn=lambda device, value: device.set_child_lock(value)
+            set_fn=lambda device, value: device.set_child_lock(value),
+            name="Child Lock"
         ),
         PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
             key="enable_light",
             translation_key="enable_light",
-            set_fn=lambda device, value: device.set_light_enable(value)
+            set_fn=lambda device, value: device.set_light_enable(value),
+            name="Enable Light"
         ),
         PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
             key="light_switch",
             translation_key="light_switch",
-            set_fn=lambda device, value: device.set_light_switch(value)
+            set_fn=lambda device, value: device.set_light_switch(value),
+            name="Light Switch"
         ),
         PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
             key="enable_sound",
             translation_key="enable_sound",
-            set_fn=lambda device, value: device.set_sound_enable(value)
+            set_fn=lambda device, value: device.set_sound_enable(value),
+            name="Enable Sound"
         ),
         PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
             key="sound_switch",
             translation_key="sound_switch",
-            set_fn=lambda device, value: device.set_sound_switch(value)
+            set_fn=lambda device, value: device.set_sound_switch(value),
+            name="Sound Switch"
         )
     ]
 }
