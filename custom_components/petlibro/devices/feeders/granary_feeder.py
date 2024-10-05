@@ -1,6 +1,6 @@
 from typing import cast
 from logging import getLogger
-from .device import Device  # Import the base Device class
+from ..device import Device
 
 _LOGGER = getLogger(__name__)
 
