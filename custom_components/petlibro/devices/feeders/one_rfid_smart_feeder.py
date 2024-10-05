@@ -113,6 +113,67 @@ class OneRFIDSmartFeeder(GranaryFeeder):
     def enable_grain_outlet_blocked_notice(self) -> bool:
         return bool(self._data.get("realInfo", {}).get("enableGrainOutletBlockedNotice", False))  # Default to False
 
+    # New Attributes based on log data
+    @property
+    def device_sn(self) -> str:
+        return self._data.get("realInfo", {}).get("deviceSn", "unknown")
+
+    @property
+    def mac_address(self) -> str:
+        return self._data.get("realInfo", {}).get("mac", "unknown")
+
+    @property
+    def wifi_ssid(self) -> str:
+        return self._data.get("realInfo", {}).get("wifiSsid", "unknown")
+
+    @property
+    def wifi_rssi(self) -> int:
+        return self._data.get("realInfo", {}).get("wifiRssi", -100)
+
+    @property
+    def electric_quantity(self) -> int:
+        return self._data.get("realInfo", {}).get("electricQuantity", 0)
+
+    @property
+    def enable_feeding_plan(self) -> bool:
+        return self._data.get("realInfo", {}).get("enableFeedingPlan", False)
+
+    @property
+    def enable_sound(self) -> bool:
+        return self._data.get("realInfo", {}).get("enableSound", False)
+
+    @property
+    def enable_light(self) -> bool:
+        return self._data.get("realInfo", {}).get("enableLight", False)
+
+    @property
+    def vacuum_state(self) -> bool:
+        return self._data.get("realInfo", {}).get("vacuumState", False)
+
+    @property
+    def pump_air_state(self) -> bool:
+        return self._data.get("realInfo", {}).get("pumpAirState", False)
+
+    @property
+    def cover_close_speed(self) -> str:
+        return self._data.get("realInfo", {}).get("coverCloseSpeed", "unknown")
+
+    @property
+    def door_error_state(self) -> str:
+        return self._data.get("realInfo", {}).get("doorErrorState", "NORMAL")
+
+    @property
+    def enable_re_grain_notice(self) -> bool:
+        return self._data.get("realInfo", {}).get("enableReGrainNotice", False)
+
+    @property
+    def child_lock_switch(self) -> bool:
+        return self._data.get("realInfo", {}).get("childLockSwitch", False)
+
+    @property
+    def close_door_time_sec(self) -> int:
+        return self._data.get("realInfo", {}).get("closeDoorTimeSec", 0)
+
     # Switch methods for managing features
 
     async def set_feeding_plan(self, value: bool) -> None:
