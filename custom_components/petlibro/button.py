@@ -16,6 +16,7 @@ from . import PetLibroHubConfigEntry
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 from .devices.device import Device
 from .devices.feeders.feeder import Feeder
+from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 
 
 @dataclass(frozen=True)
@@ -45,13 +46,13 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
         PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
             key="enable_feeding_plan",
             translation_key="enable_feeding_plan",
-            set_fn=lambda device: device.set_feeding_plan(),  # Enable feeding plan action
+            set_fn=lambda device: device.set_feeding_plan(),
             name="Enable Feeding Plan"
         ),
         PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
             key="disable_feeding_plan",
             translation_key="disable_feeding_plan",
-            set_fn=lambda device: device.set_feeding_plan(),  # Disable feeding plan action
+            set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
         )
     ]
