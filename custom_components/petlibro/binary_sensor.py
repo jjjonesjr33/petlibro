@@ -102,14 +102,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="enable_low_battery_notice",
             translation_key="enable_low_battery_notice",
             icon="mdi:battery-alert",
-            device_class=BinarySensorDeviceClass.SAFETY,
+            device_class=BinarySensorDeviceClass.BATTERY,  # Changed to BATTERY to differentiate
             should_report=lambda device: device.enable_low_battery_notice is not None,
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="enable_power_change_notice",
             translation_key="enable_power_change_notice",
             icon="mdi:power-plug-alert",
-            device_class=BinarySensorDeviceClass.SAFETY,
+            device_class=BinarySensorDeviceClass.SAFETY,  # Kept as SAFETY
             should_report=lambda device: device.enable_power_change_notice is not None,
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
