@@ -27,50 +27,113 @@
     },
     "entity": {
         "sensor": {
+            "device_sn": {
+                "name": "Device Serial Number"
+            },
+            "mac_address": {
+                "name": "MAC Address"
+            },
+            "wifi_ssid": {
+                "name": "Wi-Fi SSID"
+            },
+            "wifi_rssi": {
+                "name": "Wi-Fi Signal Strength"
+            },
             "remaining_desiccant": {
-                "name": "Desiccant remaining days"
+                "name": "Desiccant Remaining Days"
             },
-            "today_feeding_quantity": {
-                "name": "Today's feeding quantity"
+            "power_mode": {
+                "name": "Power Mode"
             },
-            "today_feeding_times": {
-                "name": "Today's feeding times"
-            },
-            "today_eating_time": {
-                "name": "Today's total eating time"
-            },
-            "today_eating_times": {
-                "name": "Today's eating times"
+            "volume": {
+                "name": "Volume"
             },
             "battery_state": {
-                "name": "Battery level"
+                "name": "Battery Level"
+            },
+            "electric_quantity": {
+                "name": "Electric Quantity"
+            },
+            "today_feeding_quantity": {
+                "name": "Today's Feeding Quantity"
+            },
+            "today_feeding_times": {
+                "name": "Today's Feeding Times"
+            },
+            "today_eating_times": {
+                "name": "Today's Eating Times"
+            },
+            "today_eating_time": {
+                "name": "Today's Total Eating Time"
+            },
+            "grain_outlet_state": {
+                "name": "Grain Outlet State"
+            },
+            "door_error_state": {
+                "name": "Door Error State"
+            },
+            "enable_light": {
+                "name": "Enable Light"
+            },
+            "child_lock_switch": {
+                "name": "Child Lock"
             }
         },
         "switch": {
-            "feeding_plan": {
-                "name": "Feeding plan"
+            "enable_feeding_plan": {
+                "name": "Enable Feeding Plan"
             },
-            "feeding_plan_today_all": {
-                "name": "Feeding plan today all"
+            "child_lock_switch": {
+                "name": "Child Lock"
+            },
+            "enable_light": {
+                "name": "Enable Light"
+            },
+            "light_switch": {
+                "name": "Light Switch"
+            },
+            "enable_sound": {
+                "name": "Enable Sound"
+            },
+            "sound_switch": {
+                "name": "Sound Switch"
             }
         },
         "button": {
             "manual_feed": {
-                "name": "Manual feed"
+                "name": "Manual Feed"
             }
         },
         "binary_sensor": {
             "door_state": {
-                "name": "Door state"
+                "name": "Door State"
             },
             "food_dispenser_state": {
-                "name": "Dispenser state"
+                "name": "Food Dispenser State"
             },
             "door_blocked": {
-                "name": "Door error state"
+                "name": "Door Blocked"
             },
             "food_low": {
-                "name": "Food low"
+                "name": "Food Low"
+            },
+            "online": {
+                "name": "Online"
+            },
+            "running_state": {
+                "name": "Running State"
+            },
+            "whether_in_sleep_mode": {
+                "name": "Sleep Mode"
+            },
+            "enable_low_battery_notice": {
+                "name": "Low Battery Notice"
+            },
+            "enable_power_change_notice": {
+                "name": "Power Change Notice"
+            },
+            "enable_grain_outlet_blocked_notice": {
+                "name": "Grain Outlet Blocked Notice"
             }
         }
     }
