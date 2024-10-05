@@ -117,9 +117,9 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         # For today_feeding_quantity, display as cups in the frontend
         if self.entity_description.key == "today_feeding_quantity":
             return "cups"
-        # For today_eating_time, display as seconds in the frontend
+        # Remove the unit of measurement for today_eating_time to avoid conflicts
         elif self.entity_description.key == "today_eating_time":
-            return "s"  # Display seconds as the unit for eating time
+            return None  # No unit to maintain compatibility with previous statistics
         # For wifi_rssi, display as dBm
         elif self.entity_description.key == "wifi_rssi":
             return "dBm"
