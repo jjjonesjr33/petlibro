@@ -84,7 +84,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                 return "Battery Power"
             else:
                 return "Unknown"  # Handle cases where power_mode is not 1 or 2
-    
+
         # Handle grain_outlet_state mapping with True/False values
         elif self.entity_description.key == "grain_outlet_state":
             grain_outlet_state = getattr(self.device, self.entity_description.key, None)
@@ -94,12 +94,12 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                 return "Blocked"
             else:
                 return "Unknown"  # Handle cases where the attribute is missing or not recognized
-    
+
         # Handle volume with a default value if missing
         elif self.entity_description.key == "volume":
             volume = getattr(self.device, self.entity_description.key, None)
             return volume if volume is not None else "Unknown"
-    
+
         # Handle today_eating_time in minutes and seconds format
         elif self.entity_description.key == "today_eating_time":
             eating_time_seconds = getattr(self.device, self.entity_description.key, 0)
@@ -108,14 +108,14 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                 seconds = eating_time_seconds % 60
                 return f"{minutes}m {seconds}s"  # Return formatted string in minutes and seconds
             return "0m 0s"  # Fallback if there are no eating seconds
-    
-        # Convert today_feeding_quantity to cups
+
+        # Convert today_feeding_quantity from milliliters to cups
         elif self.entity_description.key == "today_feeding_quantity":
-            # Assuming the raw quantity is in grams, and 1 cup equals 236.588 grams
-            feeding_quantity = getattr(self.device, self.entity_description.key, 0)
-            cups = feeding_quantity / 236.588
-            return f"{cups:.2f} cups"  # Format the result to 2 decimal places
-    
+            # Assuming the raw quantity is in milliliters, convert to cups (1 cup = 236.588 ml)
+            feeding_quantity_ml = getattr(self.device, self.entity_description.key, 0)
+            cups = feeding_quantity_ml / 236.588
+            return f"{cups:.2f} cups"  # Return the value in cups, formatted to 2 decimal places
+
         # Default behavior for other sensors, with fallback if key doesn't exist
         if self.entity_description.should_report(self.device):
             val = getattr(self.device, self.entity_description.key, None)
@@ -134,12 +134,16 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     @property
     def native_unit_of_measurement(self) -> str | None:
         """Return the native unit of measurement to use in the frontend, if any."""
+        # For today_feeding_quantity, display as cups in the frontend
+        if self.entity_description.key == "today_feeding_quantity":
+            return "cups"
         return self.entity_description.native_unit_of_measurement_fn(self.device)
 
     @property
     def device_class(self) -> SensorDeviceClass | None:
         """Return the device class to use in the frontend, if any."""
         return self.entity_description.device_class_fn(self.device)
+
 
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
@@ -169,7 +173,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="device_sn",
             translation_key="device_sn",
             icon="mdi:identifier",
-            name="Device Serial Number"
+            name="Device SN"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="mac",
