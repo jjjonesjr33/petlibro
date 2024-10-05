@@ -16,6 +16,7 @@ from . import PetLibroHubConfigEntry
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 from .devices.device import Device
 from .devices.feeders.feeder import Feeder
+from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 
 
 @dataclass(frozen=True)
@@ -43,6 +44,38 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
             key="feeding_plan_today_all",
             translation_key="feeding_plan_today_all",
             set_fn=lambda device, value: device.set_feeding_plan_today_all(value)
+        )
+    ],
+    OneRFIDSmartFeeder: [  # Adding support for OneRFIDSmartFeeder-specific switches
+        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
+            key="enable_feeding_plan",
+            translation_key="enable_feeding_plan",
+            set_fn=lambda device, value: device.set_feeding_plan(value)
+        ),
+        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
+            key="child_lock_switch",
+            translation_key="child_lock_switch",
+            set_fn=lambda device, value: device.set_child_lock(value)
+        ),
+        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
+            key="enable_light",
+            translation_key="enable_light",
+            set_fn=lambda device, value: device.set_light_enable(value)
+        ),
+        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
+            key="light_switch",
+            translation_key="light_switch",
+            set_fn=lambda device, value: device.set_light_switch(value)
+        ),
+        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
+            key="enable_sound",
+            translation_key="enable_sound",
+            set_fn=lambda device, value: device.set_sound_enable(value)
+        ),
+        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
+            key="sound_switch",
+            translation_key="sound_switch",
+            set_fn=lambda device, value: device.set_sound_switch(value)
         )
     ]
 }
