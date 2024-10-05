@@ -35,12 +35,6 @@ class PetLibroButtonEntityDescription(ButtonEntityDescription, PetLibroEntityDes
 
 DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
     Feeder: [
-        PetLibroButtonEntityDescription[Feeder](
-            key="manual_feed",
-            translation_key="manual_feed",
-            set_fn=lambda device: device.set_manual_feed(),
-            name="Manual Feed"
-        )
     ],
     OneRFIDSmartFeeder: [
         PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
@@ -54,6 +48,12 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
+        ),
+        PetLibroButtonEntityDescription[Feeder](
+            key="manual_feed",
+            translation_key="manual_feed",
+            set_fn=lambda device: device.set_manual_feed(),
+            name="Manual Feed"
         )
     ]
 }
