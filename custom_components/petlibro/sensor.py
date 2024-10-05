@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from logging import getLogger
 from collections.abc import Callable
 from datetime import datetime
-from functools import cached_property
 from typing import Any, cast
 
 from homeassistant.components.sensor.const import SensorStateClass, SensorDeviceClass
@@ -57,45 +56,42 @@ class PetLibroSensorEntityDescription(SensorEntityDescription, PetLibroEntityDes
     should_report: Callable[[_DeviceT], bool] = lambda _: True
 
 
-class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):  # type: ignore [reportIncompatibleVariableOverride]
+class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     """PETLIBRO sensor entity."""
 
-    entity_description: PetLibroSensorEntityDescription[_DeviceT]  # type: ignore [reportIncompatibleVariableOverride]
+    entity_description: PetLibroSensorEntityDescription[_DeviceT]
 
     def __init__(self, device, hub, description):
         """Initialize the sensor."""
         super().__init__(device, hub, description)
         self._attr_unique_id = f"{device.serial}-{description.key}"
 
-    @cached_property
+    @property
     def native_value(self) -> float | datetime | str | None:
         """Return the state."""
         if self.entity_description.should_report(self.device):
-            if isinstance(val := getattr(self.device, self.entity_description.key), str):
+            val = getattr(self.device, self.entity_description.key)
+            if isinstance(val, str):
                 return val.lower()
-            return cast(float | datetime | None, val)
+            return val
         return None
 
-    @cached_property
+    @property
     def icon(self) -> str | None:
         """Return the icon to use in the frontend, if any."""
         if (icon := self.entity_description.icon_fn(self.state)) is not None:
             return icon
         return super().icon
 
-    @cached_property
+    @property
     def native_unit_of_measurement(self) -> str | None:
         """Return the native unit of measurement to use in the frontend, if any."""
-        if (native_unit_of_measurement := self.entity_description.native_unit_of_measurement_fn(self.device)) is not None:
-            return native_unit_of_measurement
-        return super().native_unit_of_measurement
+        return self.entity_description.native_unit_of_measurement_fn(self.device)
 
-    @cached_property
+    @property
     def device_class(self) -> SensorDeviceClass | None:
         """Return the device class to use in the frontend, if any."""
-        if (device_class := self.entity_description.device_class_fn(self.device)) is not None:
-            return device_class
-        return super().device_class
+        return self.entity_description.device_class_fn(self.device)
 
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
@@ -197,7 +193,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             state_class=SensorStateClass.TOTAL_INCREASING
         ),
     ]
-
 }
 
 
