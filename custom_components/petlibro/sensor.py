@@ -69,10 +69,36 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     @property
     def native_value(self) -> float | datetime | str | None:
         """Return the state."""
+        # Handle the power_mode specifically
+        if self.entity_description.key == "power_mode":
+            power_mode = getattr(self.device, self.entity_description.key, None)
+            if power_mode == 1:
+                return "AC Power"
+            elif power_mode == 2:
+                return "Battery Power"
+            else:
+                return "Unknown"  # Handle cases where power_mode is not 1 or 2
+
+        # Handle grain_outlet_state mapping with True/False values
+        elif self.entity_description.key == "grain_outlet_state":
+            grain_outlet_state = getattr(self.device, self.entity_description.key, None)
+            if grain_outlet_state is True:
+                return "Cleared"
+            elif grain_outlet_state is False:
+                return "Blocked"
+            else:
+                return "Unknown"  # Handle cases where the attribute is missing or not recognized
+
+        # Handle volume with a default value if missing
+        elif self.entity_description.key == "volume":
+            volume = getattr(self.device, self.entity_description.key, None)
+            return volume if volume is not None else "Unknown"
+
+        # Default behavior for other sensors, with fallback if key doesn't exist
         if self.entity_description.should_report(self.device):
             val = getattr(self.device, self.entity_description.key, None)
             if isinstance(val, str):
-                return val
+                return val.lower()
             return val
         return None
 
@@ -93,37 +119,6 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         """Return the device class to use in the frontend, if any."""
         return self.entity_description.device_class_fn(self.device)
 
-    @property
-    def native_value(self) -> str | None:
-        """Return the state."""
-        if self.entity_description.key == "power_mode":
-            power_mode = getattr(self.device, self.entity_description.key)
-            if power_mode == 1:
-                return "AC Power"
-            elif power_mode == 2:
-                return "Battery Power"
-            else:
-                return "Unknown"
-        # Default behavior for other sensors
-        return super().native_value
-
-    @property
-    def native_value(self) -> str | None:
-        """Return the state."""
-        if self.entity_description.key == "grain_outlet_state":
-            # Handle specific mapping for grain_outlet_state
-            val = getattr(self.device, self.entity_description.key)
-            if val is True:
-                return "Cleared"
-            elif val is False:
-                return "Blocked"
-            return None  # If the value is neither True nor False
-        elif self.entity_description.should_report(self.device):
-            val = getattr(self.device, self.entity_description.key)
-            if isinstance(val, str):
-                return val.lower()
-            return val
-        return None
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     GranaryFeeder: [
@@ -190,7 +185,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="volume",
             icon="mdi:volume-high",
             native_unit_of_measurement="%",
-            should_report=lambda device: device.volume is not None,
+            should_report=lambda device: hasattr(device, 'volume') and device.volume is not None,
             name="Volume"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
@@ -241,7 +236,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="grain_outlet_state",
             translation_key="grain_outlet_state",
             icon="mdi:alert",
-            should_report=lambda device: device.grain_outlet_state is not None,
+            should_report=lambda device: hasattr(device, 'grain_outlet_state') and device.grain_outlet_state is not None,
             name="Grain Outlet State"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
