@@ -3,19 +3,20 @@ from logging import getLogger
 
 from aiohttp import ClientSession, ClientError  # Import aiohttp and ClientError
 
-from ..feeders.granary_feeder import GranaryFeeder
+from ..feeders.granary_feeder import GranaryFeeder  # Correct import from GranaryFeeder
 
 _LOGGER = getLogger(__name__)
 
 class OneRFIDSmartFeeder(GranaryFeeder):
     async def refresh(self):
-        await super().refresh()
+        """Refresh the device data from the API."""
+        await super().refresh()  # This calls the refresh method in GranaryFeeder (which also inherits from Device)
 
-        # Fetch data from API
+        # Fetch specific data for this device
         grain_status = await self.api.device_grain_status(self.serial)
         real_info = await self.api.device_real_info(self.serial)
 
-        # Update internal data
+        # Update internal data with fetched API data
         self.update_data({
             "grainStatus": grain_status or {},
             "realInfo": real_info or {}
