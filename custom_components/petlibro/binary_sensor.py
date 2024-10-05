@@ -55,7 +55,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:door",
             device_class=BinarySensorDeviceClass.DOOR,
             should_report=lambda device: device.door_state is not None,
-            name="Door"
+            name="Lid"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="food_dispenser_state",
@@ -71,7 +71,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:door",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.door_blocked is not None,
-            name="Door Status"
+            name="Lid Status"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="food_low",
@@ -88,14 +88,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
             name="Wi-Fi"
-        ),
-        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
-            key="running_state",
-            translation_key="running_state",
-            icon="mdi:run",
-            device_class=BinarySensorDeviceClass.RUNNING,
-            should_report=lambda device: device.running_state is not None,
-            name="Running State"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="whether_in_sleep_mode",
