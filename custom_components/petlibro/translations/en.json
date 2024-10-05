@@ -87,7 +87,7 @@
                 "name": "Child Lock"
             },
             "enable_light": {
-                "name": "Enable Light"
+                "name": "Enable Display"
             },
             "enable_sound": {
                 "name": "Enable Sound"
