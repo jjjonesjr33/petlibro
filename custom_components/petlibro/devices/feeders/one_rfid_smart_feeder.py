@@ -6,7 +6,7 @@ from .granary_feeder import GranaryFeeder
 # Configure the logger
 _LOGGER = getLogger(__name__)
 
-class OneRFIDSmartFeeder(GranaryFeeder):   
+class OneRFIDSmartFeeder(GranaryFeeder):
     async def refresh(self):
         await super().refresh()
 
@@ -33,7 +33,7 @@ class OneRFIDSmartFeeder(GranaryFeeder):
             return 0
 
         return total_seconds
-    
+
     @property
     def today_eating_times(self) -> int:
         quantity = self._data.get("grainStatus", {}).get("todayEatingTimes")
@@ -45,32 +45,60 @@ class OneRFIDSmartFeeder(GranaryFeeder):
     @property
     def battery_state(self) -> str:
         return cast(str, self._data.get("realInfo", {}).get("batteryState"))
-    
+
     @property
     def door_state(self) -> bool:
         # Accessing the realInfo section from _data
-        state = bool(self._data.get("realInfo", {}).get("barnDoorState"))
-        return state
+        return bool(self._data.get("realInfo", {}).get("barnDoorState"))
 
     @property
     def food_dispenser_state(self) -> bool:
         # Accessing the realInfo section from _data
-        state = not bool(self._data.get("realInfo", {}).get("grainOutletState"))
-        return state
-    
+        return not bool(self._data.get("realInfo", {}).get("grainOutletState"))
+
     @property
     def door_blocked(self) -> bool:
         # Accessing the realInfo section from _data
-        state = bool(self._data.get("realInfo", {}).get("barnDoorError"))
-        return state
+        return bool(self._data.get("realInfo", {}).get("barnDoorError"))
 
     @property
     def food_low(self) -> bool:
         # Accessing the realInfo section from _data
-        state = not bool(self._data.get("realInfo", {}).get("surplusGrain"))
-        return state
+        return not bool(self._data.get("realInfo", {}).get("surplusGrain"))
 
-    # New switch methods for managing features
+    # New binary sensors for connectivity and state
+
+    @property
+    def online(self) -> bool:
+        # Check online status from realInfo
+        return bool(self._data.get("realInfo", {}).get("online"))
+
+    @property
+    def running_state(self) -> bool:
+        # Check if device is running from realInfo
+        return self._data.get("realInfo", {}).get("runningState") == "RUNNING"
+
+    @property
+    def whether_in_sleep_mode(self) -> bool:
+        # Check if device is in sleep mode
+        return bool(self._data.get("realInfo", {}).get("whetherInSleepMode"))
+
+    @property
+    def enable_low_battery_notice(self) -> bool:
+        # Check if low battery notice is enabled
+        return bool(self._data.get("realInfo", {}).get("enableLowBatteryNotice"))
+
+    @property
+    def enable_power_change_notice(self) -> bool:
+        # Check if power change notice is enabled
+        return bool(self._data.get("realInfo", {}).get("enablePowerChangeNotice"))
+
+    @property
+    def enable_grain_outlet_blocked_notice(self) -> bool:
+        # Check if grain outlet blocked notice is enabled
+        return bool(self._data.get("realInfo", {}).get("enableGrainOutletBlockedNotice"))
+
+    # Switch methods for managing features
 
     async def set_feeding_plan(self, value: bool) -> None:
         """Enable or disable the feeding plan."""
