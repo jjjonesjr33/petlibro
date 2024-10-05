@@ -64,6 +64,7 @@ class PetLibroButtonEntity(PetLibroEntity[_DeviceT], ButtonEntity):  # type: ign
 
     async def async_press(self) -> None:
         """Handle the button press."""
+        _LOGGER.debug("Pressing button: %s for device %s", self.entity_description.name, self.device.name)
         await self.entity_description.set_fn(self.device)
 
 
@@ -81,4 +82,6 @@ async def async_setup_entry(
         if isinstance(device, device_type)
         for description in entity_descriptions
     ]
+    
+    _LOGGER.debug("Adding %d PetLibro buttons", len(entities))
     async_add_entities(entities)
