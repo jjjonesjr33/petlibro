@@ -131,7 +131,10 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
             return "dBm"
         # For use_water_interval and use_water_duration, display as minutes
         elif self.entity_description.key in ["use_water_interval", "use_water_duration"]:
-            return "min"  
+            return "min" 
+        # For weight_percent, display as a percentage
+        elif self.entity_description.key == "weight_percent":
+            return "%" 
         # Default behavior for other sensors
         return self.entity_description.native_unit_of_measurement_fn(self.device)
     
