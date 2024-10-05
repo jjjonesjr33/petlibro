@@ -95,7 +95,13 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
             wifi_rssi = getattr(self.device, self.entity_description.key, None)
             if wifi_rssi is not None:
                 return wifi_rssi  # Return just the numeric value for signal strength
-    
+
+        # Handle weight in grams and convert to ounces
+        elif self.entity_description.key == "weight":
+            weight_in_grams = getattr(self.device, self.entity_description.key, 0.0)
+            ounces = round(weight_in_grams * 0.035274, 2)  # Convert grams to ounces
+            return ounces  # Return the converted weight in ounces
+
         # Default behavior for other sensors, with fallback if key doesn't exist
         if self.entity_description.should_report(self.device):
             val = getattr(self.device, self.entity_description.key, None)
@@ -123,6 +129,9 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         # For wifi_rssi, display as dBm
         elif self.entity_description.key == "wifi_rssi":
             return "dBm"
+        # For use_water_interval and use_water_duration, display as minutes
+        elif self.entity_description.key in ["use_water_interval", "use_water_duration"]:
+            return "min"  
         # Default behavior for other sensors
         return self.entity_description.native_unit_of_measurement_fn(self.device)
     
@@ -253,7 +262,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="weight",
             translation_key="weight",
             icon="mdi:scale",
-            native_unit_of_measurement="g",
+            native_unit_of_measurement="oz",
             state_class=SensorStateClass.MEASUREMENT,
             name="Current Weight"
         ),
@@ -270,14 +279,14 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="use_water_interval",
             icon="mdi:water",
             native_unit_of_measurement="min",
-            name="Water Usage Interval"
+            name="Water Working Interval"
         ),
         PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
             key="use_water_duration",
             translation_key="use_water_duration",
             icon="mdi:water",
             native_unit_of_measurement="min",
-            name="Water Usage Duration"
+            name="Water Working Time Duration"
         ),
         PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
             key="today_total_ml",
