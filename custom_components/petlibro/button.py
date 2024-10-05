@@ -37,7 +37,8 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
         PetLibroButtonEntityDescription[Feeder](
             key="manual_feed",
             translation_key="manual_feed",
-            set_fn=lambda device: device.set_manual_feed()
+            set_fn=lambda device: device.set_manual_feed(),
+            name="Manual Feed"
         )
     ]
 }
