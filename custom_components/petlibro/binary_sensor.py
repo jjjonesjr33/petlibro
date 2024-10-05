@@ -105,6 +105,16 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.enable_low_battery_notice is not None,
             name="Battery Status"
         )
+    ],
+    DockstreamSmartRFIDFountain: [
+        PetLibroBinarySensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="online",
+            translation_key="online",
+            icon="mdi:wifi",
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
+            should_report=lambda device: device.online is not None,
+            name="Wi-Fi"
+        )
     ]
 }
 
