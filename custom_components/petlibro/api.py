@@ -166,14 +166,46 @@ class PetLibroAPI:
     async def device_feeding_plan_today_new(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/feedingPlan/todayNew", serial)  # type: ignore
 
-    async def set_device_feeding_plan(self, serial: str, enable: bool):
+    # Support for new switch functions
+
+    async def set_feeding_plan(self, serial: str, enable: bool):
+        """Set the feeding plan on/off"""
         await self.session.post("/device/setting/updateFeedingPlanSwitch", json={
             "deviceSn": serial,
             "enable": enable
         })
 
-    async def set_device_feeding_plan_today_all(self, serial: str, enable: bool):
-        return await self.session.post("/device/feedingPlan/enableTodayAll", json={
+    async def set_child_lock(self, serial: str, enable: bool):
+        """Set the child lock on/off"""
+        await self.session.post("/device/setting/updateChildLockSwitch", json={
+            "deviceSn": serial,
+            "enable": enable
+        })
+
+    async def set_light_enable(self, serial: str, enable: bool):
+        """Enable or disable the light functionality"""
+        await self.session.post("/device/setting/updateLightEnableSwitch", json={
+            "deviceSn": serial,
+            "enable": enable
+        })
+
+    async def set_light_switch(self, serial: str, enable: bool):
+        """Turn the light on or off"""
+        await self.session.post("/device/setting/updateLightSwitch", json={
+            "deviceSn": serial,
+            "enable": enable
+        })
+
+    async def set_sound_enable(self, serial: str, enable: bool):
+        """Enable or disable the sound functionality"""
+        await self.session.post("/device/setting/updateSoundEnableSwitch", json={
+            "deviceSn": serial,
+            "enable": enable
+        })
+
+    async def set_sound_switch(self, serial: str, enable: bool):
+        """Turn the sound on or off"""
+        await self.session.post("/device/setting/updateSoundSwitch", json={
             "deviceSn": serial,
             "enable": enable
         })
@@ -181,6 +213,6 @@ class PetLibroAPI:
     async def set_device_manual_feeding(self, serial: str):
         return await self.session.post("/device/device/manualFeeding", json={
             "deviceSn": serial,
-            "grainNum": 1, # try and make this dynamic. add a number entity for the amount perhaps.
-            "requestId":"50ef5fdf9c8146bdba873934b1041200", # replace with real hashed md5 request id. we can probably just generate a random one each time.
+            "grainNum": 1,  # try and make this dynamic. add a number entity for the amount perhaps.
+            "requestId": "50ef5fdf9c8146bdba873934b1041200",  # replace with real hashed md5 request id. we can probably just generate a random one each time.
         })
