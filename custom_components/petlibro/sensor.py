@@ -156,13 +156,14 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             native_unit_of_measurement_fn=unit_of_measurement_feeder,
             device_class_fn=device_class_feeder,
             state_class=SensorStateClass.TOTAL_INCREASING
-        ),
-        PetLibroSensorEntityDescription[GranaryFeeder](
-            key="today_feeding_times",
-            translation_key="today_feeding_times",
-            icon="mdi:history",
-            state_class=SensorStateClass.TOTAL_INCREASING
         )
+# Error, field is already defind in OneRFIDSmartFeeder, but tries to show up twice even though coded as GranaryFeeder
+#        PetLibroSensorEntityDescription[GranaryFeeder](
+#            key="today_feeding_times",
+#            translation_key="today_feeding_times",
+#            icon="mdi:history",
+#            state_class=SensorStateClass.TOTAL_INCREASING
+#        )
     ],
     OneRFIDSmartFeeder: [
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
