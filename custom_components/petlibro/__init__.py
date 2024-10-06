@@ -23,15 +23,20 @@ PLATFORMS_BY_TYPE = {
     GranaryFeeder: (
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
+        Platform.SWITCH,
+        Platform.BUTTON,
     ),
     OneRFIDSmartFeeder: (
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
         Platform.SWITCH,
+        Platform.BUTTON,
     ),
     DockstreamSmartRFIDFountain: (
         Platform.SENSOR,
-        Platform.BINARY_SENSOR,  
+        Platform.BINARY_SENSOR,
+        Platform.SWITCH,
+        Platform.BUTTON,
     ),
 }
 
