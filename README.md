@@ -20,20 +20,92 @@ Also if you want to check out all the other things I do follow me on my [**Socia
 ### May or may not work as intended with
 * Granary Feeder (PLAF103)
 
-## Features
+## One RFID Smart Feeder (PLAF301) Features
+Device Information
 
+    Model
+    Manufacturer
+    Firmware Version
+
+Features & Sensors
+
+    Battery Status
+    Buttons Lock
+    Desiccant Remaining Days
+    Device SN
+    Food Dispenser Status
+    Food Status
+    Lid Status
+    MAC Address
+    Sleep Mode
+
+Feeding Statistics
+
+    Today's Eating Times
+    Today's Feeding Plan
+    Today's Feeding Quantity
+    Today's Feeding Times
+    Today's Total Eating Time
+
+Connectivity
+
+    Wi-Fi Status
+    Wi-Fi Signal Strength
+    Wi-Fi SSID
+
+Configuration Options
+
+    Disable Feeding Plan
+    Enable Feeding Plan
+    Manual Feed
+
+## One RFID Smart Feeder Preview
+![One RFID Smart Feeder](https://github.com/user-attachments/assets/0636003e-04ab-495c-8f28-d032610c9b19)
+
+## Dockstream Smart RFID (PLWF305) Features
+Device Information
+
+    Model
+    Manufacturer
+    Firmware Version
+    Hardware Version
+
+Features & Sensors
+
+    Current Weight
+    Device Serial Number
+    MAC Address
+    Remaining Cleaning Days
+    Remaining Filter Day
+    Remaining Water
+    Water Interval
+    Water Time Duration
+
+Connectivity
+
+    Wi-Fi Status
+    Wi-Fi Signal Strength
+    Wi-Fi SSID
+
+## Dockstream RFID Smart Fountain Preview
+![Dockstream RFID Smart Fountain](https://github.com/user-attachments/assets/45622291-5eae-4a83-87ea-b98a8749b8f8)
+
+# In Devlopment
 * This is still a WIP integration, features may or may not be removed at any time. If you have suggestions please let me know.
 - Features missing, but in the works.
-  > Buttons for scheduling - One RFID Smart Feeder (PLAF301)
 
   > Buttons to reset Cleaning/Filter Days - Dockstream RFID Smart Fountain (PLWF305)
 
   > Tracking RFID per pet intance eat/drink - Both (PLAF301) & (PLWF305) - Currently missing the API to setup tracking.
 
-## One RFID Smart Feeder Preview
-![One RFID Smart Feeder](https://github.com/jjjonesjr33/ha_petlibro/blob/master/docs/media/Screenshot%202024-10-05%20154145.png)
-## Dockstream RFID Smart Fountain Preview
-![Dockstream RFID Smart Fountain](https://github.com/jjjonesjr33/ha_petlibro/blob/master/docs/media/Screenshot%202024-10-05%20154229.png)
+# NOTICE
+Alpha/Beta State Notice for this Plugin:
+
+When setting up for the first time, please sign in and allow 1-5 minutes for the login process and data retrieval to complete. If you do not see all the sensors and controls listed, you may need to refresh your web browser's cache.
+
+I recommend performing a full reboot of Home Assistant to ensure you are logged in and that the add-on has refreshed the data without any errors.
+
+  > The addon is programmed to update every 60 seconds.
 
 ## Installation
 
