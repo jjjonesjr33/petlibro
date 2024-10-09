@@ -60,8 +60,8 @@
             "today_eating_time": {
                 "name": "Today's Total Eating Time"
             },
-            "child_lock_switch": {
-                "name": "Buttons Lock"
+            "feeding_plan_state": {
+                "name": "Today's Feeding Plan"
             },
             "today_total_ml": {
                 "name": "Today's Water Consumption (mL)"
@@ -84,7 +84,7 @@
         },
         "switch": {
             "child_lock_switch": {
-                "name": "Child Lock"
+                "name": "Buttons Lock"
             },
             "enable_light": {
                 "name": "Enable Display"
@@ -99,6 +99,12 @@
             },
             "manual_cleaning": {
                 "name": "Manual Cleaning"
+            },
+            "enable_feeding_plan": {
+                "name": "Enable Feeding Plan"
+            },
+            "disable_feeding_plan": {
+                "name": "Disable Feeding Plan"
             }
         },
         "binary_sensor": {

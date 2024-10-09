@@ -1,4 +1,13 @@
+from ...api import make_api_call
+import aiohttp
+from aiohttp import ClientSession, ClientError
+from ...exceptions import PetLibroAPIError
 from ..device import Device
+
+from typing import cast
+from logging import getLogger
+
+_LOGGER = getLogger(__name__)
 
 class DockstreamSmartRFIDFountain(Device):
     """Represents the Dockstream Smart RFID Fountain device."""
@@ -14,6 +23,22 @@ class DockstreamSmartRFIDFountain(Device):
         self.update_data({
             "realInfo": real_info or {}
         })
+
+ #   @property
+ #   def available(self) -> bool:
+ #       """Determine if the device is available."""
+ #       return self.online if hasattr(self, 'online') else True
+
+    @property
+    def available(self) -> bool:
+        _LOGGER.debug(f"Device {self.device.name} availability: {self.device.online}")
+        return self.device.online if hasattr(self.device, 'online') else True
+
+ #   @property
+ #   def available(self) -> bool:
+ #       _LOGGER.debug(f"Device {self.device.name} availability: True")
+ #       return True  # Always available, buttons will not be greyed out
+
 
     # Properties for Sensors
     @property
@@ -134,4 +159,3 @@ class DockstreamSmartRFIDFountain(Device):
     def machine_cleaning_frequency(self) -> int:
         """Get the machine cleaning frequency."""
         return self._data.get("realInfo", {}).get("machineCleaningFrequency", 0)
-

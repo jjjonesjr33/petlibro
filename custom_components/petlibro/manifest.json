@@ -9,5 +9,5 @@
   "documentation": "https://github.com/jjjonesjr33/ha_petlibro",
   "iot_class": "cloud_polling",
   "requirements": [],
-  "version": "1.0.1"
+  "version": "1.0.0"
 }

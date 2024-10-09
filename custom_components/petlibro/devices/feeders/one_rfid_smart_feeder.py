@@ -1,26 +1,49 @@
+from ...api import make_api_call
+import aiohttp
+from aiohttp import ClientSession, ClientError
+from ...exceptions import PetLibroAPIError
+from ..device import Device
+
 from typing import cast
 from logging import getLogger
 
-from aiohttp import ClientSession, ClientError  # Import aiohttp and ClientError
-
-from ..feeders.granary_feeder import GranaryFeeder  # Correct import from GranaryFeeder
+# from ..feeders.granary_feeder import GranaryFeeder  # Correct import from GranaryFeeder
 
 _LOGGER = getLogger(__name__)
 
-class OneRFIDSmartFeeder(GranaryFeeder):
+class OneRFIDSmartFeeder(Device):
     async def refresh(self):
         """Refresh the device data from the API."""
-        await super().refresh()  # This calls the refresh method in GranaryFeeder (which also inherits from Device)
+        try:
+            await super().refresh()  # This calls the refresh method in GranaryFeeder (which also inherits from Device)
+    
+            # Fetch specific data for this device
+            grain_status = await self.api.device_grain_status(self.serial)
+            real_info = await self.api.device_real_info(self.serial)
+    
+            # Update internal data with fetched API data
+            self.update_data({
+                "grainStatus": grain_status or {},
+                "realInfo": real_info or {}
+            })
+        except PetLibroAPIError as err:
+            _LOGGER.error(f"Error refreshing data for OneRFIDSmartFeeder: {err}")
 
-        # Fetch specific data for this device
-        grain_status = await self.api.device_grain_status(self.serial)
-        real_info = await self.api.device_real_info(self.serial)
+ #   @property
+ #   def available(self) -> bool:
+ #       """Determine if the device is available."""
+ #       return self.online if hasattr(self, 'online') else True
 
-        # Update internal data with fetched API data
-        self.update_data({
-            "grainStatus": grain_status or {},
-            "realInfo": real_info or {}
-        })
+    @property
+    def available(self) -> bool:
+        _LOGGER.debug(f"Device {self.device.name} availability: {self.device.online}")
+        return self.device.online if hasattr(self.device, 'online') else True
+
+ #   @property
+ #   def available(self) -> bool:
+ #       _LOGGER.debug(f"Device {self.device.name} availability: True")
+ #       return True  # Always available, buttons will not be greyed out
+
 
     # Property for todayFeedingQuantities (list of quantities fed today)
     @property
@@ -50,6 +73,11 @@ class OneRFIDSmartFeeder(GranaryFeeder):
         except ValueError:
             return 0
         return total_seconds
+
+    @property
+    def feeding_plan_state(self) -> bool:
+        """Return the state of the feeding plan, based on API data."""
+        return bool(self._data.get("enableFeedingPlan", False))
 
     @property
     def battery_state(self) -> str:
@@ -164,27 +192,88 @@ class OneRFIDSmartFeeder(GranaryFeeder):
     def screen_display_switch(self) -> bool:
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
 
-    # Switch methods
+    @property
+    def remaining_desiccant(self) -> str:
+        """Get the remaining desiccant days."""
+        return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
+    
+    # Error-handling updated for set_feeding_plan
     async def set_feeding_plan(self, value: bool) -> None:
         _LOGGER.debug(f"Setting feeding plan to {value} for {self.serial}")
-        await self.api.set_feeding_plan(self.serial, value)
+        try:
+            await self.api.set_feeding_plan(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting feeding plan: {err}")
 
+    # Error-handling updated for set_child_lock
     async def set_child_lock(self, value: bool) -> None:
         _LOGGER.debug(f"Setting child lock to {value} for {self.serial}")
-        await self.api.set_child_lock(self.serial, value)
+        try:
+            await self.api.set_child_lock(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set child lock for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting child lock: {err}")
 
+    # Error-handling updated for set_light_enable
     async def set_light_enable(self, value: bool) -> None:
         _LOGGER.debug(f"Setting light enable to {value} for {self.serial}")
-        await self.api.set_light_enable(self.serial, value)
+        try:
+            await self.api.set_light_enable(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set light enable for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting light enable: {err}")
 
+    # Error-handling updated for set_light_switch
     async def set_light_switch(self, value: bool) -> None:
         _LOGGER.debug(f"Setting light switch to {value} for {self.serial}")
-        await self.api.set_light_switch(self.serial, value)
+        try:
+            await self.api.set_light_switch(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set light switch for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting light switch: {err}")
 
+    # Error-handling updated for set_sound_enable
     async def set_sound_enable(self, value: bool) -> None:
         _LOGGER.debug(f"Setting sound enable to {value} for {self.serial}")
-        await self.api.set_sound_enable(self.serial, value)
+        try:
+            await self.api.set_sound_enable(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set sound enable for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting sound enable: {err}")
 
+    # Error-handling updated for set_sound_switch
     async def set_sound_switch(self, value: bool) -> None:
         _LOGGER.debug(f"Setting sound switch to {value} for {self.serial}")
-        await self.api.set_sound_switch(self.serial, value)
+        try:
+            await self.api.set_sound_switch(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set sound switch for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting sound switch: {err}")
+
+    # Method for manual feeding
+    async def set_manual_feed(self) -> None:
+        _LOGGER.debug(f"Triggering manual feed for {self.serial}")
+        try:
+            await self.api.set_manual_feed(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger manual feed for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering manual feed: {err}")
+
+    # Method for setting the feeding plan
+    async def set_feeding_plan(self, value: bool) -> None:
+        _LOGGER.debug(f"Setting feeding plan to {value} for {self.serial}")
+        try:
+            await self.api.set_feeding_plan(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting feeding plan: {err}")
+
