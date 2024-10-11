@@ -101,7 +101,8 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         # Handle today_feeding_quantity as raw numeric value, converting to cups
         elif sensor_key == "today_feeding_quantity":
             feeding_quantity = getattr(self.device, sensor_key, 0)
-            cups = (feeding_quantity / 236.588) * 100
+            # Convert feeding_quantity to cups, where 1/12 cup = 20 ml
+            cups = feeding_quantity * (1 / 12)  # Since each 1 unit is 1/12 of a cup
             return f"{round(cups, 2)}"
 
         # Handle wifi_rssi to display only the numeric value
