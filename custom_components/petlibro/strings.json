@@ -27,34 +27,7 @@
     }
   },
   "state": {
-    "device_sn": "Device Serial Number",
-    "mac_address": "MAC Address",
-    "wifi_ssid": "Wi-Fi SSID",
-    "wifi_rssi": "Wi-Fi Signal Strength",
-    "remaining_desiccant": "Desiccant Remaining Days",
-    "battery_state": "Battery Level",
-    "electric_quantity": "Battery / AC %",
-    "today_feeding_quantity": "Today's Feeding Quantity",
-    "today_feeding_times": "Today's Feeding Times",
-    "today_eating_times": "Today's Eating Times",
-    "today_eating_time": "Today's Total Eating Time",
-    "feeding_plan_state": "Today's Feeding Plan",
-    "child_lock_switch": "Buttons Lock",
-    "enable_light": "Enable Display",
-    "enable_sound": "Enable Sound",
-    "door_state": "Lid",
-    "food_dispenser_state": "Food Dispenser",
-    "door_blocked": "Lid Status",
-    "food_low": "Food Status",
-    "online": "Wi-Fi",
-    "whether_in_sleep_mode": "Sleep Mode",
-    "enable_low_battery_notice": "Battery Status",
-    "today_total_ml": "Today's Water Consumption (mL)",
-    "weight_percent": "Remaining Water",
-    "remaining_cleaning_days": "Remaining Cleaning Days",
-    "remaining_filter_days": "Remaining Filter Days",
-    "use_water_interval": "Water Interval",
-    "use_water_duration": "Water Time Duration"
+    "on": "On",
+    "off": "Off"
   }
 }
-
