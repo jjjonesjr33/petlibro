@@ -24,23 +24,11 @@ class DockstreamSmartRFIDFountain(Device):
             "realInfo": real_info or {}
         })
 
- #   @property
- #   def available(self) -> bool:
- #       """Determine if the device is available."""
- #       return self.online if hasattr(self, 'online') else True
-
     @property
     def available(self) -> bool:
         _LOGGER.debug(f"Device {self.device.name} availability: {self.device.online}")
         return self.device.online if hasattr(self.device, 'online') else True
 
- #   @property
- #   def available(self) -> bool:
- #       _LOGGER.debug(f"Device {self.device.name} availability: True")
- #       return True  # Always available, buttons will not be greyed out
-
-
-    # Properties for Sensors
     @property
     def device_sn(self) -> str:
         """Return the device serial number."""
@@ -86,7 +74,6 @@ class DockstreamSmartRFIDFountain(Device):
         """Get the number of days remaining for machine cleaning."""
         return self._data.get("realInfo", {}).get("remainingCleaningDays", 0)
     
-    # Properties for Binary Sensors
     @property
     def vacuum_state(self) -> bool:
         """Check if the vacuum state is active."""
@@ -107,7 +94,6 @@ class DockstreamSmartRFIDFountain(Device):
         """Get the current running state of the device."""
         return self._data.get("realInfo", {}).get("runningState", "unknown")
     
-    # Properties for Switches
     @property
     def light_switch(self) -> bool:
         """Check if the light is enabled."""
@@ -118,7 +104,6 @@ class DockstreamSmartRFIDFountain(Device):
         """Check if the sound is enabled."""
         return self._data.get("realInfo", {}).get("soundSwitch", False)
     
-    # Properties for Buttons
     async def set_light_switch(self, value: bool):
         """Enable or disable the light."""
         await self.api.set_light_switch(self.serial, value)
@@ -134,7 +119,6 @@ class DockstreamSmartRFIDFountain(Device):
         await self.api.set_manual_cleaning(self.serial)
         await self.refresh()
     
-    # Additional properties from API
     @property
     def today_total_ml(self) -> int:
         """Get the total milliliters of water used today."""

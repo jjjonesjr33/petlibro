@@ -41,6 +41,8 @@ class PetLibroSwitchEntityDescription(SwitchEntityDescription, PetLibroEntityDes
 DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
     Feeder: [
     ],
+    GranaryFeeder: [
+    ],
     OneRFIDSmartFeeder: [
 #        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
 #            key="child_lock_switch",
@@ -60,7 +62,9 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
 #            set_fn=lambda device, value: device.set_sound_enable(value),
 #            name="Enable Sound"
 #        )
-    ]
+    ],
+    DockstreamSmartRFIDFountain: [
+    ],
 }
 
 class PetLibroSwitchEntity(PetLibroEntity[_DeviceT], SwitchEntity):

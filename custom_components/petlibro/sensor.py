@@ -168,6 +168,8 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
 
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
+    Feeder: [
+    ],
     GranaryFeeder: [
     ],
     OneRFIDSmartFeeder: [

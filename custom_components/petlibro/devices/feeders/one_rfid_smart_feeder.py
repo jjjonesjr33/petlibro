@@ -7,8 +7,6 @@ from ..device import Device
 from typing import cast
 from logging import getLogger
 
-# from ..feeders.granary_feeder import GranaryFeeder  # Correct import from GranaryFeeder
-
 _LOGGER = getLogger(__name__)
 
 class OneRFIDSmartFeeder(Device):
@@ -29,23 +27,11 @@ class OneRFIDSmartFeeder(Device):
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for OneRFIDSmartFeeder: {err}")
 
- #   @property
- #   def available(self) -> bool:
- #       """Determine if the device is available."""
- #       return self.online if hasattr(self, 'online') else True
-
     @property
     def available(self) -> bool:
         _LOGGER.debug(f"Device {self.device.name} availability: {self.device.online}")
         return self.device.online if hasattr(self.device, 'online') else True
 
- #   @property
- #   def available(self) -> bool:
- #       _LOGGER.debug(f"Device {self.device.name} availability: True")
- #       return True  # Always available, buttons will not be greyed out
-
-
-    # Property for todayFeedingQuantities (list of quantities fed today)
     @property
     def today_feeding_quantities(self) -> list[int]:
         return self._data.get("grainStatus", {}).get("todayFeedingQuantities", [])
@@ -87,7 +73,6 @@ class OneRFIDSmartFeeder(Device):
     def door_state(self) -> bool:
         return bool(self._data.get("realInfo", {}).get("barnDoorState", False))
 
-    # Remove duplicate door_error_state property.
     @property
     def food_dispenser_state(self) -> bool:
         return not bool(self._data.get("realInfo", {}).get("grainOutletState", True))

@@ -81,7 +81,10 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
         return bool(state)
 
 DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDescription]] = {
-    GranaryFeeder: [],
+    Feeder: [
+    ],
+    GranaryFeeder: [
+    ],
     OneRFIDSmartFeeder: [
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="door_state",

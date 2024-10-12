@@ -3,7 +3,7 @@ description: Suggest a non Tuya PETLIBRO device to add
 title: "[Device]: "
 labels: ["New device", "Triage"]
 assignees:
-  - flifloo
+  - jjjonesjr33
 body:
   - type: markdown
     attributes:

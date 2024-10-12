@@ -1,13 +1,14 @@
-[![version](https://img.shields.io/github/manifest-json/v/flifloo/ha_petlibro?filename=custom_components%2Fpetlibro%2Fmanifest.json&color=slateblue)](https://github.com/jjjonesjr33/ha_petlibro/releases)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/jjjonesjr33/ha_petlibro)
-![GitHub all releases](https://img.shields.io/github/downloads/jjjonesjr33/ha_petlibro/total)
+[![version](https://img.shields.io/github/manifest-json/v/jjjonesjr33/petlibro?filename=custom_components%2Fpetlibro%2Fmanifest.json&color=slateblue)](https://github.com/jjjonesjr33/petlibro/releases)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/jjjonesjr33/petlibro)
+![GitHub all releases](https://img.shields.io/github/downloads/jjjonesjr33/petlibro/total)
 [![Community Forum](https://img.shields.io/static/v1.svg?label=Community&message=Forum&color=41bdf5&logo=HomeAssistant&logoColor=white)](https://community.home-assistant.io/t/petlibro-cloud-integration-non-tuya-wip/759978)
 
 ![Logo](https://raw.githubusercontent.com/jjjonesjr33/ha_petlibro/master/docs/media/logo.png)
 
-# PETLIBRO integration for Home Assistant - RFID Feeder/Fountain
+# PETLIBRO integration for Home Assistant
 
-Have questions, or need support for one of my configs? Get ahold of me via direct message on discord - `Jamie Jones Jr` / `jjjonesjr33` previously  `JJJonesJr33#0001` 
+## Have questions, or need support?
+Get ahold of me via direct message on discord - `Jamie Jones Jr` / `jjjonesjr33` previously  `JJJonesJr33#0001` 
  
 Also if you want to check out all the other things I do follow me on my [**Socials**](https://jjjonesjr33.com/).
 
@@ -17,8 +18,10 @@ Also if you want to check out all the other things I do follow me on my [**Socia
 * One RFID Smart Feeder (PLAF301)
 * Dockstream RFID Smart Fountain (PLWF305)
 
-### May or may not work as intended with
+### Pending Devices / May or may not work as intended with
+
 * Granary Feeder (PLAF103)
+* Dockstream Smart Fountain (PLWF105)
 
 ## One RFID Smart Feeder (PLAF301) Features
 Device Information
@@ -107,6 +110,16 @@ I recommend performing a full reboot of Home Assistant to ensure you are logged 
 
   > The addon is programmed to update every 60 seconds.
 
+## Troubleshooting
+To troubleshoot your Home Assistant instance, you can add the following configuration to your configuration.yaml file:
+
+```yaml
+logger:
+  default: warning  # Default log level for all components
+  logs:
+    custom_components.petlibro: debug    # Enable debug logging for your component
+```
+
 ## Installation
 
 ### Manually
@@ -115,7 +128,7 @@ Get the folder `custom_components/petlibro` in your HA `config/custom_components
 
 
 ### Via [HACS](https://hacs.xyz/)
-<a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=jjjonesjr33&repository=ha_petlibro&category=integration" target="_blank"><img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open your Home Assistant instance and open a repository inside the Home Assistant Community Store." /></a>
+<a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=jjjonesjr33&repository=petlibro&category=integration" target="_blank"><img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open your Home Assistant instance and open a repository inside the Home Assistant Community Store." /></a>
 
 ## Configuration
 <a href="https://my.home-assistant.io/redirect/config_flow_start/?domain=petlibro" target="_blank"><img src="https://my.home-assistant.io/badges/config_flow_start.svg" alt="Open your Home Assistant instance and start setting up a new integration." /></a>
@@ -125,10 +138,3 @@ Get the folder `custom_components/petlibro` in your HA `config/custom_components
   > Only one device can be login at the same time.
   >
   > If you to wan to keep your phone connected, create another account for this integration and share your device to it.
-
-# Credit
-
-The following users were the ones who inspired me to add/customize petlibro via a fourm post ~ Thank you!
-
-* ![flifloo](https://github.com/flifloo)
-* ![C4-Dimitri](https://github.com/C4-Dimitri)
