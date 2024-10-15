@@ -9,7 +9,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .devices import Device
 from .devices.feeders.feeder import Feeder
-from .devices.feeders.granary_feeder import GranaryFeeder
+from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD, PLATFORMS, UPDATE_INTERVAL_SECONDS  # Assuming UPDATE_INTERVAL_SECONDS is defined in const
@@ -24,7 +24,7 @@ PLATFORMS_BY_TYPE = {
         Platform.SWITCH,
         Platform.BUTTON,
     ),
-    GranaryFeeder: (
+    GranarySmartFeeder: (
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
         Platform.SWITCH,

@@ -21,7 +21,7 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 from .devices import Device
 from .devices.device import Device
 from .devices.feeders.feeder import Feeder
-from .devices.feeders.granary_feeder import GranaryFeeder
+from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 
@@ -41,7 +41,7 @@ class PetLibroButtonEntityDescription(ButtonEntityDescription, PetLibroEntityDes
 DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
     Feeder: [
     ],
-    GranaryFeeder: [
+    GranarySmartFeeder: [
     ],
     OneRFIDSmartFeeder: [
         PetLibroButtonEntityDescription[OneRFIDSmartFeeder](

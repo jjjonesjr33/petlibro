@@ -15,12 +15,12 @@ Also if you want to check out all the other things I do follow me on my [**Socia
 ## Supported Devices
 ### This has been reworked to work with the following devices
 
+* Granary Smart Feeder (PLAF103)
 * One RFID Smart Feeder (PLAF301)
 * Dockstream RFID Smart Fountain (PLWF305)
 
 ### Pending Devices / May or may not work as intended with
 
-* Granary Feeder (PLAF103)
 * Dockstream Smart Fountain (PLWF105)
 
 ## One RFID Smart Feeder (PLAF301) Features

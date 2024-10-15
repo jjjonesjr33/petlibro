@@ -25,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 from .devices import Device
 from .devices.device import Device
 from .devices.feeders.feeder import Feeder
-from .devices.feeders.granary_feeder import GranaryFeeder
+from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
@@ -83,7 +83,7 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
 DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDescription]] = {
     Feeder: [
     ],
-    GranaryFeeder: [
+    GranarySmartFeeder: [
     ],
     OneRFIDSmartFeeder: [
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](

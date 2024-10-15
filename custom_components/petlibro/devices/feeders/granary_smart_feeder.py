@@ -5,7 +5,7 @@ from .feeder import Feeder
 
 _LOGGER = getLogger(__name__)
 
-class GranaryFeeder(Device):  # Inherit directly from Device
+class GranarySmartFeeder(Device):  # Inherit directly from Device
     async def refresh(self):
         """Refresh the device data from the API."""
         await super().refresh()  # Call the refresh method from Device
