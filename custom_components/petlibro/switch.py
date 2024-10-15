@@ -41,7 +41,7 @@ class PetLibroSwitchEntityDescription(SwitchEntityDescription, PetLibroEntityDes
 DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
     Feeder: [
     ],
-    GranaryFeeder: [
+    GranarySmartFeeder: [
     ],
     OneRFIDSmartFeeder: [
 #        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
