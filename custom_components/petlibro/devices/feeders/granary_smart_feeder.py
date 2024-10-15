@@ -42,22 +42,6 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         return self._data.get("grainStatus", {}).get("todayFeedingTimes", 0)
 
     @property
-    def today_eating_times(self) -> int:
-        return self._data.get("grainStatus", {}).get("todayEatingTimes", 0)
-
-    @property
-    def today_eating_time(self) -> int:
-        eating_time_str = self._data.get("grainStatus", {}).get("eatingTime", "0'0''")
-        if not eating_time_str:
-            return 0
-        try:
-            minutes, seconds = map(int, eating_time_str.replace("''", "").split("'"))
-            total_seconds = minutes * 60 + seconds
-        except ValueError:
-            return 0
-        return total_seconds
-
-    @property
     def feeding_plan_state(self) -> bool:
         """Return the state of the feeding plan, based on API data."""
         return bool(self._data.get("enableFeedingPlan", False))

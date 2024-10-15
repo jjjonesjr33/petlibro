@@ -239,21 +239,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Today Feeding Times"
         ),
         PetLibroSensorEntityDescription[GranarySmartFeeder](
-            key="today_eating_times",
-            translation_key="today_eating_times",
-            icon="mdi:history",
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            name="Today Eating Times"
-        ),
-        PetLibroSensorEntityDescription[GranarySmartFeeder](
-            key="today_eating_time",
-            translation_key="today_eating_time",
-            native_unit_of_measurement="s",
-            icon="mdi:history",
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            name="Today Eating Time"
-        ),
-        PetLibroSensorEntityDescription[GranarySmartFeeder](
             key="child_lock_switch",
             translation_key="child_lock_switch",
             icon="mdi:lock",
