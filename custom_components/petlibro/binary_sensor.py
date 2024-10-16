@@ -85,28 +85,12 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
     ],
     GranarySmartFeeder: [
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
-            key="door_state",
-            translation_key="door_state",
-            icon="mdi:door",
-            device_class=BinarySensorDeviceClass.DOOR,
-            should_report=lambda device: device.door_state is not None,
-            name="Lid"
-        ),
-        PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
             key="food_dispenser_state",
             translation_key="food_dispenser_state",
             icon="mdi:bowl-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_dispenser_state is not None,
             name="Food Dispenser"
-        ),
-        PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
-            key="door_blocked",
-            translation_key="door_blocked",
-            icon="mdi:door",
-            device_class=BinarySensorDeviceClass.PROBLEM,
-            should_report=lambda device: device.door_blocked is not None,
-            name="Lid Status"
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
             key="food_low",

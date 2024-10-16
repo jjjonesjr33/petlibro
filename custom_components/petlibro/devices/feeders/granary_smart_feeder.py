@@ -51,16 +51,8 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         return cast(str, self._data.get("realInfo", {}).get("batteryState", "unknown"))
 
     @property
-    def door_state(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("barnDoorState", False))
-
-    @property
     def food_dispenser_state(self) -> bool:
         return not bool(self._data.get("realInfo", {}).get("grainOutletState", True))
-
-    @property
-    def door_blocked(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("barnDoorError", False))
 
     @property
     def food_low(self) -> bool:
