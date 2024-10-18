@@ -11,7 +11,7 @@ from typing import Any, cast
 from .const import DOMAIN
 from homeassistant.components.sensor.const import SensorStateClass, SensorDeviceClass
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
-from homeassistant.const import UnitOfMass, UnitOfVolume
+from homeassistant.const import UnitOfMass, UnitOfVolume, PERCENTAGE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
@@ -212,7 +212,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="electric_quantity",
             translation_key="electric_quantity",
             icon="mdi:battery",
-            native_unit_of_measurement="%",
+            native_unit_of_measurement=PERCENTAGE,
             device_class=SensorDeviceClass.BATTERY,
             state_class=SensorStateClass.MEASUREMENT,
             name="Battery / AC %"
@@ -289,7 +289,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="electric_quantity",
             translation_key="electric_quantity",
             icon="mdi:battery",
-            native_unit_of_measurement="%",
+            native_unit_of_measurement=PERCENTAGE,
             device_class=SensorDeviceClass.BATTERY,
             state_class=SensorStateClass.MEASUREMENT,
             name="Battery / AC %"
