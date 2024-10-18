@@ -290,6 +290,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="electric_quantity",
             icon="mdi:battery",
             native_unit_of_measurement="%",
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Battery / AC %"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
