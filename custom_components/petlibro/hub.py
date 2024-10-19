@@ -11,9 +11,7 @@ from homeassistant.const import CONF_REGION, CONF_API_TOKEN
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from aiohttp import ClientResponseError, ClientConnectorError
-
 from .api import PetLibroAPI  # Use a relative import if inside the same package
-
 from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD  # Import CONF_EMAIL and CONF_PASSWORD
 from .api import PetLibroAPIError
 from .devices import Device, product_name_map
@@ -68,7 +66,6 @@ class PetLibroHub:
             update_method=self.refresh_devices,  # Calls the refresh_devices method
             update_interval=timedelta(seconds=UPDATE_INTERVAL_SECONDS),  # Use defined interval
         )
-
 
     async def load_devices(self) -> None:
         """Load devices from the API and initialize them."""
@@ -142,7 +139,6 @@ class PetLibroHub:
             _LOGGER.error(f"Unexpected error during device refresh: {ex}", exc_info=True)
             raise UpdateFailed(f"Unexpected error: {ex}")
 
-
     async def _refresh_device_if_needed(self, device: Device, now: datetime) -> None:
         """Refresh a device only if enough time has passed since the last refresh."""
         device_sn = device.serial
@@ -164,14 +160,12 @@ class PetLibroHub:
             _LOGGER.error(f"Error refreshing {device_sn}: {ex}", exc_info=True)
             raise
 
-
     async def get_device(self, serial: str) -> Optional[Device]:
         """Return the device with the specified serial number."""
         device = next((device for device in self.devices if device.serial == serial), None)
         if not device:
             _LOGGER.debug(f"Device with serial {serial} not found.")
         return device
-
 
     async def async_refresh(self) -> None:
         """Force a manual refresh of devices."""
@@ -186,9 +180,3 @@ class PetLibroHub:
         
         # No need to stop the coordinator explicitly
         return True
-
-
-
-
-
-

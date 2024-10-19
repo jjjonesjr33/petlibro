@@ -7,7 +7,7 @@ from ..device import Device
 
 _LOGGER = getLogger(__name__)
 
-class GranarySmartFeeder(Device):  # Inherit directly from Device
+class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
     async def refresh(self):
         """Refresh the device data from the API."""
         try:
@@ -23,7 +23,7 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
                 "realInfo": real_info or {}
             })
         except PetLibroAPIError as err:
-            _LOGGER.error(f"Error refreshing data for GranarySmartFeeder: {err}")
+            _LOGGER.error(f"Error refreshing data for GranarySmartCameraFeeder: {err}")
 
     @property
     def available(self) -> bool:
@@ -48,8 +48,8 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         return bool(self._data.get("enableFeedingPlan", False))
 
     @property
-    def battery_state(self) -> float:
-        return cast(float, self._data.get("realInfo", {}).get("batteryState", "unknown"))
+    def battery_state(self) -> str:
+        return cast(str, self._data.get("realInfo", {}).get("batteryState", "unknown"))
 
     @property
     def food_dispenser_state(self) -> bool:
@@ -151,6 +151,31 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
     def screen_display_switch(self) -> bool:
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
 
+    @property
+    def resolution(self) -> str:
+        """Return the camera resolution."""
+        return self._data.get("realInfo", {}).get("resolution", "unknown")
+
+    @property
+    def night_vision(self) -> str:
+        """Return the current night vision mode."""
+        return self._data.get("realInfo", {}).get("nightVision", "unknown")
+
+    @property
+    def enable_video_record(self) -> bool:
+        """Return whether video recording is enabled."""
+        return self._data.get("realInfo", {}).get("enableVideoRecord", False)
+
+    @property
+    def video_record_switch(self) -> bool:
+        """Return the state of the video recording switch."""
+        return self._data.get("realInfo", {}).get("videoRecordSwitch", False)
+
+    @property
+    def video_record_mode(self) -> str:
+        """Return the current video recording mode."""
+        return self._data.get("realInfo", {}).get("videoRecordMode", "unknown")
+    
     @property
     def remaining_desiccant(self) -> str:
         """Get the remaining desiccant days."""
