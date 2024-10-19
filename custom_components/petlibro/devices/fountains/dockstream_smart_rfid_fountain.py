@@ -45,9 +45,15 @@ class DockstreamSmartRFIDFountain(Device):
         return bool(self._data.get("realInfo", {}).get("online", False))
     
     @property
-    def battery_state(self) -> str:
-        """Get the battery state."""
-        return self._data.get("realInfo", {}).get("batteryState", "unknown")
+    def battery_display_type(self) -> float:
+        """Get the battery percentage state."""
+        try:
+            value = str(self._data.get("realInfo", {}).get("batteryDisplayType", "percentage"))
+            # Attempt to convert the value to a float
+            return cast(float, float(value))
+        except (TypeError, ValueError):
+            # Handle the case where the value is None or not a valid float
+            return 0.0
     
     @property
     def wifi_rssi(self) -> int:

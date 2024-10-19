@@ -292,7 +292,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="electric_quantity",
             translation_key="electric_quantity",
             icon="mdi:battery",
-            native_unit_of_measurement="%",
+            native_unit_of_measurement=PERCENTAGE,
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Battery / AC %"
         ),
         PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
