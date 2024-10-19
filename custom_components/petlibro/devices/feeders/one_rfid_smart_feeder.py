@@ -89,9 +89,15 @@ class OneRFIDSmartFeeder(Device):
     def unit_type(self) -> int:
         return self._data.get("realInfo", {}).get("unitType", 1)
 
-    @property
-    def battery_display_type(self) -> float:
-        return cast(float, self._data.get("realInfo", {}).get("batteryDisplayType", "percentage"))
+@property
+def battery_display_type(self) -> float:
+    try:
+        value = str(self._data.get("realInfo", {}).get("batteryDisplayType", "percentage"))
+        # Attempt to convert the value to a float
+        return cast(float, float(value))
+    except (TypeError, ValueError):
+        # Handle the case where the value is None or not a valid float
+        return 0.0
 
     @property
     def online(self) -> bool:
