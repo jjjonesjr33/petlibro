@@ -22,7 +22,9 @@ from .devices import Device
 from .devices.device import Device
 from .devices.feeders.feeder import Feeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
+from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
+from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 
 @dataclass(frozen=True)
@@ -59,7 +61,27 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
+        )
+    ],
+    GranarySmartCameraFeeder: [
+        PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
+            key="manual_feed",
+            translation_key="manual_feed",
+            set_fn=lambda device: device.set_manual_feed(),
+            name="Manual Feed"
         ),
+        PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
+            key="enable_feeding_plan",
+            translation_key="enable_feeding_plan",
+            set_fn=lambda device: device.set_feeding_plan(True),
+            name="Enable Feeding Plan"
+        ),
+        PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
+            key="disable_feeding_plan",
+            translation_key="disable_feeding_plan",
+            set_fn=lambda device: device.set_feeding_plan(False),
+            name="Disable Feeding Plan"
+        )
     ],
     OneRFIDSmartFeeder: [
         PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
@@ -79,7 +101,9 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
-        ),
+        )
+    ],
+    DockstreamSmartFountain: [
     ],
     DockstreamSmartRFIDFountain: [
     ],

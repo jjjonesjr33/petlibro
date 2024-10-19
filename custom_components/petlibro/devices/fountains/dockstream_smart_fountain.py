@@ -9,8 +9,8 @@ from logging import getLogger
 
 _LOGGER = getLogger(__name__)
 
-class DockstreamSmartRFIDFountain(Device):
-    """Represents the Dockstream Smart RFID Fountain device."""
+class DockstreamSmartFountain(Device):
+    """Represents the Dockstream Smart Fountain device."""
 
     async def refresh(self):
         """Refresh the device data from the API."""

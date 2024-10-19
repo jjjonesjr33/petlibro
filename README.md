@@ -16,12 +16,16 @@ Also if you want to check out all the other things I do follow me on my [**Socia
 ### This has been reworked to work with the following devices
 
 * Granary Smart Feeder (PLAF103)
+* Granary Smart Camera Feeder (PLAF203)
 * One RFID Smart Feeder (PLAF301)
+* Dockstream Smart Fountain (PLWF105)
 * Dockstream RFID Smart Fountain (PLWF305)
 
-### Pending Devices / May or may not work as intended with
+### Some Devices / May or may not work as intended
 
-* Dockstream Smart Fountain (PLWF105)
+* If you have a device that you would like added please issue a [request](https://github.com/jjjonesjr33/petlibro/issues/new/choose).
+
+# Device Preview
 
 ## One RFID Smart Feeder (PLAF301) Features
 Device Information
@@ -97,9 +101,13 @@ Connectivity
 * This is still a WIP integration, features may or may not be removed at any time. If you have suggestions please let me know.
 - Features missing, but in the works.
 
-  > Buttons to reset Cleaning/Filter Days - Dockstream RFID Smart Fountain (PLWF305)
+  > Buttons to reset Cleaning/Filter/Desiccant - (PLAF103), (PLAF203), (PLAF301), (PLWF105), (PLWF305)
+
+  > Switches to be added - Child Lock/Button Lock, Screen/Display, and Volume - (PLAF103), (PLAF203), (PLAF301)
 
   > Tracking RFID per pet intance eat/drink - Both (PLAF301) & (PLWF305) - Currently missing the API to setup tracking.
+
+  > Live camera feed for Granary Smart Camera Feeder (PLAF203) - Currently missing the API to setup live stream.
 
 # NOTICE
 Alpha/Beta State Notice for this Plugin:
