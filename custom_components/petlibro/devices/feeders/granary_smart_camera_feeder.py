@@ -1,19 +1,17 @@
 import aiohttp
 
-from ...api import make_api_call
-from aiohttp import ClientSession, ClientError
-from ...exceptions import PetLibroAPIError
-from ..device import Device
 from typing import cast
 from logging import getLogger
+from ...exceptions import PetLibroAPIError
+from ..device import Device
 
 _LOGGER = getLogger(__name__)
 
-class OneRFIDSmartFeeder(Device):
+class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
     async def refresh(self):
         """Refresh the device data from the API."""
         try:
-            await super().refresh()  # This calls the refresh method in GranaryFeeder (which also inherits from Device)
+            await super().refresh()  # Call the refresh method from Device
     
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
@@ -25,7 +23,7 @@ class OneRFIDSmartFeeder(Device):
                 "realInfo": real_info or {}
             })
         except PetLibroAPIError as err:
-            _LOGGER.error(f"Error refreshing data for OneRFIDSmartFeeder: {err}")
+            _LOGGER.error(f"Error refreshing data for GranarySmartCameraFeeder: {err}")
 
     @property
     def available(self) -> bool:
@@ -45,22 +43,6 @@ class OneRFIDSmartFeeder(Device):
         return self._data.get("grainStatus", {}).get("todayFeedingTimes", 0)
 
     @property
-    def today_eating_times(self) -> int:
-        return self._data.get("grainStatus", {}).get("todayEatingTimes", 0)
-
-    @property
-    def today_eating_time(self) -> int:
-        eating_time_str = self._data.get("grainStatus", {}).get("eatingTime", "0'0''")
-        if not eating_time_str:
-            return 0
-        try:
-            minutes, seconds = map(int, eating_time_str.replace("''", "").split("'"))
-            total_seconds = minutes * 60 + seconds
-        except ValueError:
-            return 0
-        return total_seconds
-
-    @property
     def feeding_plan_state(self) -> bool:
         """Return the state of the feeding plan, based on API data."""
         return bool(self._data.get("enableFeedingPlan", False))
@@ -70,16 +52,8 @@ class OneRFIDSmartFeeder(Device):
         return cast(str, self._data.get("realInfo", {}).get("batteryState", "unknown"))
 
     @property
-    def door_state(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("barnDoorState", False))
-
-    @property
     def food_dispenser_state(self) -> bool:
         return not bool(self._data.get("realInfo", {}).get("grainOutletState", True))
-
-    @property
-    def door_blocked(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("barnDoorError", False))
 
     @property
     def food_low(self) -> bool:
@@ -178,6 +152,31 @@ class OneRFIDSmartFeeder(Device):
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
 
     @property
+    def resolution(self) -> str:
+        """Return the camera resolution."""
+        return self._data.get("realInfo", {}).get("resolution", "unknown")
+
+    @property
+    def night_vision(self) -> str:
+        """Return the current night vision mode."""
+        return self._data.get("realInfo", {}).get("nightVision", "unknown")
+
+    @property
+    def enable_video_record(self) -> bool:
+        """Return whether video recording is enabled."""
+        return self._data.get("realInfo", {}).get("enableVideoRecord", False)
+
+    @property
+    def video_record_switch(self) -> bool:
+        """Return the state of the video recording switch."""
+        return self._data.get("realInfo", {}).get("videoRecordSwitch", False)
+
+    @property
+    def video_record_mode(self) -> str:
+        """Return the current video recording mode."""
+        return self._data.get("realInfo", {}).get("videoRecordMode", "unknown")
+    
+    @property
     def remaining_desiccant(self) -> str:
         """Get the remaining desiccant days."""
         return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
@@ -261,4 +260,3 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
-

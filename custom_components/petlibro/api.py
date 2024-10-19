@@ -9,16 +9,12 @@ from logging import getLogger
 from hashlib import md5
 from urllib.parse import urljoin
 from typing import Any, Dict, List, TypeAlias
-
-## Added this to fix dupe logs
 from datetime import datetime, timedelta
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-
 from homeassistant.exceptions import ConfigEntryAuthFailed
-
 from .exceptions import PetLibroAPIError, PetLibroInvalidAuth
-
 from aiohttp import ClientSession, ClientError
+
 import aiohttp
 import uuid  # To generate unique request IDs
 
@@ -31,12 +27,14 @@ _LOGGER = getLogger(__name__)
 
 class PetLibroSession:
     """PetLibro AIOHTTP session"""
-    def __init__(self, base_url: str, websession: ClientSession, email: str, password: str, token: str | None = None):
+    
+    def __init__(self, base_url: str, websession: ClientSession, email: str, password: str, region: str, token: str | None = None):
         self.base_url = base_url
         self.websession = websession
         self.token = token
-        self.email = email  # Save email for re-login
-        self.password = password  # Save password for re-login
+        self.email = email
+        self.password = password
+        self.region = region
         self.headers = {
             "source": "ANDROID",
             "language": "EN",
@@ -51,14 +49,10 @@ class PetLibroSession:
     async def post_serial(self, path: str, serial: str, **kwargs: Any) -> JSON:
         """POST request with device serial in the payload."""
         json_data = kwargs.get("json", {})
-        
-        # Ensure both "id" and "deviceSn" are included in the payload
         json_data["id"] = serial  # Add serial as 'id'
         json_data["deviceSn"] = serial  # Add serial as 'deviceSn'
-        
         kwargs["json"] = json_data
         return await self.request("POST", path, **kwargs)
-
 
     async def request(self, method: str, url: str, **kwargs: Any) -> JSON:
         """Make a request."""
@@ -82,10 +76,6 @@ class PetLibroSession:
         else:
             _LOGGER.warning("No token available for request. Attempting to log in...")
 
-        # Log the request details
-        _LOGGER.debug(f"Request Headers: {kwargs['headers']}")
-        _LOGGER.debug(f"Request JSON: {kwargs.get('json')}")
-
         # Send the request
         async with self.websession.request(method, joined_url, **kwargs) as resp:
             _LOGGER.debug(f"Received response status: {resp.status}")
@@ -101,9 +91,12 @@ class PetLibroSession:
 
             if data.get("code") == 1009:  # NOT_YET_LOGIN error code
                 _LOGGER.warning(f"NOT_YET_LOGIN error occurred for {joined_url}. Trying re-login.")
-                await self.re_login()  # Re-login if necessary
-                kwargs["headers"]["token"] = self.token
-                _LOGGER.debug(f"Retrying request with new token: {self.token}")
+                # Trigger a re-login and get the new token
+                new_token = await self.re_login()
+                kwargs["headers"]["token"] = new_token
+                _LOGGER.debug(f"Retrying request with new token: {new_token}")
+
+                # Retry the request with the new token
                 async with self.websession.request(method, joined_url, **kwargs) as retry_resp:
                     retry_data = await retry_resp.json()
                     _LOGGER.debug(f"Retry response: {retry_data}")
@@ -114,45 +107,51 @@ class PetLibroSession:
 
             return data.get("data")
 
-    async def re_login(self):
+    async def re_login(self) -> str:
         """Re-login to get a new token when the old one expires."""
         try:
             _LOGGER.debug(f"Attempting re-login with email: {self.email} and region: {self.region}")
 
-            # Making the login request
             async with self.websession.post(
                 urljoin(self.base_url, "/member/auth/login"),
                 json={
                     "appId": PetLibroAPI.APPID,
                     "appSn": PetLibroAPI.APPSN,
-                    "country": self.region,  # Ensure region is passed correctly
+                    "country": self.region,
                     "email": self.email,
                     "password": PetLibroAPI.hash_password(self.password),
-                    "phoneBrand": "",  # Optional fields, can be customized
+                    "phoneBrand": "",
                     "phoneSystemVersion": "",
                     "timezone": self.headers["timezone"],
                     "thirdId": None,
                     "type": None
-                }
+                },
+                headers=self.headers
             ) as response:
-                # Log the status code of the response
                 _LOGGER.debug(f"Re-login response status: {response.status}")
 
-                # Check if the response status is not 200 (success)
                 if response.status != 200:
                     raise PetLibroAPIError(f"Failed to login, status: {response.status}")
 
-                # Parse the response as JSON
                 response_data = await response.json()
                 _LOGGER.debug(f"Re-login response data: {response_data}")
 
-                # Check if the token is present in the response
-                if not isinstance(response_data, dict) or "token" not in response_data:
+                if not isinstance(response_data, dict) or "token" not in response_data.get("data", {}):
                     raise PetLibroAPIError("Token not found during login.")
 
-                # Set the new token
-                self.token = response_data["token"]
-                _LOGGER.debug(f"Re-login successful, new token obtained: {self.token}")
+                # Get the new token from response data
+                new_token = response_data["data"]["token"]
+                self.token = new_token  # Update the session token
+
+                # Save the new token in the config entry
+                if hasattr(self, 'api') and self.api.hass and self.api.config_entry:
+                    _LOGGER.debug(f"Saving new token to config entry: {self.token}")
+                    self.api.hass.config_entries.async_update_entry(
+                        self.api.config_entry,
+                        data={**self.api.config_entry.data, "token": self.token}
+                    )
+
+                return new_token
 
         except aiohttp.ClientError as e:
             _LOGGER.error(f"Re-login failed due to a client error: {e}")
@@ -171,13 +170,25 @@ class PetLibroAPI:
         "US": "https://api.us.petlibro.com"
     }
 
-    def __init__(self, session: ClientSession, time_zone: str, region: str, email: str, password: str, token: str | None = None):
+    def __init__(self, session: ClientSession, time_zone: str, region: str, email: str, password: str, token: str | None = None, config_entry=None, hass=None):
         """Initialize."""
-        self.session = PetLibroSession(self.API_URLS[region], session, email, password, token)
+        self.session = PetLibroSession(self.API_URLS[region], session, email, password, region, token)
         self.region = region
         self.time_zone = time_zone
         self.email = email  # Store email for login/re-login
         self.password = password  # Store password for login/re-login
+        self.token = token
+        self.config_entry = config_entry
+        self.hass = hass
+
+        # Inject the API reference into the session for token saving
+        self.session.api = self
+
+        # Load the saved token if available
+        if config_entry and "token" in config_entry.data:
+            self.token = config_entry.data["token"]
+            _LOGGER.debug(f"Loaded saved token: {self.token}")
+
         self._last_api_call_times = {}  # To store last call time per device
         self._cached_responses = {}  # To store cached responses for short periods
 
@@ -243,13 +254,11 @@ class PetLibroAPI:
             _LOGGER.error(f"Error fetching realInfo for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching realInfo for device {device_id}: {e}")
 
-
     async def logout(self):
         """Logout of the API and reset the token"""
         await self.session.post("/member/auth/logout")
         self.session.token = None
         _LOGGER.debug("Logout successful, token cleared.")
-
 
     async def list_devices(self) -> List[dict]:
         """
@@ -260,7 +269,6 @@ class PetLibroAPI:
         """
         _LOGGER.debug("Requesting list of devices")
         return await self.session.post("/device/device/list", json={})  # Ensure JSON is passed here
-
 
     async def device_base_info(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/device/baseInfo", serial)
@@ -297,7 +305,6 @@ class PetLibroAPI:
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set child lock for device {serial}: {err}")
             raise PetLibroAPIError(f"Error setting child lock: {err}")
-
 
     async def set_light_enable(self, serial: str, enable: bool):
         """Enable or disable the light functionality with error handling."""

@@ -23,7 +23,9 @@ from .devices import Device
 from .devices.device import Device
 from .devices.feeders.feeder import Feeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
+from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
+from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 
 @dataclass(frozen=True)
@@ -43,25 +45,11 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
     ],
     GranarySmartFeeder: [
     ],
+    GranarySmartCameraFeeder: [
+    ],
     OneRFIDSmartFeeder: [
-#        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
-#            key="child_lock_switch",
-#            translation_key="child_lock_switch",
-#            set_fn=lambda device, value: device.set_child_lock(value),
-#            name="Buttons Lock"
-#        ),
-#        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
-#            key="enable_light",
-#            translation_key="enable_light",
-#            set_fn=lambda device, value: device.set_light_enable(value),
-#            name="Enable Display"
-#        ),
-#        PetLibroSwitchEntityDescription[OneRFIDSmartFeeder](
-#            key="enable_sound",
-#            translation_key="enable_sound",
-#            set_fn=lambda device, value: device.set_sound_enable(value),
-#            name="Enable Sound"
-#        )
+    ],
+    DockstreamSmartFountain: [
     ],
     DockstreamSmartRFIDFountain: [
     ],

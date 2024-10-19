@@ -1,4 +1,5 @@
 import aiohttp
+
 from typing import cast
 from logging import getLogger
 from ...exceptions import PetLibroAPIError

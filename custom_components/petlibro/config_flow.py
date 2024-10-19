@@ -133,4 +133,3 @@ class PetlibroConfigFlow(ConfigFlow, domain=DOMAIN):
             return "unknown"
 
         return ""
-

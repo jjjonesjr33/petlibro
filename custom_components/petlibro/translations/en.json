@@ -80,6 +80,21 @@
             },
             "remaining_cleaning_days": {
                 "name": "Remaining Cleaning Days"
+            },
+            "resolution": {
+                "name": "Camera Resolution"
+            },
+            "night_vision": {
+                "name": "Night Vision Mode"
+            },
+            "enable_video_record": {
+                "name": "Video Recording Enabled"
+            },
+            "video_record_switch": {
+                "name": "Video Recording Switch"
+            },
+            "video_record_mode": {
+                "name": "Video Recording Mode"
             }
         },
         "switch": {
