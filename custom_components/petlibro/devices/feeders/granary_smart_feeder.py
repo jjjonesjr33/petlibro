@@ -48,8 +48,8 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         return bool(self._data.get("enableFeedingPlan", False))
 
     @property
-    def battery_state(self) -> float:
-        return cast(float, self._data.get("realInfo", {}).get("batteryState", "unknown"))
+    def battery_state(self) -> str:
+        return cast(str, self._data.get("realInfo", {}).get("batteryState", "unknown"))
 
     @property
     def food_dispenser_state(self) -> bool:
