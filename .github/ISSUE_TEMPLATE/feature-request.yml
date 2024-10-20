@@ -1,6 +1,6 @@
 name: Feature request
 description: Suggest a new feature or enhancement for the integration
-title: "[Feature]: "
+title: "[Feature Request]: "
 labels: ["Feature request", "Triage"]
 assignees:
   - jjjonesjr33
