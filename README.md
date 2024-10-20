@@ -1,14 +1,14 @@
 [![version](https://img.shields.io/github/manifest-json/v/jjjonesjr33/petlibro?filename=custom_components%2Fpetlibro%2Fmanifest.json&color=slateblue)](https://github.com/jjjonesjr33/petlibro/releases)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/jjjonesjr33/petlibro)
-![GitHub all releases](https://img.shields.io/github/downloads/jjjonesjr33/petlibro/total)
 [![Community Forum](https://img.shields.io/static/v1.svg?label=Community&message=Forum&color=41bdf5&logo=HomeAssistant&logoColor=white)](https://community.home-assistant.io/t/petlibro-cloud-integration-non-tuya-wip/759978)
+[![Become a Sponsor](https://img.shields.io/badge/Become%20a%20Sponsor-❤️-black)](https://github.com/sponsors/jjjonesjr33)
 
 ![Logo](https://raw.githubusercontent.com/jjjonesjr33/ha_petlibro/master/docs/media/logo.png)
 
 # PETLIBRO integration for Home Assistant
 
-## Have questions, or need support?
-Get ahold of me via direct message on discord - `Jamie Jones Jr` / `jjjonesjr33` previously  `JJJonesJr33#0001` 
+## Have questions, or need support? We now have a [Wiki](https://github.com/jjjonesjr33/petlibro/wiki)!
+Or get ahold of me via direct message on discord - `Jamie Jones Jr` / `jjjonesjr33` previously  `JJJonesJr33#0001` 
  
 Also if you want to check out all the other things I do follow me on my [**Socials**](https://jjjonesjr33.com/).
 
