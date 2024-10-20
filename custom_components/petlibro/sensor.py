@@ -160,6 +160,9 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         # For weight_percent, display as a percentage
         elif self.entity_description.key == "weight_percent":
             return "%"
+        # For electric_quantity, display as a percentage
+        elif self.entity_description.key == "electric_quantity":
+            return "%"
         # Default behavior for other sensors
         return self.entity_description.native_unit_of_measurement_fn(self.device)
 
@@ -215,6 +218,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="electric_quantity",
             icon="mdi:battery",
             native_unit_of_measurement="%",
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Battery / AC %"
         ),
         PetLibroSensorEntityDescription[GranarySmartFeeder](
@@ -291,6 +296,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="electric_quantity",
             icon="mdi:battery",
             native_unit_of_measurement="%",
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Battery / AC %"
         ),
         PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
@@ -401,6 +408,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="electric_quantity",
             icon="mdi:battery",
             native_unit_of_measurement="%",
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Battery / AC %"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
