@@ -1,0 +1,64 @@
+name: Feature request
+description: Suggest a new feature or enhancement for the integration
+title: "[Feature]: "
+labels: ["Feature request", "Triage"]
+assignees:
+  - jjjonesjr33
+body:
+  - type: markdown
+    attributes:
+      value: We need some information to help us consider your feature request for the integration
+  - type: input
+    id: model_name
+    attributes:
+      label: Device model name
+      placeholder: ex. Granary Feeder
+    validations:
+      required: true
+  - type: input
+    id: model_number
+    attributes:
+      label: Device model number
+      placeholder: ex. PLAF103
+    validations:
+      required: true
+  - type: dropdown
+    id: device_type
+    attributes:
+      label: Device type
+      options:
+        - Feeder
+        - Fountain
+        - Other
+      default: 0
+    validations:
+      required: true
+  - type: input
+    id: feature_name
+    attributes:
+      label: Feature name
+      placeholder: ex. Schedule Feeding Feature
+    validations:
+      required: true
+  - type: textarea
+    id: feature_description
+    attributes:
+      label: Describe the feature
+      placeholder: Explain what the feature should do and why it would be useful
+    validations:
+      required: true
+  - type: input
+    id: use_case
+    attributes:
+      label: What problem does this feature solve?
+      placeholder: Describe the use case or the problem it addresses
+    validations:
+      required: true
+  - type: checkboxes
+    id: available_to_help
+    attributes:
+      label: Available to help with the feature development
+      description: If possible, let us know if you are willing to assist in testing or developing this feature
+      options:
+        - label: I agree to help with testing or providing relevant information for this feature request
+          required: true
