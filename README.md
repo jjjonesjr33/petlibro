@@ -8,8 +8,8 @@
 # PETLIBRO integration for Home Assistant
 
 ## Have questions, or need support? We now have a [Wiki](https://github.com/jjjonesjr33/petlibro/wiki)!
-Or get ahold of me via direct message on discord - `Jamie Jones Jr` / `jjjonesjr33` previously  `JJJonesJr33#0001` 
- 
+Or get ahold of me via direct message on discord - `Jamie Jones Jr` / `jjjonesjr33` previously  `JJJonesJr33#0001`
+
 Also if you want to check out all the other things I do follow me on my [**Socials**](https://jjjonesjr33.com/).
 
 ## Supported Devices
@@ -97,7 +97,7 @@ Connectivity
 ## Dockstream RFID Smart Fountain Preview
 ![Dockstream RFID Smart Fountain](https://github.com/user-attachments/assets/45622291-5eae-4a83-87ea-b98a8749b8f8)
 
-# In Devlopment
+# In Development
 * This is still a WIP integration, features may or may not be removed at any time. If you have suggestions please let me know.
 - Features missing, but in the works.
 
