@@ -1,6 +1,5 @@
 """Generic PETLIBRO feeder"""
 from typing import Optional, cast
-from . import Device
 from ..device import Device
 
 
@@ -17,6 +16,7 @@ UNITS_RATIO = {
     3: 10,
     4: 20
 }
+
 
 class Feeder(Device):
     """Generic PETLIBRO feeder device"""
@@ -35,7 +35,7 @@ class Feeder(Device):
     @property
     def unit_type(self) -> str | None:
         """The device unit type"""
-        unit : Optional[str] = None
+        unit: Optional[str] = None
 
         if unit_id := self.unit_id:
             unit = UNITS.get(unit_id)

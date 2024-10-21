@@ -7,16 +7,17 @@ from ..device import Device
 
 _LOGGER = getLogger(__name__)
 
+
 class GranarySmartFeeder(Device):  # Inherit directly from Device
     async def refresh(self):
         """Refresh the device data from the API."""
         try:
             await super().refresh()  # Call the refresh method from Device
-    
+
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
-    
+
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
@@ -162,16 +163,6 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
     def remaining_desiccant(self) -> str:
         """Get the remaining desiccant days."""
         return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
-    
-    # Error-handling updated for set_feeding_plan
-    async def set_feeding_plan(self, value: bool) -> None:
-        _LOGGER.debug(f"Setting feeding plan to {value} for {self.serial}")
-        try:
-            await self.api.set_feeding_plan(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting feeding plan: {err}")
 
     # Error-handling updated for set_child_lock
     async def set_child_lock(self, value: bool) -> None:
