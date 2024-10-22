@@ -20,8 +20,11 @@ class Fountain(Device):
 
     @property
     def available(self) -> bool:
-        _LOGGER.debug(f"Device {self.device.name} availability: {self.device.online}")
-        return self.device.online if hasattr(self.device, 'online') else True
+        # `Device` doesn't seem to have a `device` field so I'm not
+        # sure that this works.
+        # _LOGGER.debug(f"Device {self.device.name} availability: {self.device.online}")
+        # return self.device.online if hasattr(self.device, 'online') else True
+        return True
 
     @property
     def device_sn(self) -> str:

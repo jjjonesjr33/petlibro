@@ -30,6 +30,7 @@ class Device(Event):
             _LOGGER.error(f"Error updating data: {e}")
             # Optionally log specific fields instead of the entire data
             _LOGGER.debug(f"Partial data: {data.get('deviceSn', 'Unknown Serial')}")
+
     async def refresh(self):
         """Refresh the device data from the API."""
         try:
@@ -39,7 +40,7 @@ class Device(Event):
             self.update_data(data)
         except Exception as e:
             _LOGGER.error(f"Failed to refresh device data: {e}")
-            
+
     # def update_data(self, data: dict) -> None:
     #     """Save the device info from a data dictionary."""
     #     _LOGGER.error("Updating data with: %s", data)

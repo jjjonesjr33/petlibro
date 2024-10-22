@@ -27,7 +27,9 @@ _LOGGER = getLogger(__name__)
 
 class PetLibroSession:
     """PetLibro AIOHTTP session"""
-    
+
+    api: PetLibroAPI | None
+
     def __init__(self, base_url: str, websession: ClientSession, email: str, password: str, region: str, token: str | None = None):
         self.base_url = base_url
         self.websession = websession
@@ -144,12 +146,17 @@ class PetLibroSession:
                 self.token = new_token  # Update the session token
 
                 # Save the new token in the config entry
-                if hasattr(self, 'api') and self.api.hass and self.api.config_entry:
-                    _LOGGER.debug(f"Saving new token to config entry: {self.token}")
-                    self.api.hass.config_entries.async_update_entry(
-                        self.api.config_entry,
-                        data={**self.api.config_entry.data, "token": self.token}
-                    )
+                # Repeated getattrs to appease mypy
+                api = getattr(self, 'api', None)
+                if api:
+                    hass = getattr(api, 'hass', None)
+                    config_entry = getattr(api, 'config_entry', None)
+                    if hass and config_entry:
+                        _LOGGER.debug(f"Saving new token to config entry: {self.token}")
+                        hass.config_entries.async_update_entry(
+                            config_entry,
+                            data={**config_entry.data, "token": self.token}
+                        )
 
                 return new_token
 
@@ -189,7 +196,7 @@ class PetLibroAPI:
             self.token = config_entry.data["token"]
             _LOGGER.debug(f"Loaded saved token: {self.token}")
 
-        self._last_api_call_times = {}  # To store last call time per device
+        self._last_api_call_times: dict[str, datetime] = {}  # To store last call time per device
         self._cached_responses = {}  # To store cached responses for short periods
 
     @staticmethod
@@ -200,7 +207,7 @@ class PetLibroAPI:
     async def login(self, email: str, password: str) -> str:
         """Login to the API and retrieve the token"""
         _LOGGER.debug("Attempting to log in with email: %s", email)
-        
+
         try:
             # Use the request method with "POST" instead of post()
             data = await self.session.request("POST", "/member/auth/login", json={
@@ -294,7 +301,7 @@ class PetLibroAPI:
         """Enable or disable the child lock functionality."""
         try:
             response = await self.session.post(
-                "/device/setting/updateChildLockSwitch", 
+                "/device/setting/updateChildLockSwitch",
                 json={"deviceSn": serial, "enable": enable}
             )
 
@@ -329,7 +336,7 @@ class PetLibroAPI:
         """Enable or disable the sound functionality."""
         try:
             response = await self.session.post(
-                "/device/setting/updateSoundEnableSwitch", 
+                "/device/setting/updateSoundEnableSwitch",
                 json={"deviceSn": serial, "enable": enable}
             )
             response.raise_for_status()
@@ -347,7 +354,7 @@ class PetLibroAPI:
     async def set_manual_feed(self, serial: str) -> JSON:
         """Trigger manual feeding for a specific device."""
         _LOGGER.debug(f"Triggering manual feeding for device with serial: {serial}")
-        
+
         try:
             # Generate a dynamic request ID for the manual feeding
             request_id = str(uuid.uuid4()).replace("-", "")
@@ -363,11 +370,11 @@ class PetLibroAPI:
             if isinstance(response, int):
                 _LOGGER.debug(f"Manual feeding successful, returned code: {response}")
                 return response
-            
+
             # If response is a dictionary (JSON), handle it
             response_data = await response.json()
             _LOGGER.debug(f"Manual feeding response data: {response_data}")
-            
+
             # Check if the response indicates success
             if response.status != 200 or response_data.get("code") != 0:
                 raise PetLibroAPIError(f"Failed to trigger manual feeding: {response_data.get('msg')}")
@@ -386,4 +393,4 @@ class PetLibroDataCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         # Fetch data from the API once per update cycle
-        return await self.api.fetch_device_data()        
+        return await self.api.fetch_device_data()

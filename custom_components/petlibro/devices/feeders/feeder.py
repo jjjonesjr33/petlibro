@@ -19,8 +19,8 @@ UNITS = {
 UNITS_RATIO = {
     1: 1/12,
     2: 0.35,
-    3: 10,
-    4: 20
+    3: 10.0,
+    4: 20.0
 }
 
 
@@ -53,7 +53,7 @@ class Feeder(Device):
         return self._data.get("enableFeedingPlan", False)
 
     async def set_feeding_plan(self, value: bool):
-        await self.api.set_device_feeding_plan(self.serial, value)
+        await self.api.set_feeding_plan(self.serial, value)
         await self.refresh()
 
     @property
@@ -76,7 +76,7 @@ class Feeder(Device):
         :return: Converted value or unchanged if no unit
         """
         if self.unit_id:
-            return value * UNITS_RATIO.get(self.unit_id, 1)
+            return int(value * UNITS_RATIO.get(self.unit_id, 1.0))
         return value
 
 
@@ -100,8 +100,11 @@ class BaseFeeder(Device):
 
     @property
     def available(self) -> bool:
-        _LOGGER.debug(f"Device {self.device.name} availability: {self.device.online}")
-        return self.device.online if hasattr(self.device, 'online') else True
+        # `Device` doesn't seem to have a `device` field so I'm not
+        # sure that this works.
+        # _LOGGER.debug(f"Device {self.device.name} availability: {self.device.online}")
+        # return self.device.online if hasattr(self.device, 'online') else True
+        return True
 
     @property
     def today_feeding_quantities(self) -> list[int]:
