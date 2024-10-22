@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from typing import Generic, TypeVar
 from functools import cached_property
+from dataclasses import dataclass
 
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
+from homeassistant.components.sensor.const import SensorStateClass
 
 from .devices import Device
 from .devices.event import EVENT_UPDATE
@@ -52,5 +54,12 @@ class PetLibroEntity(
         await super().async_added_to_hass()
         self.async_on_remove(self.device.on(EVENT_UPDATE, self.async_write_ha_state))
 
+@dataclass(frozen=True)
 class PetLibroEntityDescription(EntityDescription, Generic[_DeviceT]):
     """PETLIBRO Entity description"""
+
+    key: str
+    translation_key: str
+    name: str
+    icon: str | None = None
+    state_class: SensorStateClass | None = None

@@ -26,9 +26,8 @@ class PetLibroHub:
         self.hass = hass
         self._data = data
         self.devices: List[Device] = []  # Initialize devices as an instance variable
-        self.last_refresh_times = {}  # Track the last refresh time for each device
-        self.loaded_device_sn = set()  # Track device serial numbers that have already been loaded
-        self._last_online_status = {}  # Store online status per device
+        self.last_refresh_times: dict[str, datetime] = {}  # Track the last refresh time for each device
+        self.loaded_device_sn: set[str] = set()  # Track device serial numbers that have already been loaded
 
         # Fetch email, password, and region from entry.data
         email = data.get(CONF_EMAIL)
@@ -177,6 +176,6 @@ class PetLibroHub:
         _LOGGER.debug("Unloading PetLibro Hub and clearing devices.")
         self.devices.clear()  # Clears the device list
         self.last_refresh_times.clear()  # Clears refresh times as well
-        
+
         # No need to stop the coordinator explicitly
         return True

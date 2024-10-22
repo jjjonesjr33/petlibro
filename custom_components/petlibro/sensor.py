@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from logging import getLogger
 from collections.abc import Callable
 from datetime import datetime
-from typing import Any, cast
+from typing import Any, cast, List
 from .const import DOMAIN
 from homeassistant.components.sensor.const import SensorStateClass, SensorDeviceClass
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
@@ -50,13 +50,17 @@ def device_class_feeder(device: Feeder) -> SensorDeviceClass | None:
     if device.unit_type in [UnitOfVolume.MILLILITERS]:
         return SensorDeviceClass.VOLUME
 
+    return None
+
 
 @dataclass(frozen=True)
 class PetLibroSensorEntityDescription(SensorEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device sensor entities."""
 
     icon_fn: Callable[[Any], str | None] = lambda _: None
+    native_unit_of_measurement: str | None = None
     native_unit_of_measurement_fn: Callable[[_DeviceT], str | None] = lambda _: None
+    device_class: SensorDeviceClass | None = None
     device_class_fn: Callable[[_DeviceT], SensorDeviceClass | None] = lambda _: None
     should_report: Callable[[_DeviceT], bool] = lambda _: True
 
@@ -69,14 +73,14 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     def __init__(self, device, hub, description):
         """Initialize the sensor."""
         super().__init__(device, hub, description)
-        
+
         # Ensure unique_id includes the device serial, specific sensor key, and the MAC address from the device attributes
         mac_address = getattr(device, "mac", None)
         if mac_address:
             self._attr_unique_id = f"{device.serial}-{description.key}-{mac_address.replace(':', '')}"
         else:
             self._attr_unique_id = f"{device.serial}-{description.key}"
-        
+
         # Dictionary to keep track of the last known state for each sensor key
         self._last_sensor_state = {}
 
@@ -85,7 +89,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         """Return the state."""
 
         sensor_key = self.entity_description.key
-        
+
         # Handle feeding_plan_state as "On" or "Off"
         if sensor_key == "feeding_plan_state":
             feeding_plan_active = getattr(self.device, sensor_key, False)
@@ -633,7 +637,7 @@ async def async_setup_entry(
     _LOGGER.debug("Devices in hub: %s", devices)
 
     # Create sensor entities for each device based on the sensor map
-    entities = [
+    entities: List[PetLibroSensorEntity] = [
         PetLibroSensorEntity(device, hub, description)
         for device in devices  # Iterate through devices from the hub
         for device_type, entity_descriptions in DEVICE_SENSOR_MAP.items()
