@@ -28,6 +28,7 @@ from .devices.feeders.feeder import Feeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
+from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
@@ -187,22 +188,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             name="Food Dispenser"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
-            key="door_blocked",
-            translation_key="door_blocked",
-            icon="mdi:door",
-            device_class=BinarySensorDeviceClass.PROBLEM,
-            should_report=lambda device: device.door_blocked is not None,
-            name="Lid Status"
-        ),
-        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
-            key="food_low",
-            translation_key="food_low",
-            icon="mdi:bowl-mix-outline",
-            device_class=BinarySensorDeviceClass.PROBLEM,
-            should_report=lambda device: device.food_low is not None,
-            name="Food Status"
-        ),
-        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="online",
             translation_key="online",
             icon="mdi:wifi",
@@ -225,6 +210,48 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             device_class=BinarySensorDeviceClass.BATTERY,
             should_report=lambda device: device.enable_low_battery_notice is not None,
             name="Battery Status"
+        ),
+    ],
+    PolarWetFoodFeeder: [
+        PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
+            key="food_low",
+            translation_key="food_low",
+            icon="mdi:bowl-mix-outline",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.food_low is not None,
+            name="Food Status"
+        ),
+        PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
+            key="online",
+            translation_key="online",
+            icon="mdi:wifi",
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
+            should_report=lambda device: device.online is not None,
+            name="Wi-Fi"
+        ),
+        PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
+            key="enable_low_battery_notice",
+            translation_key="enable_low_battery_notice",
+            icon="mdi:battery-alert",
+            device_class=BinarySensorDeviceClass.BATTERY,
+            should_report=lambda device: device.enable_low_battery_notice is not None,
+            name="Battery Status"
+        ),
+        PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
+            key="door_blocked",
+            translation_key="door_blocked",
+            icon="mdi:door-closed-lock",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.door_blocked is not None,
+            name="Lid Status"
+        ),
+        PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
+            key="whether_in_sleep_mode",
+            translation_key="whether_in_sleep_mode",
+            icon="mdi:sleep",
+            device_class=BinarySensorDeviceClass.POWER,
+            should_report=lambda device: device.whether_in_sleep_mode is not None,
+            name="Sleep Mode"
         ),
     ],
     DockstreamSmartFountain: [

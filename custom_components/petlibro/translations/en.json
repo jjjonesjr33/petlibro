@@ -95,6 +95,21 @@
             },
             "video_record_mode": {
                 "name": "Video Recording Mode"
+            },
+            "next_feeding_day": {
+                "name": "Feeding Schedule"
+            },
+            "next_feeding_time": {
+                "name": "Feeding Begins"
+            },
+            "next_feeding_end_time": {
+                "name": "Feeding Ends"
+            },
+            "feeding_plan": {
+                "name": "Feeding Plan"
+            },
+            "temperature": {
+                "name": "Temperature"
             }
         },
         "switch": {

@@ -11,6 +11,7 @@ from .devices.feeders.feeder import Feeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
+from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD, PLATFORMS, UPDATE_INTERVAL_SECONDS  # Assuming UPDATE_INTERVAL_SECONDS is defined in const
@@ -38,6 +39,12 @@ PLATFORMS_BY_TYPE = {
         Platform.BUTTON,
     ),
     OneRFIDSmartFeeder: (
+        Platform.SENSOR,
+        Platform.BINARY_SENSOR,
+        Platform.SWITCH,
+        Platform.BUTTON,
+    ),
+    PolarWetFoodFeeder: (
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
         Platform.SWITCH,

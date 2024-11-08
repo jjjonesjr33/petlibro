@@ -25,6 +25,7 @@ from .devices.feeders.feeder import Feeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
+from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
@@ -142,6 +143,9 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     @property
     def native_unit_of_measurement(self) -> str | None:
         """Return the native unit of measurement to use in the frontend, if any."""
+        # For temperature, display as Fahrenheit
+        if self.entity_description.key == "temperature":
+            return "°F"
         # For today_feeding_quantity, display as cups in the frontend
         if self.entity_description.key == "today_feeding_quantity":
             return "cups"
@@ -457,7 +461,90 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Buttons Lock"
         ),
     ],
-DockstreamSmartFountain: [
+    PolarWetFoodFeeder: [
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="device_sn",
+            translation_key="device_sn",
+            icon="mdi:identifier",
+            name="Device SN"
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="mac",
+            translation_key="mac_address",
+            icon="mdi:network",
+            name="MAC Address"
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="wifi_rssi",
+            translation_key="wifi_rssi",
+            icon="mdi:wifi",
+            native_unit_of_measurement="dBm",
+            name="Wi-Fi Signal Strength"
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="wifi_ssid",
+            translation_key="wifi_ssid",
+            icon="mdi:wifi",
+            name="Wi-Fi SSID"
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="battery_state",
+            translation_key="battery_state",
+            icon="mdi:battery",
+            name="Battery Level"
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="electric_quantity",
+            translation_key="electric_quantity",
+            icon="mdi:battery",
+            native_unit_of_measurement="%",
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Battery / AC %"
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="feeding_plan_state",
+            translation_key="feeding_plan",
+            icon="mdi:calendar-check",
+            name="Feeding Plan",
+            should_report=lambda device: device.feeding_plan_state is not None,
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="next_feeding_day",
+            translation_key="next_feeding_day",
+            icon="mdi:calendar-clock",
+            name="Feeding Schedule"
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="next_feeding_time",
+            translation_key="next_feeding_time",
+            icon="mdi:clock-outline",
+            name="Feeding Begins"
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="next_feeding_end_time",
+            translation_key="next_feeding_end_time",
+            icon="mdi:clock-end",
+            name="Feeding Ends"
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="temperature",
+            translation_key="temperature",
+            icon="mdi:thermometer",
+            native_unit_of_measurement="°F",
+            device_class=SensorDeviceClass.TEMPERATURE,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Temperature"
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="plate_position",
+            translation_key="plate_position",
+            icon="mdi:rotate-3d-variant",
+            name="Plate Position",
+            should_report=lambda device: device.plate_position is not None,
+        ),
+    ],
+    DockstreamSmartFountain: [
         PetLibroSensorEntityDescription[DockstreamSmartFountain](
             key="device_sn",
             translation_key="device_sn",
