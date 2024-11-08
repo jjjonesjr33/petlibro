@@ -188,6 +188,22 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             name="Food Dispenser"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="door_blocked",
+            translation_key="door_blocked",
+            icon="mdi:door",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.door_blocked is not None,
+            name="Lid Status"
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="food_low",
+            translation_key="food_low",
+            icon="mdi:bowl-mix-outline",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.food_low is not None,
+            name="Food Status"
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="online",
             translation_key="online",
             icon="mdi:wifi",
