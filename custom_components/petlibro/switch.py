@@ -22,6 +22,7 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 from .devices import Device
 from .devices.device import Device
 from .devices.feeders.feeder import Feeder
+from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
@@ -43,6 +44,8 @@ class PetLibroSwitchEntityDescription(SwitchEntityDescription, PetLibroEntityDes
 
 DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
     Feeder: [
+    ],
+    AirSmartFeeder: [
     ],
     GranarySmartFeeder: [
     ],

@@ -8,6 +8,7 @@ from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed  # For coordinator and update handling
 from .devices import Device
 from .devices.feeders.feeder import Feeder
+from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
@@ -23,6 +24,12 @@ _LOGGER = logging.getLogger(__name__)
 # Define the platforms for each device type
 PLATFORMS_BY_TYPE = {
     Feeder: (
+        Platform.SWITCH,
+        Platform.BUTTON,
+    ),
+    AirSmartFeeder: (
+        Platform.SENSOR,
+        Platform.BINARY_SENSOR,
         Platform.SWITCH,
         Platform.BUTTON,
     ),

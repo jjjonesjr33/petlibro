@@ -25,6 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 from .devices import Device
 from .devices.device import Device
 from .devices.feeders.feeder import Feeder
+from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
@@ -85,6 +86,48 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
 
 DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDescription]] = {
     Feeder: [
+    ],
+    AirSmartFeeder: [
+        PetLibroBinarySensorEntityDescription[AirSmartFeeder](
+            key="food_dispenser_state",
+            translation_key="food_dispenser_state",
+            icon="mdi:bowl-outline",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.food_dispenser_state is not None,
+            name="Food Dispenser"
+        ),
+        PetLibroBinarySensorEntityDescription[AirSmartFeeder](
+            key="food_low",
+            translation_key="food_low",
+            icon="mdi:bowl-mix-outline",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.food_low is not None,
+            name="Food Status"
+        ),
+        PetLibroBinarySensorEntityDescription[AirSmartFeeder](
+            key="online",
+            translation_key="online",
+            icon="mdi:wifi",
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
+            should_report=lambda device: device.online is not None,
+            name="Wi-Fi"
+        ),
+        PetLibroBinarySensorEntityDescription[AirSmartFeeder](
+            key="whether_in_sleep_mode",
+            translation_key="whether_in_sleep_mode",
+            icon="mdi:sleep",
+            device_class=BinarySensorDeviceClass.POWER,
+            should_report=lambda device: device.whether_in_sleep_mode is not None,
+            name="Sleep Mode"
+        ),
+        PetLibroBinarySensorEntityDescription[AirSmartFeeder](
+            key="enable_low_battery_notice",
+            translation_key="enable_low_battery_notice",
+            icon="mdi:battery-alert",
+            device_class=BinarySensorDeviceClass.BATTERY,
+            should_report=lambda device: device.enable_low_battery_notice is not None,
+            name="Battery Status"
+        ),
     ],
     GranarySmartFeeder: [
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](

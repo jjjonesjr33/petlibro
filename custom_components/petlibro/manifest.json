@@ -7,5 +7,5 @@
   "config_flow": true,
   "documentation": "https://github.com/jjjonesjr33/petlibro",
   "iot_class": "cloud_polling",
-  "version": "1.0.10"
+  "version": "1.0.11"
 }

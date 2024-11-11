@@ -21,6 +21,7 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 from .devices import Device
 from .devices.device import Device
 from .devices.feeders.feeder import Feeder
+from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
@@ -43,6 +44,26 @@ class PetLibroButtonEntityDescription(ButtonEntityDescription, PetLibroEntityDes
 # Map buttons to their respective device types
 DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
     Feeder: [
+    ],
+    AirSmartFeeder: [
+        PetLibroButtonEntityDescription[AirSmartFeeder](
+            key="manual_feed",
+            translation_key="manual_feed",
+            set_fn=lambda device: device.set_manual_feed(),
+            name="Manual Feed"
+        ),
+        PetLibroButtonEntityDescription[AirSmartFeeder](
+            key="enable_feeding_plan",
+            translation_key="enable_feeding_plan",
+            set_fn=lambda device: device.set_feeding_plan(True),
+            name="Enable Feeding Plan"
+        ),
+        PetLibroButtonEntityDescription[AirSmartFeeder](
+            key="disable_feeding_plan",
+            translation_key="disable_feeding_plan",
+            set_fn=lambda device: device.set_feeding_plan(False),
+            name="Disable Feeding Plan"
+        )
     ],
     GranarySmartFeeder: [
         PetLibroButtonEntityDescription[GranarySmartFeeder](

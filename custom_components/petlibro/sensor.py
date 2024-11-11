@@ -22,6 +22,7 @@ _LOGGER = getLogger(__name__)
 from .devices import Device
 from .devices.device import Device
 from .devices.feeders.feeder import Feeder
+from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
@@ -178,6 +179,77 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     Feeder: [
+    ],
+    AirSmartFeeder: [
+        PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="device_sn",
+            translation_key="device_sn",
+            icon="mdi:identifier",
+            name="Device SN"
+        ),
+        PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="mac",
+            translation_key="mac_address",
+            icon="mdi:network",
+            name="MAC Address"
+        ),
+        PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="wifi_ssid",
+            translation_key="wifi_ssid",
+            icon="mdi:wifi",
+            name="Wi-Fi SSID"
+        ),
+        PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="wifi_rssi",
+            translation_key="wifi_rssi",
+            icon="mdi:wifi",
+            native_unit_of_measurement="dBm",
+            name="Wi-Fi Signal Strength"
+        ),
+        PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="battery_state",
+            translation_key="battery_state",
+            icon="mdi:battery",
+            name="Battery Level"
+        ),
+        PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="electric_quantity",
+            translation_key="electric_quantity",
+            icon="mdi:battery",
+            native_unit_of_measurement="%",
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Battery / AC %"
+        ),
+        PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="feeding_plan_state",
+            translation_key="feeding_plan_state",
+            icon="mdi:calendar-check",
+            name="Feeding Plan State",
+            should_report=lambda device: device.feeding_plan_state is not None,
+        ),
+        PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="today_feeding_quantity",
+            translation_key="today_feeding_quantity",
+            icon="mdi:scale",
+            native_unit_of_measurement_fn=unit_of_measurement_feeder,
+            device_class_fn=device_class_feeder,
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Today Feeding Quantity"
+        ),
+        PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="today_feeding_times",
+            translation_key="today_feeding_times",
+            icon="mdi:history",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Today Feeding Times"
+        ),
+        PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="child_lock_switch",
+            translation_key="child_lock_switch",
+            icon="mdi:lock",
+            name="Buttons Lock"
+        ),
     ],
     GranarySmartFeeder: [
         PetLibroSensorEntityDescription[GranarySmartFeeder](
