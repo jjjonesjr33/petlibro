@@ -379,10 +379,10 @@ class PetLibroAPI:
             raise PetLibroAPIError(f"Error triggering manual feeding: {err}")
 
     async def set_manual_lid_open(self, serial: str):
-        """Turn the sound on or off."""
+        """Trigger manual lid opening for a specific device."""
         await self.session.post("/device/device/doorStateChange", json={
             "deviceSn": serial,
-            "barnDoorState": 'true'
+            "barnDoorState": 'true',
             "timeout": 8000 # Can make this dynamic in the future?
         })
 
