@@ -382,8 +382,8 @@ class PetLibroAPI:
         """Trigger manual lid opening for a specific device."""
         await self.session.post("/device/device/doorStateChange", json={
             "deviceSn": serial,
-            "barnDoorState": 'true',
-            "timeout": 8000 # Can make this dynamic in the future?
+            "barnDoorState": True,
+            "timeout": 8000
         })
 
 ## Added this to fix dupe logs
