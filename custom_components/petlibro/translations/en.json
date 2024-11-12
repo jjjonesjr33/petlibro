@@ -135,6 +135,9 @@
             },
             "disable_feeding_plan": {
                 "name": "Disable Feeding Plan"
+            },
+            "manual_lid_open": {
+                "name": "Manually Open Lid"
             }
         },
         "binary_sensor": {

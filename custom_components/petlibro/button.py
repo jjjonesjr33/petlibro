@@ -123,6 +123,12 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
+        ),
+        PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
+            key="manual_lid_open",
+            translation_key="manual_lid_open",
+            set_fn=lambda device: device.set_manual_lid_open(),
+            name="Manually Open Lid"
         )
     ],
     PolarWetFoodFeeder: [

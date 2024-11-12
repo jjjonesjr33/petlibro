@@ -269,3 +269,13 @@ class OneRFIDSmartFeeder(Device):
             _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
 
+    # Method for manual lid opening
+    async def set_manual_lid_open(self) -> None:
+        _LOGGER.debug(f"Triggering manual lid opening for {self.serial}")
+        try:
+            await self.api.set_manual_lid_open(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger manual lid opening for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering manual lid opening: {err}")
+

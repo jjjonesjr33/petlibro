@@ -378,6 +378,14 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to trigger manual feeding for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feeding: {err}")
 
+    async def set_manual_lid_open(self, serial: str):
+        """Turn the sound on or off."""
+        await self.session.post("/device/device/doorStateChange", json={
+            "deviceSn": serial,
+            "barnDoorState": 'true'
+            "timeout": 8000 # Can make this dynamic in the future?
+        })
+
 ## Added this to fix dupe logs
 class PetLibroDataCoordinator(DataUpdateCoordinator):
     def __init__(self, hass, api):
