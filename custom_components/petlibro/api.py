@@ -385,6 +385,26 @@ class PetLibroAPI:
             "barnDoorState": True,
             "timeout": 8000
         })
+    
+    async def set_display_matrix_on(self, serial: str):
+        """Trigger turn display matrix on"""
+        await self.session.post("/device/setting/updateDisplayMatrixSetting", json={
+            "deviceSn": serial,
+            "screenDisplayAgingType": 1,
+            "screenDisplayStartTime": None,
+            "screenDisplayEndTime": None,
+            "screenDisplaySwitch": True
+        })
+    
+    async def set_display_matrix_off(self, serial: str):
+        """Trigger turn display matrix off"""
+        await self.session.post("/device/setting/updateDisplayMatrixSetting", json={
+            "deviceSn": serial,
+            "screenDisplayAgingType": 1,
+            "screenDisplayStartTime": None,
+            "screenDisplayEndTime": None,
+            "screenDisplaySwitch": False
+        })
 
 ## Added this to fix dupe logs
 class PetLibroDataCoordinator(DataUpdateCoordinator):

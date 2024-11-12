@@ -129,6 +129,18 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="manual_lid_open",
             set_fn=lambda device: device.set_manual_lid_open(),
             name="Manually Open Lid"
+        ),
+        PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
+            key="display_matrix_on",
+            translation_key="display_matrix_on",
+            set_fn=lambda device: device.set_display_matrix_on(),
+            name="Turn On Display Matrix"
+        ),
+        PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
+            key="display_matrix_off",
+            translation_key="display_matrix_off",
+            set_fn=lambda device: device.set_display_matrix_off(),
+            name="Turn Off Display Matrix"
         )
     ],
     PolarWetFoodFeeder: [

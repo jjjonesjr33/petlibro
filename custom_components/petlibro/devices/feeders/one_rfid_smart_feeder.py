@@ -279,3 +279,22 @@ class OneRFIDSmartFeeder(Device):
             _LOGGER.error(f"Failed to trigger manual lid opening for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual lid opening: {err}")
 
+    # Method for display matrix turn on
+    async def set_display_matrix_on(self) -> None:
+        _LOGGER.debug(f"Turning on the display matrix for {self.serial}")
+        try:
+            await self.api.set_display_matrix_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the display matrix for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the display matrix: {err}")
+
+    # Method for display matrix turn off
+    async def set_display_matrix_off(self) -> None:
+        _LOGGER.debug(f"Turning off the display matrix for {self.serial}")
+        try:
+            await self.api.set_display_matrix_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the display matrix for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the display matrix: {err}")
