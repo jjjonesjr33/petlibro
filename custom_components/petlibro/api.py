@@ -410,20 +410,20 @@ class PetLibroAPI:
         """Trigger turn sound on"""
         await self.session.post("/device/setting/updateDisplayMatrixSetting", json={
             "deviceSn": serial,
+            "soundSwitch": True,
             "soundAgingType": 1,
             "soundStartTime": None,
-            "soundStartTime": None,
-            "soundSwitch": True
+            "soundEndTime": None
         })
     
     async def set_sound_off(self, serial: str):
         """Trigger turn sound off"""
         await self.session.post("/device/setting/updateDisplayMatrixSetting", json={
             "deviceSn": serial,
+            "soundSwitch": False,
             "soundAgingType": 1,
             "soundStartTime": None,
-            "soundStartTime": None,
-            "soundSwitch": False
+            "soundEndTime": None
         })
 
 ## Added this to fix dupe logs
