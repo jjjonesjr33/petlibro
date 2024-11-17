@@ -408,7 +408,7 @@ class PetLibroAPI:
 
     async def set_sound_on(self, serial: str):
         """Trigger turn sound on"""
-        await self.session.post("/device/setting/updateDisplayMatrixSetting", json={
+        await self.session.post("/device/setting/updateSoundSetting", json={
             "deviceSn": serial,
             "soundSwitch": True,
             "soundAgingType": 1,
@@ -418,7 +418,7 @@ class PetLibroAPI:
     
     async def set_sound_off(self, serial: str):
         """Trigger turn sound off"""
-        await self.session.post("/device/setting/updateDisplayMatrixSetting", json={
+        await self.session.post("/device/setting/updateSoundSetting", json={
             "deviceSn": serial,
             "soundSwitch": False,
             "soundAgingType": 1,
