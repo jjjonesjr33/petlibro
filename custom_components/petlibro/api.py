@@ -386,8 +386,8 @@ class PetLibroAPI:
             "timeout": 8000
         })
     
-    async def set_display_matrix_on(self, serial: str):
-        """Trigger turn display matrix on"""
+    async def set_display_on(self, serial: str):
+        """Trigger turn display on"""
         await self.session.post("/device/setting/updateDisplayMatrixSetting", json={
             "deviceSn": serial,
             "screenDisplayAgingType": 1,
@@ -396,14 +396,34 @@ class PetLibroAPI:
             "screenDisplaySwitch": True
         })
     
-    async def set_display_matrix_off(self, serial: str):
-        """Trigger turn display matrix off"""
+    async def set_display_off(self, serial: str):
+        """Trigger turn display off"""
         await self.session.post("/device/setting/updateDisplayMatrixSetting", json={
             "deviceSn": serial,
             "screenDisplayAgingType": 1,
             "screenDisplayStartTime": None,
             "screenDisplayEndTime": None,
             "screenDisplaySwitch": False
+        })
+
+    async def set_sound_on(self, serial: str):
+        """Trigger turn sound on"""
+        await self.session.post("/device/setting/updateDisplayMatrixSetting", json={
+            "deviceSn": serial,
+            "soundAgingType": 1,
+            "soundStartTime": None,
+            "soundStartTime": None,
+            "soundSwitch": True
+        })
+    
+    async def set_sound_off(self, serial: str):
+        """Trigger turn sound off"""
+        await self.session.post("/device/setting/updateDisplayMatrixSetting", json={
+            "deviceSn": serial,
+            "soundAgingType": 1,
+            "soundStartTime": None,
+            "soundStartTime": None,
+            "soundSwitch": False
         })
 
 ## Added this to fix dupe logs

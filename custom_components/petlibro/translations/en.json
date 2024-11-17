@@ -139,11 +139,17 @@
             "manual_lid_open": {
                 "name": "Manually Open Lid"
             },
-            "display_matrix_on": {
-                "name": "Turn On Display Matrix"
+            "display_on": {
+                "name": "Turn On Display"
             },
-            "display_matrix_off": {
-                "name": "Turn Off Display Matrix"
+            "display_off": {
+                "name": "Turn Off Display"
+            },
+            "sound_on": {
+                "name": "Turn On Sound"
+            },
+            "sound_off": {
+                "name": "Turn Off Sound"
             }
         },
         "binary_sensor": {
