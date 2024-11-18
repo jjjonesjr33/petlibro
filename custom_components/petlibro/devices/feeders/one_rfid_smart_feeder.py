@@ -50,15 +50,7 @@ class OneRFIDSmartFeeder(Device):
 
     @property
     def today_eating_time(self) -> int:
-        eating_time_str = self._data.get("grainStatus", {}).get("eatingTime", "0'0''")
-        if not eating_time_str:
-            return 0
-        try:
-            minutes, seconds = map(int, eating_time_str.replace("''", "").split("'"))
-            total_seconds = minutes * 60 + seconds
-        except ValueError:
-            return 0
-        return total_seconds
+        return self._data.get("grainStatus", {}).get("petEatingTime", 0)
 
     @property
     def feeding_plan_state(self) -> bool:
@@ -269,3 +261,52 @@ class OneRFIDSmartFeeder(Device):
             _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
 
+    # Method for manual lid opening
+    async def set_manual_lid_open(self) -> None:
+        _LOGGER.debug(f"Triggering manual lid opening for {self.serial}")
+        try:
+            await self.api.set_manual_lid_open(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger manual lid opening for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering manual lid opening: {err}")
+
+    # Method for display turn on
+    async def set_display_on(self) -> None:
+        _LOGGER.debug(f"Turning on the display matrix for {self.serial}")
+        try:
+            await self.api.set_display_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the display for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the display: {err}")
+
+    # Method for display matrix turn off
+    async def set_display_off(self) -> None:
+        _LOGGER.debug(f"Turning off the display for {self.serial}")
+        try:
+            await self.api.set_display_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the display for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the display: {err}")
+
+    # Method for sound turn on
+    async def set_sound_on(self) -> None:
+        _LOGGER.debug(f"Turning on the sound for {self.serial}")
+        try:
+            await self.api.set_sound_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the sound for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the sound: {err}")
+
+    # Method for sound turn off
+    async def set_sound_off(self) -> None:
+        _LOGGER.debug(f"Turning off the sound for {self.serial}")
+        try:
+            await self.api.set_sound_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the sound for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the sound: {err}")
