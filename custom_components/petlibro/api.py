@@ -378,6 +378,54 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to trigger manual feeding for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feeding: {err}")
 
+    async def set_manual_lid_open(self, serial: str):
+        """Trigger manual lid opening for a specific device."""
+        await self.session.post("/device/device/doorStateChange", json={
+            "deviceSn": serial,
+            "barnDoorState": True,
+            "timeout": 8000
+        })
+    
+    async def set_display_on(self, serial: str):
+        """Trigger turn display on"""
+        await self.session.post("/device/setting/updateDisplayMatrixSetting", json={
+            "deviceSn": serial,
+            "screenDisplayAgingType": 1,
+            "screenDisplayStartTime": None,
+            "screenDisplayEndTime": None,
+            "screenDisplaySwitch": True
+        })
+    
+    async def set_display_off(self, serial: str):
+        """Trigger turn display off"""
+        await self.session.post("/device/setting/updateDisplayMatrixSetting", json={
+            "deviceSn": serial,
+            "screenDisplayAgingType": 1,
+            "screenDisplayStartTime": None,
+            "screenDisplayEndTime": None,
+            "screenDisplaySwitch": False
+        })
+
+    async def set_sound_on(self, serial: str):
+        """Trigger turn sound on"""
+        await self.session.post("/device/setting/updateSoundSetting", json={
+            "deviceSn": serial,
+            "soundSwitch": True,
+            "soundAgingType": 1,
+            "soundStartTime": None,
+            "soundEndTime": None
+        })
+    
+    async def set_sound_off(self, serial: str):
+        """Trigger turn sound off"""
+        await self.session.post("/device/setting/updateSoundSetting", json={
+            "deviceSn": serial,
+            "soundSwitch": False,
+            "soundAgingType": 1,
+            "soundStartTime": None,
+            "soundEndTime": None
+        })
+
 ## Added this to fix dupe logs
 class PetLibroDataCoordinator(DataUpdateCoordinator):
     def __init__(self, hass, api):
