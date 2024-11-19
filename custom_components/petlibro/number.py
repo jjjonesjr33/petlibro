@@ -44,23 +44,13 @@ class PetLibroNumberEntityDescription(NumberEntityDescription, PetLibroEntityDes
 
     value: Callable[[_DeviceT, int], float | None]
     method: Callable[[_DeviceT, int, float], Any]
-    device_class_fn: Callable[[_DeviceT], NumberDeviceClass | None] = field(default=lambda _: None)
-    device_class: Optional[NumberDeviceClass] = field(default=None)
+    device_class_fn: Callable[[_DeviceT], NumberDeviceClass | None]
+    device_class: Optional[NumberDeviceClass]
 
 class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
     """PETLIBRO number entity."""
 
     entity_description: PetLibroNumberEntityDescription[_DeviceT]
-
-    @property
-    def device_class(self) -> NumberDeviceClass | None:
-        """Return the device class to use in the frontend, if any."""
-        return self.entity_description.device_class_fn(self.device)
-
-    @cached_property
-    def device_class(self) -> NumberDeviceClass | None:
-        """Return the device class to use in the frontend, if any."""
-        return self.entity_description.device_class
 
 DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
     Feeder: [
