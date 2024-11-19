@@ -41,7 +41,8 @@ class PetLibroNumberEntityDescription(NumberEntityDescription, PetLibroEntityDes
     """A class that describes device number entities."""
 
     device_class_fn: Callable[[_DeviceT], NumberDeviceClass | None] = lambda _: None
-    should_report: Callable[[_DeviceT], bool] = lambda _: True
+    value: Callable[[_DeviceT], bool] = lambda _: True
+    method: Callable[[_DeviceT], bool] = lambda _: True
     device_class: Optional[NumberDeviceClass] = None
 
 class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
