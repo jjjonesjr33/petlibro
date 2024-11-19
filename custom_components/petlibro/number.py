@@ -4,6 +4,7 @@ from .api import make_api_call
 import aiohttp
 from aiohttp import ClientSession, ClientError
 from dataclasses import dataclass
+from dataclasses import dataclass, field
 from collections.abc import Callable
 from functools import cached_property
 from typing import Optional
@@ -41,10 +42,10 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 class PetLibroNumberEntityDescription(NumberEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device number entities."""
 
-    value: Callable[[Any, int], float | None]
-    method: Callable[[Any, int, float], Any]
-    device_class_fn: Callable[[_DeviceT], NumberDeviceClass | None] = lambda _: None
-    device_class: Optional[NumberDeviceClass] = None
+    value: Callable[[_DeviceT, int], float | None]
+    method: Callable[[_DeviceT, int, float], Any]
+    device_class_fn: Callable[[_DeviceT], NumberDeviceClass | None] = field(default=lambda _: None)
+    device_class: Optional[NumberDeviceClass] = field(default=None)
 
 class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
     """PETLIBRO number entity."""
