@@ -44,8 +44,6 @@ class PetLibroNumberEntityDescription(NumberEntityDescription, PetLibroEntityDes
 
     value: Callable[[_DeviceT, int], float | None]
     method: Callable[[_DeviceT, int, float], Any]
-    device_class_fn: Callable[[_DeviceT], NumberDeviceClass | None]
-    device_class: Optional[NumberDeviceClass]
 
 class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
     """PETLIBRO number entity."""
