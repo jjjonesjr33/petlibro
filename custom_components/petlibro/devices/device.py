@@ -36,6 +36,7 @@ class Device(Event):
             data = {}
             data.update(await self.api.device_base_info(self.serial))
             data.update(await self.api.device_real_info(self.serial))
+            data.update(await self.api.device_attribute_settings(self.serial))
             self.update_data(data)
         except Exception as e:
             _LOGGER.error(f"Failed to refresh device data: {e}")
@@ -52,6 +53,7 @@ class Device(Event):
     #     data = {}
     #     data.update(await self.api.device_base_info(self.serial))
     #     data.update(await self.api.device_real_info(self.serial))
+    #     data.update(await self.api.device_attribute_settings(self.serial))
     #     self.update_data(data)
 
     @property
@@ -131,10 +133,12 @@ class Device(Event):
             ##Fetch base info and real info from API
             # base_info = await self.api.device_base_info(self.serial)
             # real_info = await self.api.device_real_info(self.serial)
+            # attribute_settings = await self.api.device_attribute_settings(self.serial)
 
             ##Update with the fetched data
             # data.update(base_info)
             # data.update(real_info)
+            # data.update(attribute_settings)
 
             # self.update_data(data)
 
