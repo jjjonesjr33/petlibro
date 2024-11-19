@@ -41,9 +41,9 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 class PetLibroNumberEntityDescription(NumberEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device number entities."""
 
-    device_class_fn: Callable[[_DeviceT], NumberDeviceClass | None] = lambda _: None
     value: Callable[[_DeviceT, int], float | None]
     method: Callable[[_DeviceT, int, float], Any]
+    device_class_fn: Callable[[_DeviceT], NumberDeviceClass | None] = lambda _: None
     device_class: Optional[NumberDeviceClass] = None
 
 class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
