@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from collections.abc import Callable
 from functools import cached_property
 from typing import Optional
+from typing import Any
 import logging
 from .const import DOMAIN
 from homeassistant.components.number import (
@@ -41,8 +42,8 @@ class PetLibroNumberEntityDescription(NumberEntityDescription, PetLibroEntityDes
     """A class that describes device number entities."""
 
     device_class_fn: Callable[[_DeviceT], NumberDeviceClass | None] = lambda _: None
-    value: Callable[[_DeviceT], bool] = lambda _: True
-    method: Callable[[_DeviceT], bool] = lambda _: True
+    value: Callable[[_DeviceT, int], float | None]
+    method: Callable[[_DeviceT, int, float], Any]
     device_class: Optional[NumberDeviceClass] = None
 
 class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
