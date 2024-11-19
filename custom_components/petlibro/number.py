@@ -42,13 +42,12 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 class PetLibroNumberEntityDescription(NumberEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device number entities."""
 
-    value: Callable[[_DeviceT, int], float | None]
-    method: Callable[[_DeviceT, int, float], Any]
-
 class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
     """PETLIBRO number entity."""
 
     entity_description: PetLibroNumberEntityDescription[_DeviceT]
+    value: Callable[[_DeviceT, int], float | None]
+    method: Callable[[_DeviceT, int, float], Any]
 
 DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
     Feeder: [
