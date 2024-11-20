@@ -16,7 +16,7 @@ Also if you want to check out all the other things I do follow me on my [**Socia
 ### This has been reworked to work with the following devices
 
 * Air Smart Feeder (PLAF108)
-* Granary Smart Feeder (PLAF103)
+* Granary Smart Feeder (PLAF103) | Version 2
 * Granary Smart Camera Feeder (PLAF203)
 * One RFID Smart Feeder (PLAF301)
 * Polar Wet Food Feeder (PLAF109)
