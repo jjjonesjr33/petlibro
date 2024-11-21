@@ -37,17 +37,55 @@ from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
-
 @dataclass(frozen=True)
 class PetLibroNumberEntityDescription(NumberEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device number entities."""
 
+    device_class_fn: Callable[[_DeviceT], NumberDeviceClass | None] = lambda _: None
+    value: Callable[[_DeviceT], float] = lambda _: True
+    method: Callable[[_DeviceT], float] = lambda _: True
+    device_class: Optional[NumberDeviceClass] = None
+
 class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
-    """PETLIBRO number entity."""
+    """PETLIBRO sensor entity."""
 
     entity_description: PetLibroNumberEntityDescription[_DeviceT]
-    value: Callable[[_DeviceT, int], float | None]
-    method: Callable[[_DeviceT, int, float], Any]
+
+    @cached_property
+    def device_class(self) -> NumberDeviceClass | None:
+        """Return the device class to use in the frontend, if any."""
+        return self.entity_description.device_class
+
+    @property
+    def is_on(self) -> float:
+        """Return True if the number sensor is on."""
+        # Check if the number entity should report its state
+        if not self.entity_description.value(self.device):
+            return False
+
+        # Retrieve the state using getattr, defaulting to None if the attribute is missing
+        state = getattr(self.device, self.entity_description.key, None)
+
+        # Check if this is the first time the sensor is being refreshed by checking if _last_state exists
+        last_state = getattr(self, '_last_state', None)
+        initial_log_done = getattr(self, '_initial_log_done', False)  # Track if we've logged the initial state
+
+        # If this is the initial boot, don't log anything but track the state
+        if not initial_log_done:
+            # Mark the initial log as done without logging
+            self._initial_log_done = True  
+        elif last_state != state:
+            # Log state changes: log online with INFO and offline with WARNING
+            if state:
+                _LOGGER.info(f"Device {self.device.name} is online.")
+            else:
+                _LOGGER.warning(f"Device {self.device.name} is offline.")
+
+        # Store the last state for future comparisons
+        self._last_state = state
+
+        # Return the state, ensuring it's a boolean
+        return float(state)
 
 DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
     Feeder: [

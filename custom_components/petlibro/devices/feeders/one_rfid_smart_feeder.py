@@ -175,14 +175,22 @@ class OneRFIDSmartFeeder(Device):
         return self._data.get("realInfo", {}).get("closeDoorTimeSec", 0)
 
     @property
-    def screen_display_switch(self) -> bool:
+    def display_switch(self) -> bool:
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
+
+    @property
+    def child_lock_switch(self) -> bool:
+        return self._data.get("realInfo", {}).get("childLockSwitch", False)
 
     @property
     def remaining_desiccant(self) -> str:
         """Get the remaining desiccant days."""
         return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
     
+    @property
+    def sound_switch(self) -> bool:
+        return self._data.get("realInfo", {}).get("soundSwitch", False)
+
     @property
     def sound_level(self) -> float:
         return self._data.get("getAttributeSetting", {}).get("volume", 0)

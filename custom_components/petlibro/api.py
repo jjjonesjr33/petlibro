@@ -269,7 +269,6 @@ class PetLibroAPI:
         try:
             response = await self.session.request("POST", "/device/setting/getAttributeSetting", json={
                 "id": device_id,
-                "deviceSn": device_id
             })
 
             # Store the time of the API call and the cached response
