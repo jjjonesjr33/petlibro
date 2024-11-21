@@ -57,7 +57,7 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
         return self.entity_description.device_class
 
     @property
-    def is_on(self) -> float:
+    def value(self) -> float:
         """Return True if the number sensor is on."""
         # Check if the number entity should report its state
         if not self.entity_description.value(self.device):
