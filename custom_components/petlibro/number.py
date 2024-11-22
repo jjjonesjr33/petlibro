@@ -79,11 +79,21 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             native_min_value=1,
             native_step=1,
             value=lambda device: device.sound_level,
-            method=lambda device, value: device.set_sound_level(device.serial, value), # Pass both serial and value
+            method=lambda device, value: device.set_sound_level(device.serial, value),
             name="Sound Level"
         ),
     ]
 }
+
+async def async_set_native_value(self, value: float) -> None:
+    """Set the value of the number."""
+    _LOGGER.debug(f"Setting value {value} for {self.device.name}")
+    try:
+        # Call the method defined in the description
+        self.entity_description.method(self.device, value)
+        _LOGGER.debug(f"Value {value} set successfully for {self.device.name}")
+    except Exception as e:
+        _LOGGER.error(f"Error setting value {value} for {self.device.name}: {e}")
 
 async def async_setup_entry(
     hass: HomeAssistant,
