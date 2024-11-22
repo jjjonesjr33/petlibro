@@ -89,7 +89,7 @@ async def async_set_native_value(self, value: float) -> None:
     """Set the value of the number."""
     _LOGGER.debug(f"Setting value {value} for {self.device.name}")
     try:
-        # Call the method defined in the description
+        # Call the set_sound_level method
         self.entity_description.method(self.device, value)
         _LOGGER.debug(f"Value {value} set successfully for {self.device.name}")
     except Exception as e:
