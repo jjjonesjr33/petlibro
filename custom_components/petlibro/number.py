@@ -84,7 +84,7 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
         # Store the last state for future comparisons
         self._last_state = state
 
-        # Return the state, ensuring it's a boolean
+        # Return the state, ensuring it's a float
         return float(state)
 
 DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
