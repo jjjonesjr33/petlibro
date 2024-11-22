@@ -100,7 +100,7 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             native_min_value=1,
             native_step=1,
             value=lambda device: device.sound_level,
-            method=lambda device: device.set_sound_level,
+            method=lambda device: value: device.set_sound_level(device.serial, value), # Pass both serial and value
             name="Sound Level"
         ),
     ]

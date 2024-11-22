@@ -180,7 +180,7 @@ class OneRFIDSmartFeeder(Device):
 
     @property
     def child_lock_switch(self) -> bool:
-        return self._data.get("realInfo", {}).get("childLockSwitch", False)
+        return not self._data.get("realInfo", {}).get("childLockSwitch", False)
 
     @property
     def remaining_desiccant(self) -> str:
