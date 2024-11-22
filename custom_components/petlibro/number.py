@@ -65,6 +65,16 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
             return None
         _LOGGER.debug(f"Retrieved sound level for {self.device.name}: {state}")
         return float(state)
+    
+    async def async_set_native_value(self, value: float) -> None:
+        """Set the value of the number."""
+        _LOGGER.debug(f"Setting value {value} for {self.device.name}")
+        try:
+            # Call the set_sound_level method
+            self.entity_description.method(self.device, value)
+            _LOGGER.debug(f"Value {value} set successfully for {self.device.name}")
+        except Exception as e:
+            _LOGGER.error(f"Error setting value {value} for {self.device.name}: {e}")
 
 DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
     Feeder: [
@@ -84,16 +94,6 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
         ),
     ]
 }
-
-async def async_set_native_value(self, value: float) -> None:
-    """Set the value of the number."""
-    _LOGGER.debug(f"Setting value {value} for {self.device.name}")
-    try:
-        # Call the set_sound_level method
-        self.entity_description.method(self.device, value)
-        _LOGGER.debug(f"Value {value} set successfully for {self.device.name}")
-    except Exception as e:
-        _LOGGER.error(f"Error setting value {value} for {self.device.name}: {e}")
 
 async def async_setup_entry(
     hass: HomeAssistant,
