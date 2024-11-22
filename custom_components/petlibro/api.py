@@ -375,10 +375,17 @@ class PetLibroAPI:
 
     async def set_sound_level(self, serial: str, value: float):
         """Set the sound level."""
-        await self.session.post("/device/setting/updateVolumeSetting", json={
-            "deviceSn": serial,
-            "volume": value
-        })
+        _LOGGER.debug(f"Setting sound level: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/setting/updateVolumeSetting", json={
+                "deviceSn": serial,
+                "volume": value
+            })
+            _LOGGER.debug(f"Sound level set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set sound level for device {serial}: {e}")
+            raise
 
     async def set_manual_feed(self, serial: str) -> JSON:
         """Trigger manual feeding for a specific device."""
