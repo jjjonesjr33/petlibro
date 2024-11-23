@@ -3,6 +3,7 @@
 # https://api.us.petlibro.com/device/device/list
 # https://api.us.petlibro.com/device/device/baseInfo
 # https://api.us.petlibro.com/device/device/realInfo
+# https://api.us.petlibro.com/device/setting/getAttributeSetting
 # https://api.us.petlibro.com/device/data/grainStatus
 
 from logging import getLogger
@@ -254,6 +255,31 @@ class PetLibroAPI:
             _LOGGER.error(f"Error fetching realInfo for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching realInfo for device {device_id}: {e}")
 
+    async def get_device_attribute_settings(self, device_id: str) -> dict:
+        """Fetch real-time information for a device, with caching to prevent frequent requests."""
+        now = datetime.utcnow()
+        last_call_time = self._last_api_call_times.get(f"{device_id}_getAttributeSetting")
+
+        # If we made the request within the last 10 seconds, return cached response
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Skipping getAttributeSetting request for {device_id}, using cached response.")
+            return self._cached_responses.get(f"{device_id}_getAttributeSetting", {})
+
+        # Otherwise, make the API call and update cache
+        try:
+            response = await self.session.request("POST", "/device/setting/getAttributeSetting", json={
+                "id": device_id,
+            })
+
+            # Store the time of the API call and the cached response
+            self._last_api_call_times[f"{device_id}_getAttributeSetting"] = now
+            self._cached_responses[f"{device_id}_getAttributeSetting"] = response
+
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Error fetching getAttributeSetting for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching getAttributeSetting for device {device_id}: {e}")
+
     async def logout(self):
         """Logout of the API and reset the token"""
         await self.session.post("/member/auth/logout")
@@ -275,6 +301,9 @@ class PetLibroAPI:
 
     async def device_real_info(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/device/realInfo", serial)
+
+    async def device_attribute_settings(self, serial: str) -> Dict[str, Any]:
+        return await self.session.post_serial("/device/setting/getAttributeSetting", serial)
 
     async def device_grain_status(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/data/grainStatus", serial)
@@ -336,6 +365,27 @@ class PetLibroAPI:
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set sound enable for device {serial}: {err}")
             raise PetLibroAPIError(f"Error setting sound enable: {err}")
+
+    async def set_dessicant_days(self, serial: str, value: float):
+        """Set the sound level."""
+        _LOGGER.debug(f"Setting sound level: serial={serial}, value={value}")
+        try:
+            # Generate a dynamic request ID for the dessicant days change.
+            request_id = str(uuid.uuid4()).replace("-", "")
+
+            response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
+                "deviceSn": serial,
+                "key": "DESSICANT", # Make this dynamic as i think its likely fountains use a different key.
+                "frequency": value,
+                "requestId": request_id  # Use dynamic request ID
+                "timeout": 5000 # Not sure what this refers to. but this is the number when making the request from App.
+            })
+
+            _LOGGER.debug(f"Dessicant days set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set dessicant days for device {serial}: {e}")
+            raise
 
     async def set_sound_switch(self, serial: str, enable: bool):
         """Turn the sound on or off."""
