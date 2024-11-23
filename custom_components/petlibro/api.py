@@ -368,37 +368,43 @@ class PetLibroAPI:
 
     async def set_dessicant_frequency(self, serial: str, value: float):
         """Set the dessicant frequency."""
-        _LOGGER.debug(f"Setting dessicant level: serial={serial}, value={value}")
+        _LOGGER.debug(f"Setting dessicant frequency: serial={serial}, value={value}")
         try:
+            # Generate a dynamic request ID for the dessicant frequency change.
             request_id = str(uuid.uuid4()).replace("-", "")
 
-            response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
-                "deviceSn": serial,
-                "key": "DESSICANT", # Make this dynamic as i think its likely fountains use a different key.
-                "frequency": value,
-                "requestId": request_id,  # Use dynamic request ID
-                "timeout": 5000
-            })
-            if response is None:
-                _LOGGER.error("Response object is None")
-                raise PetLibroAPIError("No response received from API.")
+            # Make the API request
+            response = await self.session.post(
+                "/device/device/maintenanceFrequencySetting",
+                json={
+                    "deviceSn": serial,
+                    "key": "DESSICANT",  # Use the correct key for dessicant frequency
+                    "frequency": value,
+                    "requestId": request_id,
+                    "timeout": 5000,
+                },
+            )
 
-            _LOGGER.debug(f"Received response status: {response.status}")
-            try:
-                response_data = await response.json()
-            except Exception as e:
-                _LOGGER.error(f"Failed to parse JSON: {e}")
-                raise PetLibroAPIError("Invalid JSON response.")
+            # Parse the JSON response
+            response_data = await response.json()
+            _LOGGER.debug(f"Dessicant frequency response data: {response_data}")
 
-            _LOGGER.debug(f"Response data: {response_data}")
-            if response.status != 200 or response_data.get("code") != 0:
-                raise PetLibroAPIError(f"Failed to set dessicant frequency: {response_data.get('msg')}")
+            # Check the API response status and code
+            if response.status != 200:
+                _LOGGER.error(f"Unexpected HTTP status {response.status} from API.")
+                raise PetLibroAPIError(f"HTTP error {response.status}")
 
+            if response_data.get("code") != 0:
+                error_message = response_data.get("msg", "Unknown error")
+                _LOGGER.error(f"API error: {error_message} (code: {response_data.get('code')})")
+                raise PetLibroAPIError(f"API error: {error_message}")
+
+            _LOGGER.debug(f"Dessicant frequency set successfully for serial={serial}, value={value}")
             return response_data
 
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to trigger dessicant frequency set for device {serial}: {err}")
-            raise PetLibroAPIError(f"Client error: {err}")
+            _LOGGER.error(f"Failed to set dessicant frequency for device {serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering dessicant frequency: {err}")
 
     async def set_sound_switch(self, serial: str, enable: bool):
         """Turn the sound on or off."""
