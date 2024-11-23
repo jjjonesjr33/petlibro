@@ -70,8 +70,8 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
         """Set the value of the number."""
         _LOGGER.debug(f"Setting value {value} for {self.device.name}")
         try:
-            # Call the set_sound_level method
-            self.entity_description.method(self.device, value)
+            # Call the method with await since it's async
+            await self.entity_description.method(self.device, value)
             _LOGGER.debug(f"Value {value} set successfully for {self.device.name}")
         except Exception as e:
             _LOGGER.error(f"Error setting value {value} for {self.device.name}: {e}")
