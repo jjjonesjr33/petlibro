@@ -2,7 +2,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/jjjonesjr33/petlibro)
 [![Community Forum](https://img.shields.io/static/v1.svg?label=Community&message=Forum&color=41bdf5&logo=HomeAssistant&logoColor=white)](https://community.home-assistant.io/t/petlibro-cloud-integration-non-tuya-wip/759978)
 [![Become a Sponsor](https://img.shields.io/badge/Become%20a%20Sponsor-❤️-black)](https://github.com/sponsors/jjjonesjr33)
-
+[![Sponsors](https://img.shields.io/github/sponsors/jjjonesjr33?label=Sponsors)](https://github.com/sponsors/jjjonesjr33)
 ![Logo](https://raw.githubusercontent.com/jjjonesjr33/ha_petlibro/master/docs/media/logo.png)
 
 # PETLIBRO integration for Home Assistant
@@ -16,7 +16,7 @@ Also if you want to check out all the other things I do follow me on my [**Socia
 ### This has been reworked to work with the following devices
 
 * Air Smart Feeder (PLAF108)
-* Granary Smart Feeder (PLAF103)
+* Granary Smart Feeder (PLAF103) | Version 2
 * Granary Smart Camera Feeder (PLAF203)
 * One RFID Smart Feeder (PLAF301)
 * Polar Wet Food Feeder (PLAF109)
