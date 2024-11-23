@@ -377,7 +377,7 @@ class PetLibroAPI:
                 "deviceSn": serial,
                 "key": "DESSICANT", # Make this dynamic as i think its likely fountains use a different key.
                 "frequency": value,
-                "requestId": request_id  # Use dynamic request ID
+                "requestId": request_id,  # Use dynamic request ID
                 "timeout": 5000
             })
 
