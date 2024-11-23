@@ -58,12 +58,12 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
 
     @property
     def value(self) -> float:
-        """Return the current dessicant frequency."""
+        """Return the current state."""
         state = getattr(self.device, self.entity_description.key, None)
         if state is None:
-            _LOGGER.warning(f"Dessicant frequency attribute '{self.entity_description.key}' is None for device {self.device.name}")
+            _LOGGER.warning(f"Value '{self.entity_description.key}' is None for device {self.device.name}")
             return None
-        _LOGGER.debug(f"Retrieved dessicant frequency for {self.device.name}: {state}")
+        _LOGGER.debug(f"Retrieved value for {self.device.name}: {state}")
         return float(state)
     
     async def async_set_native_value(self, value: float) -> None:
