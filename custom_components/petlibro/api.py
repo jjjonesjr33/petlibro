@@ -367,10 +367,9 @@ class PetLibroAPI:
             raise PetLibroAPIError(f"Error setting sound enable: {err}")
 
     async def set_dessicant_frequency(self, serial: str, value: float):
-        """Set the sound level."""
-        _LOGGER.debug(f"Setting dessicant frequency: serial={serial}, value={value}")
+        """Set the dessicant frequency."""
+        _LOGGER.debug(f"Setting dessicant level: serial={serial}, value={value}")
         try:
-            # Generate a dynamic request ID for the dessicant frequency change.
             request_id = str(uuid.uuid4()).replace("-", "")
 
             response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
@@ -380,7 +379,11 @@ class PetLibroAPI:
                 "requestId": request_id,  # Use dynamic request ID
                 "timeout": 5000
             })
+            response_data = await response.json()
+            _LOGGER.debug(f"Dessicant frequency response data: {response_data}")
 
+            if response.status != 200 or response_data.get("code") != 0:
+                raise PetLibroAPIError(f"Failed to trigger dessicant frequency : {response_data.get('msg')}")
             _LOGGER.debug(f"Dessicant frequency set successfully: {response}")
             return response
         except Exception as e:
@@ -409,24 +412,26 @@ class PetLibroAPI:
                 "requestId": request_id  # Use dynamic request ID
             })
 
-            # Check if response is already parsed (since response is an integer here)
-            if isinstance(response, int):
-                _LOGGER.debug(f"Manual feeding successful, returned code: {response}")
-                return response
-            
-            # If response is a dictionary (JSON), handle it
-            response_data = await response.json()
-            _LOGGER.debug(f"Manual feeding response data: {response_data}")
-            
-            # Check if the response indicates success
+            if response is None:
+                _LOGGER.error("Response object is None")
+                raise PetLibroAPIError("No response received from API.")
+
+            _LOGGER.debug(f"Received response status: {response.status}")
+            try:
+                response_data = await response.json()
+            except Exception as e:
+                _LOGGER.error(f"Failed to parse JSON: {e}")
+                raise PetLibroAPIError("Invalid JSON response.")
+
+            _LOGGER.debug(f"Response data: {response_data}")
             if response.status != 200 or response_data.get("code") != 0:
-                raise PetLibroAPIError(f"Failed to trigger manual feeding: {response_data.get('msg')}")
+                raise PetLibroAPIError(f"Failed to set dessicant frequency: {response_data.get('msg')}")
 
             return response_data
 
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to trigger manual feeding for device {serial}: {err}")
-            raise PetLibroAPIError(f"Error triggering manual feeding: {err}")
+            _LOGGER.error(f"Failed to trigger dessicant frequency set for device {serial}: {err}")
+            raise PetLibroAPIError(f"Client error: {err}")
 
 
     async def set_dessicant_reset(self, serial: str) -> JSON:
