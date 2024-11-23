@@ -378,7 +378,7 @@ class PetLibroAPI:
                 "key": "DESSICANT", # Make this dynamic as i think its likely fountains use a different key.
                 "frequency": value,
                 "requestId": request_id  # Use dynamic request ID
-                "timeout": 5000 # Not sure what this refers to. but this is the number when making the request from App.
+                "timeout": 5000
             })
 
             # Check if response is already parsed (since response is an integer here)
@@ -454,7 +454,7 @@ class PetLibroAPI:
             response = await self.session.post("/device/device/desiccantReset", json={
                 "deviceSn": serial,
                 "requestId": request_id,  # Use dynamic request ID
-                "timeout": 5000 # Not sure what this refers to. but this is the number when making the request from App.
+                "timeout": 5000
             })
 
             # Check if response is already parsed (since response is an integer here)
