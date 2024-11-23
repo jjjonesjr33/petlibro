@@ -381,24 +381,11 @@ class PetLibroAPI:
                 "timeout": 5000
             })
 
-            # Check if response is already parsed (since response is an integer here)
-            if isinstance(response, int):
-                _LOGGER.debug(f"Dessicant frequency set successfully, returned code: {response}")
-                return response
-            
-            # If response is a dictionary (JSON), handle it
-            response_data = await response.json()
-            _LOGGER.debug(f"Dessicant frequency response data: {response_data}")
-            
-            # Check if the response indicates success
-            if response.status != 200 or response_data.get("code") != 0:
-                raise PetLibroAPIError(f"Failed to trigger dessicant frequency: {response_data.get('msg')}")
-
-            return response_data
-
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to trigger dessicant frequency set for device {serial}: {err}")
-            raise PetLibroAPIError(f"Error triggering dessicant frequency: {err}")
+            _LOGGER.debug(f"Dessicant frequency set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set dessicant frequency for device {serial}: {e}")
+            raise
 
     async def set_sound_switch(self, serial: str, enable: bool):
         """Turn the sound on or off."""
