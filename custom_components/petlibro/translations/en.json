@@ -150,6 +150,9 @@
             },
             "sound_off": {
                 "name": "Turn Off Sound"
+            },
+            "dessicant_reset": {
+                "name": "Dessicant Replaced"
             }
         },
         "binary_sensor": {
@@ -176,8 +179,8 @@
             }
         },
         "number": {
-            "dessicant_days": {
-                "name": "Dessicant Reminder Days"
+            "dessicant_frequency": {
+                "name": "Dessicant Frequency"
             }
         }
     }

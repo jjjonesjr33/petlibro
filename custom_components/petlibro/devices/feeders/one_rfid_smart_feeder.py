@@ -184,17 +184,17 @@ class OneRFIDSmartFeeder(Device):
         return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
     
     @property
-    def dessicant_days(self) -> float:
-        return self._data.get("getAttributeSetting", {}).get("volume", 0)
+    def dessicant_frequency(self) -> float:
+        return self._data.get("realInfo", {}).get("changeDesiccantFrequency", 0)
 
-    async def set_dessicant_days(self, value: float) -> None:
-        _LOGGER.debug(f"Setting dessicant days to {value} for {self.serial}")
+    async def set_dessicant_frequency(self, value: float) -> None:
+        _LOGGER.debug(f"Setting dessicant frequency to {value} for {self.serial}")
         try:
-            await self.api.set_dessicant_days(self.serial, value)
+            await self.api.set_dessicant_frequency(self.serial, value)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set dessicant days for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting dessicant days: {err}")
+            _LOGGER.error(f"Failed to set dessicant frequency for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting dessicant frequency: {err}")
 
     # Error-handling updated for set_feeding_plan
     async def set_feeding_plan(self, value: bool) -> None:
@@ -325,3 +325,12 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to turn off the sound for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error turning off the sound: {err}")
+
+    async def set_dessicant_reset(self) -> None:
+        _LOGGER.debug(f"Triggering dessicant reset for {self.serial}")
+        try:
+            await self.api.set_dessicant_reset(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger dessicant reset for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering dessicant reset: {err}")

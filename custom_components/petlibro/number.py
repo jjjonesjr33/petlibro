@@ -58,12 +58,12 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
 
     @property
     def value(self) -> float:
-        """Return the current dessicant days."""
+        """Return the current dessicant frequency."""
         state = getattr(self.device, self.entity_description.key, None)
         if state is None:
-            _LOGGER.warning(f"Dessicant days attribute '{self.entity_description.key}' is None for device {self.device.name}")
+            _LOGGER.warning(f"Dessicant frequency attribute '{self.entity_description.key}' is None for device {self.device.name}")
             return None
-        _LOGGER.debug(f"Retrieved dessicant days for {self.device.name}: {state}")
+        _LOGGER.debug(f"Retrieved dessicant frequency for {self.device.name}: {state}")
         return float(state)
     
     async def async_set_native_value(self, value: float) -> None:
@@ -81,16 +81,17 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
     ],
     OneRFIDSmartFeeder: [
         PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
-            key="dessicant_days",
-            translation_key="dessicant_days",
+            key="dessicant_frequency",
+            translation_key="dessicant_frequency",
             icon="mdi:calendar-alert",
             native_unit_of_measurement="Days",
+            mode="box",
             native_max_value=60,
             native_min_value=1,
             native_step=1,
-            value=lambda device: device.dessicant_days,
-            method=lambda device, value: device.set_dessicant_days(value),
-            name="Dessicant Reminder Days"
+            value=lambda device: device.dessicant_frequency,
+            method=lambda device, value: device.set_dessicant_frequency(value),
+            name="Dessicant Frequency"
         ),
     ]
 }
