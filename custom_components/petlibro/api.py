@@ -377,7 +377,6 @@ class PetLibroAPI:
         """Set the sound level."""
         _LOGGER.debug(f"Setting sound level: serial={serial}, value={value}")
         try:
-            self.entity_description.method(self.device, value)
             response = await self.session.post("/device/setting/updateVolumeSetting", json={
                 "deviceSn": serial,
                 "volume": value
