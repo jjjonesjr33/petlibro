@@ -70,34 +70,19 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
         """Set the value of the number."""
         _LOGGER.debug(f"Setting value {value} for {self.device.name}")
         try:
-            # Extract method from entity description
-            method = self.entity_description.method
-
-            # Determine if the method requires replacetype
-            if "replacetype" in method.__code__.co_varnames:
-                # Get the replacetype from the method's context (from DEVICE_NUMBER_MAP)
-                replacetype = self.get_replacetype_for_device()
-                
-                # Handle the case where the method needs replacetype (e.g. desiccant_frequency)
-                _LOGGER.debug(f"Calling method with replacetype={replacetype} for {self.device.name}")
-                await method(self.device, replacetype, value)
-            else:
-                # Regular case for sound_level or other methods that only need a value
-                _LOGGER.debug(f"Calling method with value={value} for {self.device.name}")
-                await method(self.device, value)
-
+            # Regular case for sound_level or other methods that only need a value
+            _LOGGER.debug(f"Calling method with value={value} for {self.device.name}")
+            await self.entity_description.method(self.device, value)
             _LOGGER.debug(f"Value {value} set successfully for {self.device.name}")
         except Exception as e:
             _LOGGER.error(f"Error setting value {value} for {self.device.name}: {e}")
 
-    def get_replacetype_for_device(self):
-        """Fetch the replacetype for the device from DEVICE_NUMBER_MAP."""
-        # Logic to fetch the replacetype from DEVICE_NUMBER_MAP or device attributes
-        # Example:
-        if isinstance(self.device, OneRFIDSmartFeeder):
-            return "DESICCANT"
-        # Add other devices here if necessary
-        return "DEFAULT_REPLACETYPE"  # Fallback replacetype
+    def method(device, value=None, replacetype=None):
+        if value is not None:
+            device.set_desiccant_frequency(value)
+        if replacetype is not None:
+            device.set_desiccant_frequency(replacetype="DESSICANT")
+
 
 DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
     Feeder: [
@@ -113,7 +98,7 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             native_min_value=1,
             native_step=1,
             value=lambda device: device.desiccant_frequency,
-            method=lambda device, value: device.set_desiccant_frequency(replacetype="DESICCANT", value=value),
+            method=lambda device, value: device.set_desiccant_frequency(value),
             name="Desiccant Frequency"
         ),
         PetLibroNumberEntityDescription[OneRFIDSmartFeeder](

@@ -389,7 +389,7 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set sound enable for device {serial}: {err}")
             raise PetLibroAPIError(f"Error setting sound enable: {err}")
 
-    async def set_desiccant_frequency(self, serial: str, replacetype: str, value: float) -> JSON:
+    async def set_desiccant_frequency(self, serial: str, value: float) -> JSON:
         """Set the desiccant frequency."""
         _LOGGER.debug(f"Setting desiccant frequency: serial={serial}, value={value}, replacetype={replacetype}")
         try:
@@ -398,7 +398,7 @@ class PetLibroAPI:
 
             response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
                     "deviceSn": serial,
-                    "key": replacetype,
+                    "key": "DESICCANT",  # Try and find a way to make this dynamic as different devices may have a different key. if too difficult we could just duplicate this block for each key type.
                     "frequency": value,
                     "requestId": request_id,
                     "timeout": 5000
