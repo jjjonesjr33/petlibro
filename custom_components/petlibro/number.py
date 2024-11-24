@@ -77,13 +77,6 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
         except Exception as e:
             _LOGGER.error(f"Error setting value {value} for {self.device.name}: {e}")
 
-    def method(device, value=None, replacetype=None):
-        if value is not None:
-            device.set_desiccant_frequency(value)
-        if replacetype is not None:
-            device.set_desiccant_frequency(replacetype="DESSICANT")
-
-
 DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
     Feeder: [
     ],
