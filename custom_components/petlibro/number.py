@@ -95,7 +95,7 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             method=lambda device, value: (
                 _LOGGER.debug(f"Setting desiccant frequency with value={value} and replacetype='DESICCANT'"), 
                 device.set_desiccant_frequency(value=value, replacetype="DESICCANT")
-            )
+            )[1]
             name="Desiccant Frequency"
         ),
         PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
