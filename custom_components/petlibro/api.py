@@ -391,7 +391,7 @@ class PetLibroAPI:
 
     async def set_desiccant_frequency(self, serial: str, value: float) -> JSON:
         """Set the desiccant frequency."""
-        _LOGGER.debug(f"Setting desiccant frequency: serial={serial}, value={value}, replacetype={replacetype}")
+        _LOGGER.debug(f"Setting desiccant frequency: serial={serial}, value={value}")
         try:
             # Generate a dynamic request ID for the manual feeding
             request_id = str(uuid.uuid4()).replace("-", "")
