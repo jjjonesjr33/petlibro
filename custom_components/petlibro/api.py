@@ -389,7 +389,7 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set sound enable for device {serial}: {err}")
             raise PetLibroAPIError(f"Error setting sound enable: {err}")
 
-    async def set_desiccant_frequency(self, serial: str, value: float, replacetype: str) -> JSON:
+    async def set_desiccant_frequency(self, serial: str, replacetype: str, value: float) -> JSON:
         """Set the desiccant frequency."""
         _LOGGER.debug(f"Setting desiccant frequency: serial={serial}, value={value}, replacetype={replacetype}")
         try:

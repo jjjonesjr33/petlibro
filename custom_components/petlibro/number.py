@@ -80,7 +80,7 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
                 
                 # Handle the case where the method needs replacetype (e.g. desiccant_frequency)
                 _LOGGER.debug(f"Calling method with replacetype={replacetype} for {self.device.name}")
-                await method(self.device, value, replacetype=replacetype)
+                await method(self.device, replacetype, value)
             else:
                 # Regular case for sound_level or other methods that only need a value
                 _LOGGER.debug(f"Calling method with value={value} for {self.device.name}")
@@ -113,7 +113,7 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             native_min_value=1,
             native_step=1,
             value=lambda device: device.desiccant_frequency,
-            method=lambda device, value: device.set_desiccant_frequency(value=value, replacetype="DESICCANT"),
+            method=lambda device, value: device.set_desiccant_frequency(replacetype="DESICCANT", value=value),
             name="Desiccant Frequency"
         ),
         PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
