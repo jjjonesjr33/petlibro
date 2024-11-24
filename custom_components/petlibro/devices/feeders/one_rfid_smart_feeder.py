@@ -175,8 +175,12 @@ class OneRFIDSmartFeeder(Device):
         return self._data.get("realInfo", {}).get("closeDoorTimeSec", 0)
 
     @property
-    def screen_display_switch(self) -> bool:
+    def display_switch(self) -> bool:
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
+
+    @property
+    def child_lock_switch(self) -> bool:
+        return not self._data.get("realInfo", {}).get("childLockSwitch", False)
 
     @property
     def remaining_desiccant(self) -> str:
@@ -195,6 +199,21 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set desiccant frequency for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting desiccantfrequency: {err}")
+    def sound_switch(self) -> bool:
+        return self._data.get("realInfo", {}).get("soundSwitch", False)
+
+    @property
+    def sound_level(self) -> float:
+        return self._data.get("getAttributeSetting", {}).get("volume", 0)
+
+    async def set_sound_level(self, value: float) -> None:
+        _LOGGER.debug(f"Setting sound level to {value} for {self.serial}")
+        try:
+            await self.api.set_sound_level(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set sound level for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting sound level: {err}")
 
     # Error-handling updated for set_feeding_plan
     async def set_feeding_plan(self, value: bool) -> None:

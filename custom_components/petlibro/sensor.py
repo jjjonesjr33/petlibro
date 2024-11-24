@@ -105,8 +105,12 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         # Handle today_feeding_quantity as raw numeric value, converting to cups
         elif sensor_key == "today_feeding_quantity":
             feeding_quantity = getattr(self.device, sensor_key, 0)
-            # Convert feeding_quantity to cups, where 1/12 cup = 20 ml
-            cups = feeding_quantity * (1 / 12)  # Since each 1 unit is 1/12 of a cup
+            # Determine the conversion factor based on device-specific attributes or context
+            conversion_factor = 1 / 12  # Default conversion factor
+            if hasattr(self.device, "conversion_mode") and self.device.conversion_mode == "1/24":
+                conversion_factor = 1 / 24
+            
+            cups = feeding_quantity * conversion_factor
             return f"{round(cups, 2)}"
 
         # Handle wifi_rssi to display only the numeric value
@@ -525,12 +529,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:history",
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Today Eating Time"
-        ),
-        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="child_lock_switch",
-            translation_key="child_lock_switch",
-            icon="mdi:lock",
-            name="Buttons Lock"
         ),
     ],
     PolarWetFoodFeeder: [

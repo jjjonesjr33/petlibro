@@ -8,6 +8,11 @@ from ..device import Device
 _LOGGER = getLogger(__name__)
 
 class AirSmartFeeder(Device):  # Inherit directly from Device
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set the conversion mode explicitly for this feeder type
+        self.conversion_mode = "1/24"  # Static definition for AirSmartFeeder
+
     async def refresh(self):
         """Refresh the device data from the API."""
         try:

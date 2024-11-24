@@ -270,6 +270,28 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.enable_low_battery_notice is not None,
             name="Battery Status"
         ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="sound_switch",
+            translation_key="sound_switch",
+            icon="mdi:volume-high",
+            should_report=lambda device: device.sound_switch is not None,
+            name="Sound Status"
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="child_lock_switch",
+            translation_key="child_lock_switch",
+            icon="mdi:lock",
+            device_class=BinarySensorDeviceClass.LOCK,
+            should_report=lambda device: device.child_lock_switch is not None,
+            name="Buttons Lock"
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="display_switch",
+            translation_key="display_switch",
+            icon="mdi:monitor-star",
+            should_report=lambda device: device.display_switch is not None,
+            name="Display Status"
+        ),
     ],
     PolarWetFoodFeeder: [
         PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
