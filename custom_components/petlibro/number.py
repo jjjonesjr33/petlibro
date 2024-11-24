@@ -63,7 +63,7 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
         if state is None:
             _LOGGER.warning(f"Value '{self.entity_description.key}' is None for device {self.device.name}")
             return None
-        _LOGGER.debug(f"Retrieved value for {self.device.name}: {state}")
+        _LOGGER.debug(f"Retrieved value for '{self.entity_description.key}', {self.device.name}: {state}")
         return float(state)
     
     async def async_set_native_value(self, value: float) -> None:
@@ -71,6 +71,8 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
         _LOGGER.debug(f"Setting value {value} for {self.device.name}")
         try:
             # Call the method with await since it's async
+            _LOGGER.debug(f"Calling method: {self.entity_description.method}")
+            _LOGGER.debug(f"Calling method: {self.entity_description.method(self.device, value)}")
             await self.entity_description.method(self.device, value)
             _LOGGER.debug(f"Value {value} set successfully for {self.device.name}")
         except Exception as e:
@@ -90,7 +92,10 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             native_min_value=1,
             native_step=1,
             value=lambda device: device.desiccant_frequency,
-            method=lambda device, value: device.set_desiccant_frequency(value=value, replacetype="DESICCANT"),
+            method=lambda device, value: (
+                _LOGGER.debug(f"Setting desiccant frequency with value={value} and replacetype='DESICCANT'"), 
+                device.set_desiccant_frequency(value=value, replacetype="DESICCANT")
+            )
             name="Desiccant Frequency"
         ),
         PetLibroNumberEntityDescription[OneRFIDSmartFeeder](

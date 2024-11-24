@@ -467,8 +467,8 @@ class PetLibroAPI:
 
 
     async def set_desiccant_reset(self, serial: str) -> JSON:
-        """Trigger manual feeding for a specific device."""
-        _LOGGER.debug(f"Triggering manual feeding for device with serial: {serial}")
+        """Trigger desiccant reset for a specific device."""
+        _LOGGER.debug(f"Triggering desiccant reset for device with serial: {serial}")
         
         try:
             # Generate a dynamic request ID for the manual feeding
