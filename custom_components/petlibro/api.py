@@ -364,9 +364,9 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set sound enable for device {serial}: {err}")
             raise PetLibroAPIError(f"Error setting sound enable: {err}")
 
-    async def set_dessicant_frequency(self, serial: str, value: float) -> JSON:
-        """Set the dessicant frequency."""
-        _LOGGER.debug(f"Setting dessicant frequency: serial={serial}, value={value}")
+    async def set_desiccant_frequency(self, serial: str, value: float) -> JSON:
+        """Set the desiccant frequency."""
+        _LOGGER.debug(f"Setting desiccant frequency: serial={serial}, value={value}")
         try:
             # Generate a dynamic request ID for the manual feeding
             request_id = str(uuid.uuid4()).replace("-", "")
@@ -379,10 +379,10 @@ class PetLibroAPI:
                     "timeout": 5000
                 },
             )
-            _LOGGER.debug(f"Dessicant frequency set successfully: {response}")
+            _LOGGER.debug(f"Desiccant frequency set successfully: {response}")
             return response
         except Exception as e:
-            _LOGGER.error(f"Failed to set dessicant frequency for device {serial}: {e}")
+            _LOGGER.error(f"Failed to set desiccant frequency for device {serial}: {e}")
             raise
 
     async def set_sound_switch(self, serial: str, enable: bool):
@@ -427,7 +427,7 @@ class PetLibroAPI:
             raise PetLibroAPIError(f"Error triggering manual feeding: {err}")
 
 
-    async def set_dessicant_reset(self, serial: str) -> JSON:
+    async def set_desiccant_reset(self, serial: str) -> JSON:
         """Trigger manual feeding for a specific device."""
         _LOGGER.debug(f"Triggering manual feeding for device with serial: {serial}")
         
@@ -444,22 +444,22 @@ class PetLibroAPI:
 
             # Check if response is already parsed (since response is an integer here)
             if isinstance(response, int):
-                _LOGGER.debug(f"Dessicant reset set successfully, returned code: {response}")
+                _LOGGER.debug(f"Desiccant reset set successfully, returned code: {response}")
                 return response
             
             # If response is a dictionary (JSON), handle it
             response_data = await response.json()
-            _LOGGER.debug(f"Dessicant reset response data: {response_data}")
+            _LOGGER.debug(f"Desiccant reset response data: {response_data}")
             
             # Check if the response indicates success
             if response.status != 200 or response_data.get("code") != 0:
-                raise PetLibroAPIError(f"Failed to trigger dessicant reset: {response_data.get('msg')}")
+                raise PetLibroAPIError(f"Failed to trigger desiccant reset: {response_data.get('msg')}")
 
             return response_data
 
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to trigger dessicant reset for device {serial}: {err}")
-            raise PetLibroAPIError(f"Error triggering dessicant reset: {err}")
+            _LOGGER.error(f"Failed to trigger desiccant reset for device {serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
 
     async def set_manual_lid_open(self, serial: str):
         """Trigger manual lid opening for a specific device."""

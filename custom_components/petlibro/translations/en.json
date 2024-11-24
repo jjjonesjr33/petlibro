@@ -151,8 +151,8 @@
             "sound_off": {
                 "name": "Turn Off Sound"
             },
-            "dessicant_reset": {
-                "name": "Dessicant Replaced"
+            "desiccant_reset": {
+                "name": "Desiccant Replaced"
             }
         },
         "binary_sensor": {
@@ -179,8 +179,8 @@
             }
         },
         "number": {
-            "dessicant_frequency": {
-                "name": "Dessicant Frequency"
+            "desiccant_frequency": {
+                "name": "Desiccant Frequency"
             }
         }
     }

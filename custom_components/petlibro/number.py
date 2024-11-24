@@ -81,17 +81,17 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
     ],
     OneRFIDSmartFeeder: [
         PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
-            key="dessicant_frequency",
-            translation_key="dessicant_frequency",
+            key="desiccant_frequency",
+            translation_key="desiccant_frequency",
             icon="mdi:calendar-alert",
             native_unit_of_measurement="Days",
             mode="box",
             native_max_value=60,
             native_min_value=1,
             native_step=1,
-            value=lambda device: device.dessicant_frequency,
-            method=lambda device, value: device.set_dessicant_frequency(value),
-            name="Dessicant Frequency"
+            value=lambda device: device.desiccant_frequency,
+            method=lambda device, value: device.set_desiccant_frequency(value),
+            name="Desiccant Frequency"
         ),
     ]
 }
