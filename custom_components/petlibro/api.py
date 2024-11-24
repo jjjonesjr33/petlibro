@@ -280,30 +280,30 @@ class PetLibroAPI:
             _LOGGER.error(f"Error fetching getAttributeSetting for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching getAttributeSetting for device {device_id}: {e}")
 
-    async def get_device_attribute_settings(self, device_id: str) -> dict:
+    async def get_device_base_info(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
         now = datetime.utcnow()
-        last_call_time = self._last_api_call_times.get(f"{device_id}_getAttributeSetting")
+        last_call_time = self._last_api_call_times.get(f"{device_id}_baseInfo")
 
         # If we made the request within the last 10 seconds, return cached response
         if last_call_time and (now - last_call_time) < timedelta(seconds=10):
-            _LOGGER.debug(f"Skipping getAttributeSetting request for {device_id}, using cached response.")
-            return self._cached_responses.get(f"{device_id}_getAttributeSetting", {})
+            _LOGGER.debug(f"Skipping baseInfo request for {device_id}, using cached response.")
+            return self._cached_responses.get(f"{device_id}_baseInfo", {})
 
         # Otherwise, make the API call and update cache
         try:
-            response = await self.session.request("POST", "/device/setting/getAttributeSetting", json={
+            response = await self.session.request("POST", "/device/setting/baseInfo", json={
                 "id": device_id,
             })
 
             # Store the time of the API call and the cached response
-            self._last_api_call_times[f"{device_id}_getAttributeSetting"] = now
-            self._cached_responses[f"{device_id}_getAttributeSetting"] = response
+            self._last_api_call_times[f"{device_id}_baseInfo"] = now
+            self._cached_responses[f"{device_id}_baseInfo"] = response
 
             return response
         except Exception as e:
-            _LOGGER.error(f"Error fetching getAttributeSetting for device {device_id}: {e}")
-            raise PetLibroAPIError(f"Error fetching getAttributeSetting for device {device_id}: {e}")
+            _LOGGER.error(f"Error fetching baseInfo for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching baseInfo for device {device_id}: {e}")
 
     async def logout(self):
         """Logout of the API and reset the token"""
