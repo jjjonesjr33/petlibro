@@ -90,7 +90,7 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             native_min_value=1,
             native_step=1,
             value=lambda device: device.desiccant_frequency,
-            method=lambda device, value: device.set_desiccant_frequency(value),
+            method=lambda device, value: device.set_desiccant_frequency(value, type="DESICCANT"),
             name="Desiccant Frequency"
         ),
     ]
