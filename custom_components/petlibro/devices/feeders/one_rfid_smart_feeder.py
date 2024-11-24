@@ -18,11 +18,13 @@ class OneRFIDSmartFeeder(Device):
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
+            attribute_settings = await self.api.device_attribute_settings(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
-                "realInfo": real_info or {}
+                "realInfo": real_info or {},
+                "getAttributeSetting": attribute_settings or {}
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for OneRFIDSmartFeeder: {err}")
@@ -173,14 +175,35 @@ class OneRFIDSmartFeeder(Device):
         return self._data.get("realInfo", {}).get("closeDoorTimeSec", 0)
 
     @property
-    def screen_display_switch(self) -> bool:
+    def display_switch(self) -> bool:
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
+
+    @property
+    def child_lock_switch(self) -> bool:
+        return not self._data.get("realInfo", {}).get("childLockSwitch", False)
 
     @property
     def remaining_desiccant(self) -> str:
         """Get the remaining desiccant days."""
         return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
     
+    @property
+    def sound_switch(self) -> bool:
+        return self._data.get("realInfo", {}).get("soundSwitch", False)
+
+    @property
+    def sound_level(self) -> float:
+        return self._data.get("getAttributeSetting", {}).get("volume", 0)
+
+    async def set_sound_level(self, value: float) -> None:
+        _LOGGER.debug(f"Setting sound level to {value} for {self.serial}")
+        try:
+            await self.api.set_sound_level(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set sound level for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting sound level: {err}")
+
     # Error-handling updated for set_feeding_plan
     async def set_feeding_plan(self, value: bool) -> None:
         _LOGGER.debug(f"Setting feeding plan to {value} for {self.serial}")

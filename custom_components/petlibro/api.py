@@ -3,6 +3,7 @@
 # https://api.us.petlibro.com/device/device/list
 # https://api.us.petlibro.com/device/device/baseInfo
 # https://api.us.petlibro.com/device/device/realInfo
+# https://api.us.petlibro.com/device/setting/getAttributeSetting
 # https://api.us.petlibro.com/device/data/grainStatus
 
 from logging import getLogger
@@ -252,7 +253,32 @@ class PetLibroAPI:
             return response
         except Exception as e:
             _LOGGER.error(f"Error fetching realInfo for device {device_id}: {e}")
-            raise PetLibroAPIError(f"Error fetching realInfo for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching getAttributeSetting for device {device_id}: {e}")
+
+    async def get_device_attribute_settings(self, device_id: str) -> dict:
+        """Fetch real-time information for a device, with caching to prevent frequent requests."""
+        now = datetime.utcnow()
+        last_call_time = self._last_api_call_times.get(f"{device_id}_getAttributeSetting")
+
+        # If we made the request within the last 10 seconds, return cached response
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Skipping getAttributeSetting request for {device_id}, using cached response.")
+            return self._cached_responses.get(f"{device_id}_getAttributeSetting", {})
+
+        # Otherwise, make the API call and update cache
+        try:
+            response = await self.session.request("POST", "/device/setting/getAttributeSetting", json={
+                "id": device_id,
+            })
+
+            # Store the time of the API call and the cached response
+            self._last_api_call_times[f"{device_id}_getAttributeSetting"] = now
+            self._cached_responses[f"{device_id}_getAttributeSetting"] = response
+
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Error fetching getAttributeSetting for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching getAttributeSetting for device {device_id}: {e}")
 
     async def logout(self):
         """Logout of the API and reset the token"""
@@ -275,6 +301,9 @@ class PetLibroAPI:
 
     async def device_real_info(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/device/realInfo", serial)
+
+    async def device_attribute_settings(self, serial: str) -> Dict[str, Any]:
+        return await self.session.post_serial("/device/setting/getAttributeSetting", serial)
 
     async def device_grain_status(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/data/grainStatus", serial)
@@ -343,6 +372,20 @@ class PetLibroAPI:
             "deviceSn": serial,
             "enable": enable
         })
+
+    async def set_sound_level(self, serial: str, value: float):
+        """Set the sound level."""
+        _LOGGER.debug(f"Setting sound level: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/setting/updateVolumeSetting", json={
+                "deviceSn": serial,
+                "volume": value
+            })
+            _LOGGER.debug(f"Sound level set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set sound level for device {serial}: {e}")
+            raise
 
     async def set_manual_feed(self, serial: str) -> JSON:
         """Trigger manual feeding for a specific device."""

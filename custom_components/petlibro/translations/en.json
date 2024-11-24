@@ -173,6 +173,20 @@
             },
             "enable_low_battery_notice": {
                 "name": "Battery Status"
+            },
+            "child_lock_switch": {
+                "name": "Buttons Lock"
+            },
+            "sound_switch": {
+                "name": "Sound Status"
+            },
+            "display_switch": {
+                "name": "Display Status"
+            }
+        },
+        "number": {
+            "sound_level": {
+                "name": "Volume Level"
             }
         }
     }

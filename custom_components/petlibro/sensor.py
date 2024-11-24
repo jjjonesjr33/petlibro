@@ -526,12 +526,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Today Eating Time"
         ),
-        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="child_lock_switch",
-            translation_key="child_lock_switch",
-            icon="mdi:lock",
-            name="Buttons Lock"
-        ),
     ],
     PolarWetFoodFeeder: [
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
