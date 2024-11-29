@@ -280,6 +280,31 @@ class PetLibroAPI:
             _LOGGER.error(f"Error fetching getAttributeSetting for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching getAttributeSetting for device {device_id}: {e}")
 
+    async def get_device_base_info(self, device_id: str) -> dict:
+        """Fetch real-time information for a device, with caching to prevent frequent requests."""
+        now = datetime.utcnow()
+        last_call_time = self._last_api_call_times.get(f"{device_id}_baseInfo")
+
+        # If we made the request within the last 10 seconds, return cached response
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Skipping baseInfo request for {device_id}, using cached response.")
+            return self._cached_responses.get(f"{device_id}_baseInfo", {})
+
+        # Otherwise, make the API call and update cache
+        try:
+            response = await self.session.request("POST", "/device/setting/baseInfo", json={
+                "id": device_id,
+            })
+
+            # Store the time of the API call and the cached response
+            self._last_api_call_times[f"{device_id}_baseInfo"] = now
+            self._cached_responses[f"{device_id}_baseInfo"] = response
+
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Error fetching baseInfo for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching baseInfo for device {device_id}: {e}")
+
     async def logout(self):
         """Logout of the API and reset the token"""
         await self.session.post("/member/auth/logout")
@@ -357,14 +382,33 @@ class PetLibroAPI:
     async def set_sound_enable(self, serial: str, enable: bool):
         """Enable or disable the sound functionality."""
         try:
-            response = await self.session.post(
-                "/device/setting/updateSoundEnableSwitch", 
-                json={"deviceSn": serial, "enable": enable}
+            response = await self.session.post("/device/setting/updateSoundEnableSwitch", json={"deviceSn": serial, "enable": enable}
             )
             response.raise_for_status()
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set sound enable for device {serial}: {err}")
             raise PetLibroAPIError(f"Error setting sound enable: {err}")
+
+    async def set_desiccant_frequency(self, serial: str, value: float) -> JSON:
+        """Set the desiccant frequency."""
+        _LOGGER.debug(f"Setting desiccant frequency: serial={serial}, value={value}")
+        try:
+            # Generate a dynamic request ID for the manual feeding
+            request_id = str(uuid.uuid4()).replace("-", "")
+
+            response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
+                    "deviceSn": serial,
+                    "key": "DESICCANT",  # Try and find a way to make this dynamic as different devices may have a different key. if too difficult we could just duplicate this block for each key type.
+                    "frequency": value,
+                    "requestId": request_id,
+                    "timeout": 5000
+                },
+            )
+            _LOGGER.debug(f"Desiccant frequency set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set desiccant frequency for device {serial}: {e}")
+            raise
 
     async def set_sound_switch(self, serial: str, enable: bool):
         """Turn the sound on or off."""
@@ -420,6 +464,41 @@ class PetLibroAPI:
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger manual feeding for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feeding: {err}")
+
+
+    async def set_desiccant_reset(self, serial: str) -> JSON:
+        """Trigger desiccant reset for a specific device."""
+        _LOGGER.debug(f"Triggering desiccant reset for device with serial: {serial}")
+        
+        try:
+            # Generate a dynamic request ID for the manual feeding
+            request_id = str(uuid.uuid4()).replace("-", "")
+
+            # Send the POST request to trigger manual feeding
+            response = await self.session.post("/device/device/desiccantReset", json={
+                "deviceSn": serial,
+                "requestId": request_id,  # Use dynamic request ID
+                "timeout": 5000
+            })
+
+            # Check if response is already parsed (since response is an integer here)
+            if isinstance(response, int):
+                _LOGGER.debug(f"Desiccant reset set successfully, returned code: {response}")
+                return response
+            
+            # If response is a dictionary (JSON), handle it
+            response_data = await response.json()
+            _LOGGER.debug(f"Desiccant reset response data: {response_data}")
+            
+            # Check if the response indicates success
+            if response.status != 200 or response_data.get("code") != 0:
+                raise PetLibroAPIError(f"Failed to trigger desiccant reset: {response_data.get('msg')}")
+
+            return response_data
+
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger desiccant reset for device {serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
 
     async def set_manual_lid_open(self, serial: str):
         """Trigger manual lid opening for a specific device."""

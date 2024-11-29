@@ -58,19 +58,20 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
 
     @property
     def value(self) -> float:
-        """Return the current sound level."""
+        """Return the current state."""
         state = getattr(self.device, self.entity_description.key, None)
         if state is None:
-            _LOGGER.warning(f"Sound level attribute '{self.entity_description.key}' is None for device {self.device.name}")
+            _LOGGER.warning(f"Value '{self.entity_description.key}' is None for device {self.device.name}")
             return None
-        _LOGGER.debug(f"Retrieved sound level for {self.device.name}: {state}")
+        _LOGGER.debug(f"Retrieved value for '{self.entity_description.key}', {self.device.name}: {state}")
         return float(state)
     
     async def async_set_native_value(self, value: float) -> None:
         """Set the value of the number."""
         _LOGGER.debug(f"Setting value {value} for {self.device.name}")
         try:
-            # Call the method with await since it's async
+            # Regular case for sound_level or other methods that only need a value
+            _LOGGER.debug(f"Calling method with value={value} for {self.device.name}")
             await self.entity_description.method(self.device, value)
             _LOGGER.debug(f"Value {value} set successfully for {self.device.name}")
         except Exception as e:
@@ -80,6 +81,19 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
     Feeder: [
     ],
     OneRFIDSmartFeeder: [
+        PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
+            key="desiccant_frequency",
+            translation_key="desiccant_frequency",
+            icon="mdi:calendar-alert",
+            native_unit_of_measurement="Days",
+            mode="box",
+            native_max_value=60,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.desiccant_frequency,
+            method=lambda device, value: device.set_desiccant_frequency(value),
+            name="Desiccant Frequency"
+        ),
         PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
             key="sound_level",
             translation_key="sound_level",
@@ -91,7 +105,7 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             value=lambda device: device.sound_level,
             method=lambda device, value: device.set_sound_level(value),
             name="Sound Level"
-        ),
+        )
     ]
 }
 
