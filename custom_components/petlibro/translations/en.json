@@ -150,6 +150,9 @@
             },
             "sound_off": {
                 "name": "Turn Off Sound"
+            },
+            "desiccant_reset": {
+                "name": "Desiccant Replaced"
             }
         },
         "binary_sensor": {
@@ -187,6 +190,11 @@
         "number": {
             "sound_level": {
                 "name": "Volume Level"
+            }
+        },
+        "number": {
+            "desiccant_frequency": {
+                "name": "Desiccant Frequency"
             }
         }
     }

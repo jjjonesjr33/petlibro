@@ -147,6 +147,12 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="sound_off",
             set_fn=lambda device: device.set_sound_off(),
             name="Turn Off Sound"
+        ),
+        PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
+            key="desiccant_reset",
+            translation_key="desiccant_reset",
+            set_fn=lambda device: device.set_desiccant_reset(),
+            name="Desiccant Replaced"
         )
 
     ],
