@@ -387,7 +387,7 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set sound level for device {serial}: {e}")
             raise
 
-    async def set_manual_feed(self, serial: str) -> JSON:
+    async def set_manual_feed(self, serial: str, grainNum: int) -> JSON:
         """Trigger manual feeding for a specific device."""
         _LOGGER.debug(f"Triggering manual feeding for device with serial: {serial}")
         
@@ -398,7 +398,7 @@ class PetLibroAPI:
             # Send the POST request to trigger manual feeding
             response = await self.session.post("/device/device/manualFeeding", json={
                 "deviceSn": serial,
-                "grainNum": 1,  # Number of grains dispensed
+                "grainNum": grainNum,  # Number of grains dispensed
                 "requestId": request_id  # Use dynamic request ID
             })
 

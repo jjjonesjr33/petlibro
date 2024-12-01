@@ -229,10 +229,10 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
             raise PetLibroAPIError(f"Error setting sound switch: {err}")
 
     # Method for manual feeding
-    async def set_manual_feed(self) -> None:
+    async def set_manual_feed(self, value: int) -> None:
         _LOGGER.debug(f"Triggering manual feed for {self.serial}")
         try:
-            await self.api.set_manual_feed(self.serial)
+            await self.api.set_manual_feed(self.serial, value)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger manual feed for {self.serial}: {err}")

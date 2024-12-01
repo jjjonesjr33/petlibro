@@ -79,6 +79,18 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
 DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
     Feeder: [
     ],
+    AirSmartFeeder: [
+        PetLibroNumberEntityDescription[AirSmartFeeder](
+            key ="manual_feed",
+            translation_key ="manual_feed",
+            native_unit_of_measurement = "1/24 cups",
+            native_max_value = 24,
+            native_min_value = 1,
+            value = lambda device: device.manual_feed_quantity,
+            method = lambda device, value: device.set_manual_feed(value),
+            name = "Manual Feed"
+        ),
+    ],
     OneRFIDSmartFeeder: [
         PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
             key="sound_level",
