@@ -57,7 +57,7 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
         return self.entity_description.device_class
 
     @property
-    def value(self) -> float:
+    def native_value(self) -> float | None:
         """Return the current state."""
         state = getattr(self.device, self.entity_description.key, None)
         if state is None:
