@@ -66,6 +66,9 @@
             "today_total_ml": {
                 "name": "Today's Water Consumption (mL)"
             },
+            "weight": {
+                "name": "Current Weight"
+            },
             "weight_percent": {
                 "name": "Remaining Water"
             },
@@ -110,6 +113,9 @@
             },
             "temperature": {
                 "name": "Temperature"
+            },
+            "plate_position": {
+                "name": "Plate position"
             }
         },
         "switch": {
@@ -190,9 +196,7 @@
         "number": {
             "sound_level": {
                 "name": "Volume Level"
-            }
-        },
-        "number": {
+            },
             "desiccant_frequency": {
                 "name": "Desiccant Frequency"
             }
