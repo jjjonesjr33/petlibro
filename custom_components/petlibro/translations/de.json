@@ -1,0 +1,205 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Das Gerät ist bereits konfiguriert",
+            "reauth_successful": "Neuanmeldung erfolgreich"
+        },
+        "error": {
+            "cannot_connect": "Verbindung fehlgeschlagen",
+            "invalid_auth": "Anmeldedaten ungültig",
+            "unknown": "Unbekannter Fehler"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "email": "Email",
+                    "password": "Passwort",
+                    "region": "Region"
+                }
+            },
+            "reauth_confirm": {
+                "description": "Die PETLIBRO Integration muss sich erneut anmelden",
+                "data": {
+                    "password": "Passwort"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "device_sn": {
+                "name": "Seriennummer"
+            },
+            "mac_address": {
+                "name": "MAC Adresse"
+            },
+            "wifi_ssid": {
+                "name": "Wi-Fi SSID"
+            },
+            "wifi_rssi": {
+                "name": "Wi-Fi Signalstärke"
+            },
+            "remaining_desiccant": {
+                "name": "Verbleibende Tage Trockenmittel"
+            },
+            "battery_state": {
+                "name": "Batterielevel"
+            },
+            "electric_quantity": {
+                "name": "Batterie %"
+            },
+            "today_feeding_quantity": {
+                "name": "Futtermenge heute"
+            },
+            "today_feeding_times": {
+                "name": "Fütterzeiten heute"
+            },
+            "today_eating_times": {
+                "name": "Esszeiten heute"
+            },
+            "today_eating_time": {
+                "name": "Esszeit gesamt"
+            },
+            "feeding_plan_state": {
+                "name": "Heutiger Essensplan"
+            },
+            "today_total_ml": {
+                "name": "Heutige Wassermenge (mL)"
+            },
+            "weight": {
+                "name": "Aktuelles Gewicht"
+            },
+            "weight_percent": {
+                "name": "Verbleibendes Wasser"
+            },
+            "use_water_interval": {
+                "name": "Wasser Intervall"
+            },
+            "use_water_duration": {
+                "name": "Wasser Dauer"
+            },
+            "remaining_filter_days": {
+                "name": "Verbleibende Tage Filter"
+            },
+            "remaining_cleaning_days": {
+                "name": "Verbleibende Tage bis zur nächsten Reinigung"
+            },
+            "resolution": {
+                "name": "Kameraauflösung"
+            },
+            "night_vision": {
+                "name": "Nachtsicht"
+            },
+            "enable_video_record": {
+                "name": "Videoaufnahmen aktiviert"
+            },
+            "video_record_switch": {
+                "name": "Videoaufnahmen Schalter"
+            },
+            "video_record_mode": {
+                "name": "Modus für Videoaufnahmen"
+            },
+            "next_feeding_day": {
+                "name": "Nächste Fütterung"
+            },
+            "next_feeding_time": {
+                "name": "Beginn nächste Fütterung"
+            },
+            "next_feeding_end_time": {
+                "name": "Ende nächste Fütterung"
+            },
+            "feeding_plan": {
+                "name": "Essensplan"
+            },
+            "temperature": {
+                "name": "Temperatur"
+            },
+            "plate_position": {
+                "name": "Tellerposition"
+            }
+        },
+        "switch": {
+            "child_lock_switch": {
+                "name": "Tastensperre"
+            },
+            "enable_light": {
+                "name": "Licht aktivieren"
+            },
+            "enable_sound": {
+                "name": "Ton aktivieren"
+            }
+        },
+        "button": {
+            "manual_feed": {
+                "name": "Manuell füttern"
+            },
+            "manual_cleaning": {
+                "name": "Manuell reinigen"
+            },
+            "enable_feeding_plan": {
+                "name": "Essensplan aktivieren"
+            },
+            "disable_feeding_plan": {
+                "name": "Futterplan deaktivieren"
+            },
+            "manual_lid_open": {
+                "name": "Jetzt öffnen"
+            },
+            "display_on": {
+                "name": "Display anschalten"
+            },
+            "display_off": {
+                "name": "Display ausschalten"
+            },
+            "sound_on": {
+                "name": "Ton anschalten"
+            },
+            "sound_off": {
+                "name": "Ton ausschalten"
+            },
+            "desiccant_reset": {
+                "name": "Trockenmittel gewechselt"
+            }
+        },
+        "binary_sensor": {
+            "door_state": {
+                "name": "Klappe"
+            },
+            "food_dispenser_state": {
+                "name": "Futterausgabe"
+            },
+            "door_blocked": {
+                "name": "Klappe"
+            },
+            "food_low": {
+                "name": "Futtermenge"
+            },
+            "online": {
+                "name": "Wi-Fi"
+            },
+            "whether_in_sleep_mode": {
+                "name": "Standby Modus"
+            },
+            "enable_low_battery_notice": {
+                "name": "Batteriestatus"
+            },
+            "child_lock_switch": {
+                "name": "Tastensperre"
+            },
+            "sound_switch": {
+                "name": "Ton Modus"
+            },
+            "display_switch": {
+                "name": "Displaymodus"
+            }
+        },
+        "number": {
+            "sound_level": {
+                "name": "Lautstärke"
+            },
+            "desiccant_frequency": {
+                "name": "Trockenmittel Häufigkeit"
+            }
+        }
+    }
+}
