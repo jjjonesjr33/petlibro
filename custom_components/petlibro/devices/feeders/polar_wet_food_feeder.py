@@ -68,10 +68,6 @@ class PolarWetFoodFeeder(Device):
         return bool(self._data.get("enableFeedingPlan", False))
 
     @property
-    def food_low(self) -> bool:
-        return not bool(self._data.get("surplusGrain", True))  # Surplus grain available
-
-    @property
     def mac_address(self) -> str:
         """Returns the MAC address of the device."""
         return self._data.get("mac", "unknown")
@@ -132,10 +128,6 @@ class PolarWetFoodFeeder(Device):
     @property
     def unit_type(self) -> int:
         return self._data.get("realInfo", {}).get("unitType", 1)
-
-    @property
-    def whether_in_sleep_mode(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("whetherInSleepMode", False))
 
     @property
     def enable_low_battery_notice(self) -> bool:
