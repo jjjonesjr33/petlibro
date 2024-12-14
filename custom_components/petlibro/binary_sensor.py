@@ -295,14 +295,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
     ],
     PolarWetFoodFeeder: [
         PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
-            key="food_low",
-            translation_key="food_low",
-            icon="mdi:bowl-mix-outline",
-            device_class=BinarySensorDeviceClass.PROBLEM,
-            should_report=lambda device: device.food_low is not None,
-            name="Food Status"
-        ),
-        PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
             key="online",
             translation_key="online",
             icon="mdi:wifi",
@@ -325,14 +317,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.door_blocked is not None,
             name="Lid Status"
-        ),
-        PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
-            key="whether_in_sleep_mode",
-            translation_key="whether_in_sleep_mode",
-            icon="mdi:sleep",
-            device_class=BinarySensorDeviceClass.POWER,
-            should_report=lambda device: device.whether_in_sleep_mode is not None,
-            name="Sleep Mode"
         ),
     ],
     DockstreamSmartFountain: [

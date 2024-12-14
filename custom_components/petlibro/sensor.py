@@ -600,15 +600,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Feeding Ends"
         ),
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
-            key="temperature",
-            translation_key="temperature",
-            icon="mdi:thermometer",
-            native_unit_of_measurement="°F",
-            device_class=SensorDeviceClass.TEMPERATURE,
-            state_class=SensorStateClass.MEASUREMENT,
-            name="Temperature"
-        ),
-        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
             key="plate_position",
             translation_key="plate_position",
             icon="mdi:rotate-3d-variant",
