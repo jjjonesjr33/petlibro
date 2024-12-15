@@ -116,6 +116,9 @@
             },
             "plate_position": {
                 "name": "Plate position"
+            },
+            "active_feeding_plan_name": {
+                "name": "Active feeding plan"
             }
         },
         "switch": {

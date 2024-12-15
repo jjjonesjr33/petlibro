@@ -543,7 +543,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     ],
     PolarWetFoodFeeder: [
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
-            key="device_sn",
+            key="serial",
             translation_key="device_sn",
             icon="mdi:identifier",
             name="Device SN"
@@ -592,23 +592,18 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             should_report=lambda device: device.feeding_plan_state is not None,
         ),
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
-            key="next_feeding_day",
-            translation_key="next_feeding_day",
-            icon="mdi:calendar-clock",
-            name="Feeding Schedule",
-            device_class=SensorDeviceClass.DATE
-        ),
-        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
             key="next_feeding_time",
             translation_key="next_feeding_time",
             icon="mdi:clock-outline",
-            name="Feeding Begins"
+            name="Feeding Begins",
+            device_class=SensorDeviceClass.TIMESTAMP
         ),
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
             key="next_feeding_end_time",
             translation_key="next_feeding_end_time",
             icon="mdi:clock-end",
-            name="Feeding Ends"
+            name="Feeding Ends",
+            device_class=SensorDeviceClass.TIMESTAMP
         ),
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
             key="plate_position",
@@ -616,6 +611,12 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:rotate-3d-variant",
             name="Plate Position",
             should_report=lambda device: device.plate_position is not None,
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="active_feeding_plan_name",
+            translation_key="active_feeding_plan_name",
+            icon="mdi:notebook",
+            name="Active feeding plan"
         ),
     ],
     DockstreamSmartFountain: [
