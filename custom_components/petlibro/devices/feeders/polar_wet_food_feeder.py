@@ -1,112 +1,100 @@
-import aiohttp
-
-from ...api import make_api_call
-from aiohttp import ClientSession, ClientError
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+from typing_extensions import override
+
 from ...exceptions import PetLibroAPIError
 from ..device import Device
-from typing import cast
 from logging import getLogger
 
 _LOGGER = getLogger(__name__)
 
+
 class PolarWetFoodFeeder(Device):
+    @override
     async def refresh(self):
         """Refresh the device data from the API."""
         try:
-            await super().refresh()  # This calls the refresh method in GranaryFeeder (which also inherits from Device)
-    
-            # Fetch specific data for this device
+            await super().refresh()
+
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
-    
-            # Update internal data with fetched API data
+            feeding_plan_templates = await self.api.device_feeding_plan_templates(self.serial)
+            wet_feeding_plan = await self.api.device_wet_feeding_plan(self.serial)
+
             self.update_data({
                 "grainStatus": grain_status or {},
-                "realInfo": real_info or {}
+                "realInfo": real_info or {},
+                "feedingPlanTemplates": feeding_plan_templates or {},
+                "wetFeedingPlan": wet_feeding_plan or {},
             })
         except PetLibroAPIError as err:
-            _LOGGER.error(f"Error refreshing data for PolarWetFoodFeeder: {err}")
+            _LOGGER.error("Error refreshing data for PolarWetFoodFeeder: %", err)
 
     @property
-    def available(self) -> bool:
-        _LOGGER.debug(f"Device {self.device.name} availability: {self.device.online}")
-        return self.device.online if hasattr(self.device, 'online') else True
+    def battery_state(self) -> str | None:
+        return self._data.get("batteryState")
 
     @property
-    def battery_state(self) -> str:
-        return cast(str, self._data.get("batteryState", "unknown"))  # Battery status is low or unknown
-    
-    @property
-    def battery_display_type(self) -> float:
-        """Get the battery percentage state."""
-        try:
-            value = str(self._data.get("realInfo", {}).get("batteryDisplayType", "percentage"))
-            # Attempt to convert the value to a float
-            return cast(float, float(value))
-        except (TypeError, ValueError):
-            # Handle the case where the value is None or not a valid float
-            return 0.0
+    def door_blocked(self) -> bool | None:
+        return self._data.get("realInfo", {}).get("barnDoorError")
 
     @property
-    def device_sn(self) -> str:
-        """Returns the serial number of the device."""
-        return self._data.get("deviceSn", "unknown")
-
-    @property
-    def door_blocked(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("barnDoorError", False))
-
-    @property
-    def electric_quantity(self) -> int:
+    def electric_quantity(self) -> int | None:
         """Electric quantity (battery percentage or power state)."""
-        return self._data.get("electricQuantity", 0)
+        return self._data.get("electricQuantity")
 
     @property
-    def feeding_plan_state(self) -> bool:
+    def feeding_plan_state(self) -> bool | None:
         """Return the state of the feeding plan."""
-        return bool(self._data.get("enableFeedingPlan", False))
+        return self._data.get("enableFeedingPlan")
 
     @property
-    def mac_address(self) -> str:
-        """Returns the MAC address of the device."""
-        return self._data.get("mac", "unknown")
+    def active_feeding_plan_name(self) -> str | None:
+        """Returns the name of the currently active feeding plan"""
+        return self._data.get("wetFeedingPlan", {}).get("templateName")
 
     @property
-    def next_feeding_day(self) -> str:
-        """Returns the next feeding day."""
-        return self._data.get("nextFeedingDay", "unknown")
-
-    @property
-    def next_feeding_time(self) -> str:
-        """Returns the next feeding start time in AM/PM format."""
-        raw_time = self._data.get("nextFeedingTime", "unknown")
-        if raw_time == "unknown":
-            return raw_time
+    def next_feeding_time(self) -> datetime | None:
+        """Returns the next feeding start date/time as native datetime object. Will return None, if the date/time is
+        not parsable."""
+        raw_time = self._data.get("nextFeedingTime")
+        raw_date = self._data.get("nextFeedingDay")
+        raw_timezone = self._data.get("timezone")
+        if None in (raw_time, raw_date, raw_timezone):
+            _LOGGER.error("One of the time values is not available: raw_time=%s raw_date=%s raw_timezone=%s", raw_time, raw_date, raw_timezone)
+            return None
+        raw_combined = f"{raw_date} {raw_time}"
         try:
-            # Convert 24-hour time to 12-hour format with AM/PM
-            time_obj = datetime.strptime(raw_time, "%H:%M")
-            return time_obj.strftime("%I:%M %p")  # "08:00 AM" or "11:00 PM"
+            time_obj = datetime.strptime(raw_combined, "%Y-%m-%d %H:%M").astimezone(ZoneInfo(raw_timezone))
+            return time_obj
         except ValueError:
-            return "Invalid time"
+            _LOGGER.error("Error converting time from %s in timezone %s", raw_combined, raw_timezone)
+            return None
 
     @property
-    def next_feeding_end_time(self) -> str:
-        """Returns the next feeding end time in AM/PM format."""
-        raw_time = self._data.get("nextFeedingEndTime", "unknown")
-        if raw_time == "unknown":
-            return raw_time
+    def next_feeding_end_time(self) -> datetime | None:
+        """Returns the next feeding start date/time as native datetime object. Will return None, if the date/time is
+        not parsable. Assumes that the end time occurs on the same date as the start time, because the API does not
+        support feeding times beyond midnight."""
+        raw_time = self._data.get("nextFeedingEndTime")
+        raw_date = self._data.get("nextFeedingDay")
+        raw_timezone = self._data.get("timezone")
+        if None in (raw_time, raw_date, raw_timezone):
+            _LOGGER.error("One of the time values is not available: raw_time=%s raw_date=%s raw_timezone=%s", raw_time, raw_date, raw_timezone)
+            return None
+        raw_combined = f"{raw_date} {raw_time}"
         try:
-            # Convert 24-hour time to 12-hour format with AM/PM
-            time_obj = datetime.strptime(raw_time, "%H:%M")
-            return time_obj.strftime("%I:%M %p")  # "08:00 AM" or "11:00 PM"
+            time_obj = datetime.strptime(raw_combined, "%Y-%m-%d %H:%M").astimezone(ZoneInfo(raw_timezone))
+            return time_obj
         except ValueError:
-            return "Invalid time"
+            _LOGGER.error("Error converting time from %s in timezone %s", raw_combined, raw_timezone)
+            return None
 
     @property
-    def online(self) -> bool:
+    def online(self) -> bool | None:
         """Returns the online status of the device."""
-        return self._data.get("online", False)
+        return self._data.get("online")
 
     @property
     def online_list(self) -> list:
@@ -114,29 +102,24 @@ class PolarWetFoodFeeder(Device):
         return self._data.get("realInfo", {}).get("onlineList", [])
 
     @property
-    def plate_position(self) -> int:
+    def plate_position(self) -> int | None:
         """Returns the current position of the plate, if applicable."""
-        return self._data.get("realInfo", {}).get("platePosition", 0)
+        return self._data.get("realInfo", {}).get("platePosition")
 
     @property
-    def temperature(self) -> float:
-        """Returns the current temperature in Fahrenheit, rounded to 1 decimal place."""
-        celsius = self._data.get("realInfo", {}).get("temperature", 0.0)
-        fahrenheit = celsius * 9 / 5 + 32
-        return round(fahrenheit, 1)  # Round to 1 decimal place
+    def unit_type(self) -> int | None:
+        return self._data.get("realInfo", {}).get("unitType")
 
     @property
-    def unit_type(self) -> int:
-        return self._data.get("realInfo", {}).get("unitType", 1)
+    def enable_low_battery_notice(self) -> bool | None:
+        return self._data.get("realInfo", {}).get("enableLowBatteryNotice")
 
     @property
-    def enable_low_battery_notice(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("enableLowBatteryNotice", False))
-    
-    @property
-    def wifi_rssi(self) -> int:
-        return self._data.get("wifiRssi", -100)  # WiFi signal strength
+    def wifi_rssi(self) -> int | None:
+        """Returns the Wi-Fi's RSSI, also known as signal strength"""
+        return self._data.get("wifiRssi")
 
     @property
-    def wifi_ssid(self) -> str:
-        return self._data.get("realInfo", {}).get("wifiSsid", "unknown")
+    def wifi_ssid(self) -> str | None:
+        """Returns the Wi-Fi's SSID, also known as the name"""
+        return self._data.get("realInfo", {}).get("wifiSsid")
