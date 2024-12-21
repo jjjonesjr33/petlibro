@@ -178,7 +178,9 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     @property
     def device_class(self) -> SensorDeviceClass | None:
         """Return the device class to use in the frontend, if any."""
-        return self.entity_description.device_class_fn(self.device)
+        if (device_class := self.entity_description.device_class_fn(self.device)) is not None:
+            return device_class
+        return super().device_class
 
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
