@@ -36,6 +36,11 @@ class PolarWetFoodFeeder(Device):
         return self._data.get("batteryState")
 
     @property
+    def device_sn(self) -> str:
+        """Returns the serial number of the device."""
+        return self._data.get("deviceSn", "unknown")
+
+    @property
     def door_blocked(self) -> bool | None:
         return self._data.get("realInfo", {}).get("barnDoorError")
 

@@ -543,7 +543,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     ],
     PolarWetFoodFeeder: [
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
-            key="serial",
+            key="device_sn",
             translation_key="device_sn",
             icon="mdi:identifier",
             name="Device SN"
