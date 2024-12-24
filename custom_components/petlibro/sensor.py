@@ -210,7 +210,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="wifi_rssi",
             icon="mdi:wifi",
             native_unit_of_measurement="dBm",
-            name="Wi-Fi Signal Strength"
+            name="Wi-Fi Signal Strength",
+            device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+            state_class=SensorStateClass.MEASUREMENT
         ),
         PetLibroSensorEntityDescription[AirSmartFeeder](
             key="battery_state",
@@ -281,7 +283,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="wifi_rssi",
             icon="mdi:wifi",
             native_unit_of_measurement="dBm",
-            name="Wi-Fi Signal Strength"
+            name="Wi-Fi Signal Strength",
+            device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+            state_class=SensorStateClass.MEASUREMENT
         ),
         PetLibroSensorEntityDescription[GranarySmartFeeder](
             key="remaining_desiccant",
@@ -358,7 +362,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="wifi_rssi",
             icon="mdi:wifi",
             native_unit_of_measurement="dBm",
-            name="Wi-Fi Signal Strength"
+            name="Wi-Fi Signal Strength",
+            device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+            state_class=SensorStateClass.MEASUREMENT
         ),
         PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
             key="remaining_desiccant",
@@ -471,7 +477,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="wifi_rssi",
             icon="mdi:wifi",
             native_unit_of_measurement="dBm",
-            name="Wi-Fi Signal Strength"
+            name="Wi-Fi Signal Strength",
+            device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+            state_class=SensorStateClass.MEASUREMENT
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="remaining_desiccant",
@@ -551,7 +559,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="wifi_rssi",
             icon="mdi:wifi",
             native_unit_of_measurement="dBm",
-            name="Wi-Fi Signal Strength"
+            name="Wi-Fi Signal Strength",
+            device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+            state_class=SensorStateClass.MEASUREMENT
         ),
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
             key="wifi_ssid",
@@ -582,31 +592,18 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             should_report=lambda device: device.feeding_plan_state is not None,
         ),
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
-            key="next_feeding_day",
-            translation_key="next_feeding_day",
-            icon="mdi:calendar-clock",
-            name="Feeding Schedule"
-        ),
-        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
             key="next_feeding_time",
             translation_key="next_feeding_time",
             icon="mdi:clock-outline",
-            name="Feeding Begins"
+            name="Feeding Begins",
+            device_class=SensorDeviceClass.TIMESTAMP
         ),
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
             key="next_feeding_end_time",
             translation_key="next_feeding_end_time",
             icon="mdi:clock-end",
-            name="Feeding Ends"
-        ),
-        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
-            key="temperature",
-            translation_key="temperature",
-            icon="mdi:thermometer",
-            native_unit_of_measurement="°F",
-            device_class=SensorDeviceClass.TEMPERATURE,
-            state_class=SensorStateClass.MEASUREMENT,
-            name="Temperature"
+            name="Feeding Ends",
+            device_class=SensorDeviceClass.TIMESTAMP
         ),
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
             key="plate_position",
@@ -614,6 +611,12 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:rotate-3d-variant",
             name="Plate Position",
             should_report=lambda device: device.plate_position is not None,
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="active_feeding_plan_name",
+            translation_key="active_feeding_plan_name",
+            icon="mdi:notebook",
+            name="Active feeding plan"
         ),
     ],
     DockstreamSmartFountain: [
@@ -640,7 +643,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="wifi_rssi",
             icon="mdi:wifi",
             native_unit_of_measurement="dBm",
-            name="Wi-Fi Signal Strength"
+            name="Wi-Fi Signal Strength",
+            device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+            state_class=SensorStateClass.MEASUREMENT
         ),
         PetLibroSensorEntityDescription[DockstreamSmartFountain](
             key="remaining_cleaning_days",
@@ -654,7 +659,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:scale",
             native_unit_of_measurement="oz",
             state_class=SensorStateClass.MEASUREMENT,
-            name="Current Weight"
+            name="Current Weight",
+            device_class=SensorDeviceClass.WEIGHT
         ),
         PetLibroSensorEntityDescription[DockstreamSmartFountain](
             key="weight_percent",
@@ -710,7 +716,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="wifi_rssi",
             icon="mdi:wifi",
             native_unit_of_measurement="dBm",
-            name="Wi-Fi Signal Strength"
+            name="Wi-Fi Signal Strength",
+            device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+            state_class=SensorStateClass.MEASUREMENT
         ),
         PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
             key="remaining_cleaning_days",
@@ -724,7 +732,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:scale",
             native_unit_of_measurement="oz",
             state_class=SensorStateClass.MEASUREMENT,
-            name="Current Weight"
+            name="Current Weight",
+            device_class=SensorDeviceClass.WEIGHT
         ),
         PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
             key="weight_percent",
