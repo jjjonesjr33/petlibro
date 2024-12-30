@@ -54,6 +54,12 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
     OneRFIDSmartFeeder: [
     ],
     PolarWetFoodFeeder: [
+        PetLibroSwitchEntityDescription[PolarWetFoodFeeder](
+            key="manual_feed_now",
+            translation_key="manual_feed_now",
+            set_fn=lambda device, value: device.set_manual_feed_now(value),
+            name="Feed now"
+        ),
     ],
     DockstreamSmartFountain: [
     ],
@@ -66,7 +72,7 @@ class PetLibroSwitchEntity(PetLibroEntity[_DeviceT], SwitchEntity):
 
     entity_description: PetLibroSwitchEntityDescription[_DeviceT]  # type: ignore [reportIncompatibleVariableOverride]
 
-    @cached_property
+    @property
     def is_on(self) -> bool | None:
         """Return true if switch is on."""
         return bool(getattr(self.device, self.entity_description.key))
