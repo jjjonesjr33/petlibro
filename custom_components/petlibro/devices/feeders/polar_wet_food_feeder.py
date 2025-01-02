@@ -19,13 +19,13 @@ class PolarWetFoodFeeder(Device):
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
-            wet_list = await self.api.device_wet_feeding_plan_wet_list(self.serial)
+            wet_feeding_plan = await self.api.device_wet_feeding_plan(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
-                "wetList": wet_list or {},
+                "wetFeedingPlan": wet_feeding_plan or {},
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for PolarWetFoodFeeder: {err}")
@@ -112,7 +112,7 @@ class PolarWetFoodFeeder(Device):
     @property
     def manual_feed_id(self) -> int:
         """Returns the manual feed ID."""
-        return self._data.get("wetList", {}).get("manualFeedId", None)
+        return self._data.get("wetFeedingPlan", {}).get("manualFeedId", None)
         
     @property
     def manual_feed_now(self) -> bool:

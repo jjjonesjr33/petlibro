@@ -336,7 +336,7 @@ class PetLibroAPI:
     async def device_feeding_plan_today_new(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/feedingPlan/todayNew", serial)
     
-    async def device_wet_feeding_plan_wet_list(self, serial: str) -> Dict[str, Any]:
+    async def device_wet_feeding_plan(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/wetFeedingPlan/wetListV3", serial)
 
     # Support for new switch functions
