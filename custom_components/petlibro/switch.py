@@ -58,7 +58,7 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
             key="manual_feed_now",
             translation_key="manual_feed_now",
             set_fn=lambda device, value: device.set_manual_feed_now(value),
-            name="Feed now"
+            name="Manually Open/Close Lid"
         ),
     ],
     DockstreamSmartFountain: [
