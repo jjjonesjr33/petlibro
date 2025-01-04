@@ -167,13 +167,13 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             key="ring_bell",
             translation_key="ring_bell",
             set_fn=lambda device: device.feed_audio(),
-            name="Ring bell"
+            name="Ring Bell"
         ),
         PetLibroButtonEntityDescription[PolarWetFoodFeeder](
             key="rotate_food_bowl",
             translation_key="rotate_food_bowl",
             set_fn=lambda device: device.rotate_food_bowl(),
-            name="Rotate food bowl"
+            name="Rotate Food Bowl"
         )
     ],
     DockstreamSmartFountain: [
