@@ -127,6 +127,9 @@
             },
             "enable_sound": {
                 "name": "Enable Sound"
+            },
+            "manual_feed_now": {
+                "name": "Manually Open/Close Lid"
             }
         },
         "button": {
@@ -159,6 +162,12 @@
             },
             "desiccant_reset": {
                 "name": "Desiccant Replaced"
+            },
+            "ring_bell": {
+                "name": "Ring Bell"
+            },
+            "rotate_food_bowl": {
+                "name": "Rotate Food Bowl"
             }
         },
         "binary_sensor": {

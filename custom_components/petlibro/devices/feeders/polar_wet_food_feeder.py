@@ -19,11 +19,13 @@ class PolarWetFoodFeeder(Device):
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
+            wet_feeding_plan = await self.api.device_wet_feeding_plan(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
-                "realInfo": real_info or {}
+                "realInfo": real_info or {},
+                "wetFeedingPlan": wet_feeding_plan or {},
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for PolarWetFoodFeeder: {err}")
@@ -106,6 +108,16 @@ class PolarWetFoodFeeder(Device):
             return time_obj.strftime("%I:%M %p")  # "08:00 AM" or "11:00 PM"
         except ValueError:
             return "Invalid time"
+        
+    @property
+    def manual_feed_id(self) -> int:
+        """Returns the manual feed ID."""
+        return self._data.get("wetFeedingPlan", {}).get("manualFeedId", None)
+        
+    @property
+    def manual_feed_now(self) -> bool:
+        """Returns whether the feeder is set to feed now or not."""
+        return self.manual_feed_id is not None
 
     @property
     def online(self) -> bool:
@@ -148,3 +160,37 @@ class PolarWetFoodFeeder(Device):
     @property
     def wifi_ssid(self) -> str:
         return self._data.get("realInfo", {}).get("wifiSsid", "unknown")
+
+    async def set_manual_feed_now(self, start: bool) -> None:
+        try:
+            if start:
+                _LOGGER.debug(f"Triggering manual feed now for {self.serial}")
+                await self.api.set_manual_feed_now(self.serial)
+            else:
+                _LOGGER.debug(f"Triggering stop feed now for {self.serial}")
+                await self.api.set_stop_feed_now(self.serial, self.manual_feed_id)
+            
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger manual feed now for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering manual feed now: {err}")
+
+    async def rotate_food_bowl(self) -> None:
+        _LOGGER.debug(f"Triggering rotate food bowl for {self.serial}")
+
+        try:
+            await self.api.set_rotate_food_bowl(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger rotate food bowl for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering rotate food bowl: {err}")
+
+    async def feed_audio(self) -> None:
+        _LOGGER.debug(f"Triggering feed audio for {self.serial}")
+
+        try:
+            await self.api.set_feed_audio(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger feed audio for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering feed audio: {err}")
