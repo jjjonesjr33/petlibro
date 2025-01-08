@@ -8,5 +8,6 @@
   "documentation": "https://github.com/jjjonesjr33/petlibro",
   "issue_tracker": "https://github.com/jjjonesjr33/petlibro/issues",
   "integration_type": "hub",
+  "iot_class": "cloud_polling",
   "version": "1.0.17"
 }
