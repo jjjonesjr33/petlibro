@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/jjjonesjr33/petlibro/discussions/categories/general
+    about: Want to talk about Petlibro with the community? Check out our chat.
+  - name: 🙏Support
+    url: https://github.com/jjjonesjr33/petlibro/discussions/categories/support
+    about: For support, possible bug reports or general questions.
+  - name: 🐈Pets
+    url: https://github.com/jjjonesjr33/petlibro/discussions/categories/pets
+    about: Have a picture of your beloved pet? Share them with the community!
+  - name: 👾 Discord
+    url: https://discord.gg/HxRffWjMmg
+    about: Want to discuss the Petlibro intergration with Jones? Join him on Discord in the coders chat.
