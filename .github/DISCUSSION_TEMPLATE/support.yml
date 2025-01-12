@@ -4,8 +4,11 @@ body:
       value: |
         ### ⚠️ Before opening a discussion:
 
+        
+
         - Check the [wiki](https://github.com/jjjonesjr33/petlibro/wiki).
         - Search existing [issues](https://github.com/jjjonesjr33/petlibro/search?q=&type=issues) and [discussions](https://github.com/jjjonesjr33/petlibro/search?q=&type=discussions) (including closed ones!).
+
   - type: markdown
     attributes:
       value: We need some information from you first to help us understand what is going on.
