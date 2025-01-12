@@ -4,8 +4,8 @@ body:
       value: |
         ### ⚠️ Before opening a discussion:
 
-        - [Check the wiki](https://github.com/jjjonesjr33/petlibro/wiki).
-        - [Search existing issues](https://github.com/jjjonesjr33/petlibro/search?q=&type=issues) [and discussions](https://github.com/jjjonesjr33/petlibro/search?q=&type=discussions) (including closed ones!).
+             - Check the [wiki](https://github.com/jjjonesjr33/petlibro/wiki).
+             - Search existing [issues](https://github.com/jjjonesjr33/petlibro/search?q=&type=issues) and [discussions](https://github.com/jjjonesjr33/petlibro/search?q=&type=discussions) (including closed ones!).
   - type: markdown
     attributes:
       value: We need some information from you first to help us understand what is going on.
@@ -63,6 +63,6 @@ body:
       value: |
         ## ⚠️ NOTICE ⚠️
 
-        Before you submit this support request, please ensure you have [checked the wiki](https://github.com/jjjonesjr33/petlibro/wiki) as well as any [issues](https://github.com/jjjonesjr33/petlibro/search?q=&type=issues) and [discussions](https://github.com/jjjonesjr33/petlibro/search?q=&type=discussions), if relevant.
+        Before you submit this support request, please ensure you have checked the [wiki](https://github.com/jjjonesjr33/petlibro/wiki) as well as any [issues](https://github.com/jjjonesjr33/petlibro/search?q=&type=issues) and [discussions](https://github.com/jjjonesjr33/petlibro/search?q=&type=discussions), if relevant.
 
         *Please remember that this project is maintained by regular individuales **just like you**, so if you don't take the time to fill out the requested information, we may not be able to provide support.*
