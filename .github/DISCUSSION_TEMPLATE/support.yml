@@ -2,7 +2,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### ⚠️ Before opening a discussion:
+        ### ⚠️ BEFORE OPENING A DISCUSSION ⚠️
         &nbsp;
         - Check the [wiki](https://github.com/jjjonesjr33/petlibro/wiki).
         - Search existing [issues](https://github.com/jjjonesjr33/petlibro/search?q=&type=issues) and [discussions](https://github.com/jjjonesjr33/petlibro/search?q=&type=discussions) (including closed ones!).
@@ -58,7 +58,7 @@ body:
       description: Please include any relevant log output. This will be automatically formatted into code, so no need for backticks.
       render: python
     validations:
-      required: true
+      required: false
   - type: markdown
     attributes:
       value: |
