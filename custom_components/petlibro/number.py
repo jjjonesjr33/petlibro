@@ -82,14 +82,15 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
     ],
     AirSmartFeeder: [
         PetLibroNumberEntityDescription[AirSmartFeeder](
-            key ="manual_feed",
-            translation_key ="manual_feed",
-            native_unit_of_measurement = "1/24 cups",
+            key ="manual_feed_quantity",
+            translation_key ="manual_feed_quantity",
+            native_unit_of_measurement = "  / 24 cups",
             native_max_value = 24,
             native_min_value = 1,
+            native_step = 1,
             value = lambda device: device.manual_feed_quantity,
-            method = lambda device, value: device.set_manual_feed(value),
-            name = "Manual Feed"
+            method = lambda device, value: device.set_manual_feed_quantity(value),
+            name = "Manual Feed Quantity"
         ),
     ],
     OneRFIDSmartFeeder: [

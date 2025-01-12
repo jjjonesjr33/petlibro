@@ -12,20 +12,23 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
         super().__init__(*args, **kwargs)
         # Set the conversion mode explicitly for this feeder type
         self.conversion_mode = "1/24"  # Static definition for AirSmartFeeder
+        self.manual_feed_quantity = 1 # Static definition for AirSmartFeeder
 
     async def refresh(self):
         """Refresh the device data from the API."""
         try:
             await super().refresh()  # Call the refresh method from Device
-    
+
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
+            attribute_settings = await self.api.device_attribute_settings(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
-                "realInfo": real_info or {}
+                "realInfo": real_info or {},
+                "getAttributeSetting": attribute_settings or {}
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for AirSmartFeeder: {err}")
@@ -227,12 +230,31 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set sound switch for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting sound switch: {err}")
+    '''
+    @property
+    def manual_feed_quantity(self) -> int:
+        return self.set_manual_feed_quantity(self.serial, 1)
+
+    async def set_manual_feed_quantity(self, serial: str, value: int):
+        """Set the manual feed quantity"""
+        _LOGGER.debug(f"Setting manual feed quantity: serial={serial}, value={value}")
+        self.manual_feed_quantity = value
+        return self.manual_feed_quantity
+    '''
+
+    async def set_manual_feed_quantity(self, serial: str, value: int):
+        """Set the manual feed quantity"""
+        _LOGGER.debug(f"Setting manual feed quantity: serial={serial}, value={value}")
+        self.manual_feed_quantity = value
+        return self.manual_feed_quantity
 
     # Method for manual feeding
     async def set_manual_feed(self, value: int) -> None:
         _LOGGER.debug(f"Triggering manual feed for {self.serial}")
         try:
-            await self.api.set_manual_feed(self.serial, value)
+            if hasattr(self.device, "manual_feed_quantity"):
+                manual_feed_quantity = self.manual_feed_quantity
+            await self.api.set_manual_feed(self.serial, manual_feed_quantity)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger manual feed for {self.serial}: {err}")
