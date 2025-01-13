@@ -242,19 +242,19 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
         return self.manual_feed_quantity
     '''
 
-    async def set_manual_feed_quantity(self, serial: str, value: int):
+    async def set_manual_feed_quantity(self, value: int):
         """Set the manual feed quantity"""
-        _LOGGER.debug(f"Setting manual feed quantity: serial={serial}, value={value}")
+        _LOGGER.debug(f"Setting manual feed quantity: serial={self.serial}, value={value}")
         self.manual_feed_quantity = value
         return self.manual_feed_quantity
 
     # Method for manual feeding
-    async def set_manual_feed(self, value: int) -> None:
+    async def set_manual_feed(self) -> None:
         _LOGGER.debug(f"Triggering manual feed for {self.serial}")
         try:
-            if hasattr(self.device, "manual_feed_quantity"):
+            if hasattr(self, "manual_feed_quantity"):
                 manual_feed_quantity = self.manual_feed_quantity
-            await self.api.set_manual_feed(self.serial, manual_feed_quantity)
+            await self.api.set_manual_feed(self.serial, feed_value = manual_feed_quantity)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger manual feed for {self.serial}: {err}")
