@@ -399,4 +399,16 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set lid mode for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting lid mode: {err}")
-        
+
+    @property
+    def lid_close_time(self) -> float:
+        return self._data.get("getAttributeSetting", {}).get("volume", 0)
+
+    async def set_lid_close_time(self, value: float) -> None:
+        _LOGGER.debug(f"Setting lid close time to {value} for {self.serial}")
+        try:
+            await self.api.set_lid_close_time(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set lid close time for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting lid close time: {err}")

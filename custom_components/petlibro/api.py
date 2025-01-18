@@ -434,15 +434,32 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set sound level for device {serial}: {e}")
             raise
 
+    async def set_lid_close_time(self, serial: str, value: float):
+        """Set the lid close time."""
+        _LOGGER.debug(f"Setting sound level: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/setting/updateCoverSetting", json={
+                "deviceSn": serial,
+                "coverOpenMode": None,
+                "coverCloseSpeed": None,
+                "closeDoorTimeSec": value
+            })
+            _LOGGER.debug(f"Lid close time set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set lid close time for device {serial}: {e}")
+            raise
+
+
     async def set_lid_speed(self, serial: str, value: str):
         """Set the lid speed."""
         _LOGGER.debug(f"Setting lid speed: serial={serial}, value={value}")
         try:
             response = await self.session.post("/device/setting/updateCoverSetting", json={
                 "deviceSn": serial,
-                "coverOpenMode": 0,
+                "coverOpenMode": None,
                 "coverCloseSpeed": value,
-                "closeDoorTimeSec": 0
+                "closeDoorTimeSec": None
             })
             _LOGGER.debug(f"Lid speed set successfully: {response}")
             return response
@@ -457,8 +474,8 @@ class PetLibroAPI:
             response = await self.session.post("/device/setting/updateCoverSetting", json={
                 "deviceSn": serial,
                 "coverOpenMode": value,
-                "coverCloseSpeed": 0,
-                "closeDoorTimeSec": 0
+                "coverCloseSpeed": None,
+                "closeDoorTimeSec": None
             })
             _LOGGER.debug(f"Lid mode set successfully: {response}")
             return response
