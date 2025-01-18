@@ -220,6 +220,11 @@
             "lid_mode": {
                 "name": "Lid Mode"
             }
+        },
+        "text": {
+            "display_text": {
+                "name": "Text on Display"
+            }
         }
     }
 }

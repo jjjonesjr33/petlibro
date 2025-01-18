@@ -211,6 +211,11 @@
             "lid_mode": {
                 "name": "Deckelmodus"
             }
+        },
+        "text": {
+            "display_text": {
+                "name": "Text auf dem Display"
+            }
         }
     }
 }

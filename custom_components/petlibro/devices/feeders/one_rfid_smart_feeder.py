@@ -19,12 +19,14 @@ class OneRFIDSmartFeeder(Device):
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
+            get_default_matrix = await self.api.get_default_matrix(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
-                "getAttributeSetting": attribute_settings or {}
+                "getAttributeSetting": attribute_settings or {},
+                "getDefaultMatrix": get_default_matrix or {}
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for OneRFIDSmartFeeder: {err}")
@@ -412,3 +414,7 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set lid close time for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting lid close time: {err}")
+
+    @property
+    def display_text(self) -> str:
+        return self._data.get("getDefaultMatrix", {}).get("screenLetter", "ERROR")
