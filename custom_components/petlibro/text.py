@@ -48,13 +48,9 @@ class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
 
     @property
     def native_value(self) -> str | None:
-        """Return the current current_option."""
-        state = getattr(self.device, self.entity_description.key, None)
-        if state is None:
-            _LOGGER.warning(f"Current option '{self.entity_description.key}' is None for device {self.device.name}")
-            return None
-        _LOGGER.debug(f"Retrieved current option for '{self.entity_description.key}', {self.device.name}: {state}")
-        return str(state)
+        """Return the current text value."""
+        _LOGGER.debug(f"Retrieving native value for {self.device.name}. Current value: {self._current_value}")
+        return self._current_value
     
     async def async_set_value(self, native_value: str) -> None:
         """Set the text value for the entity."""
