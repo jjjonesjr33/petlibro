@@ -385,9 +385,9 @@ class OneRFIDSmartFeeder(Device):
         
         # Direct mapping inside the property
         if api_value == "KEEP_OPEN":
-            return "Stay Open"
+            return "Open Mode (Stays Open Until Closed)"
         elif api_value == "CUSTOM":
-            return "Open On Detection"
+            return "Personal Mode (Opens on Detection)"
         else:
             return "Unknown"
 
