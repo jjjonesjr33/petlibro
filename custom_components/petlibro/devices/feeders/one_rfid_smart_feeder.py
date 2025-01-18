@@ -355,8 +355,19 @@ class OneRFIDSmartFeeder(Device):
             raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
 
     @property
-    def lid_speed(self) -> str:
-        return self._data.get("getAttributeSetting", {}).get("coverCloseSpeed", "FAST")
+    def lid_mode(self) -> str:
+        """Return the user-friendly lid mode (mapped directly from the API value)."""
+        api_value = self._data.get("getAttributeSetting", {}).get("coverCloseSpeed", "FAST")
+        
+        # Direct mapping inside the property
+        if api_value == "FAST":
+            return "Fast"
+        elif api_value == "MEDIUM":
+            return "Medium"
+        elif api_value == "SLOW":
+            return "Slow"
+        else:
+            return "Unknown"
 
     async def set_lid_speed(self, value: str) -> None:
         _LOGGER.debug(f"Setting lid speed to {value} for {self.serial}")
@@ -369,7 +380,16 @@ class OneRFIDSmartFeeder(Device):
 
     @property
     def lid_mode(self) -> str:
-        return self._data.get("getAttributeSetting", {}).get("coverOpenMode", "CUSTOM")
+        """Return the user-friendly lid mode (mapped directly from the API value)."""
+        api_value = self._data.get("getAttributeSetting", {}).get("coverOpenMode", "CUSTOM")
+        
+        # Direct mapping inside the property
+        if api_value == "KEEP_OPEN":
+            return "Stay Open"
+        elif api_value == "CUSTOM":
+            return "Open On Detection"
+        else:
+            return "Unknown"
 
     async def set_lid_mode(self, value: str) -> None:
         _LOGGER.debug(f"Setting lid mode to {value} for {self.serial}")
@@ -379,3 +399,4 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set lid mode for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting lid mode: {err}")
+        
