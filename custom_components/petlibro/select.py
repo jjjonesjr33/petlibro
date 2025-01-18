@@ -40,9 +40,9 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 class PetLibroSelectEntityDescription(SelectEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device select entities."""
 
-    method: Callable[[_DeviceT, str], Awaitable[None]]
+    method: Callable[[_DeviceT, str],  Any]
     options: list[str]
-    current_option: Optional[Callable[[_DeviceT], str]]
+    current_option: Callable[[_DeviceT], str] | None = None
 class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
     """PETLIBRO sensor entity."""
 
