@@ -355,8 +355,8 @@ class OneRFIDSmartFeeder(Device):
             raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
 
     @property
-    def lid_mode(self) -> str:
-        """Return the user-friendly lid mode (mapped directly from the API value)."""
+    def lid_speed(self) -> str:
+        """Return the user-friendly lid speed (mapped directly from the API value)."""
         api_value = self._data.get("getAttributeSetting", {}).get("coverCloseSpeed", "FAST")
         
         # Direct mapping inside the property
