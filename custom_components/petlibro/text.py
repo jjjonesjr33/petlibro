@@ -78,7 +78,7 @@ DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
             native_max=100,
             native_min=1,
             pattern=r"^(?!\s*$)[a-zA-Z0-9 ]{1,20}$",
-            value=lambda device: device.display_text,
+            native_value=lambda device: device.display_text,
             name="Text on Display"
         )
     ]
