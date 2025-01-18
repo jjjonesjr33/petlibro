@@ -26,6 +26,7 @@ from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
+from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 
@@ -160,7 +161,6 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_desiccant_reset(),
             name="Desiccant Replaced"
         )
-
     ],
     PolarWetFoodFeeder: [
         PetLibroButtonEntityDescription[PolarWetFoodFeeder](
@@ -175,6 +175,26 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.rotate_food_bowl(),
             name="Rotate Food Bowl"
         )
+    ],
+    SpaceSmartFeeder: [
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="manual_feed",
+            translation_key="manual_feed",
+            set_fn=lambda device: device.set_manual_feed(),
+            name="Manual Feed"
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="enable_feeding_plan",
+            translation_key="enable_feeding_plan",
+            set_fn=lambda device: device.set_feeding_plan(True),
+            name="Enable Feeding Plan"
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="disable_feeding_plan",
+            translation_key="disable_feeding_plan",
+            set_fn=lambda device: device.set_feeding_plan(False),
+            name="Disable Feeding Plan"
+        ),
     ],
     DockstreamSmartFountain: [
     ],

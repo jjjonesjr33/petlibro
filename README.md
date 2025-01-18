@@ -15,11 +15,15 @@ Also if you want to check out all the other things I do follow me on my [**Socia
 ## Supported Devices
 ### This has been reworked to work with the following devices
 
-* Air Smart Feeder (PLAF108)
+### Feeders
 * Granary Smart Feeder (PLAF103) | Version 2
+* Space Smart Feeder (PLAF107)
+* Air Smart Feeder (PLAF108)
+* Polar Wet Food Feeder (PLAF109)
 * Granary Smart Camera Feeder (PLAF203)
 * One RFID Smart Feeder (PLAF301)
-* Polar Wet Food Feeder (PLAF109)
+
+### Fountains
 * Dockstream Smart Fountain (PLWF105)
 * Dockstream RFID Smart Fountain (PLWF305)
 
@@ -42,11 +46,13 @@ Features & Sensors
     Buttons Lock
     Desiccant Remaining Days
     Device SN
+    Display Status
     Food Dispenser Status
     Food Status
     Lid Status
     MAC Address
     Sleep Mode
+    Sound Status
 
 Feeding Statistics
 
@@ -64,10 +70,20 @@ Connectivity
 
 Configuration Options
 
+    Desiccant Replaced
     Disable Feeding Plan
     Enable Feeding Plan
     Manual Feed
+    Manually Open Lid
+    Turn Off Display
+    Turn On Display
+    Turn Off Sound
+    Turn On Sound
 
+Controls
+    Desiccant Frequency
+    Volume Level
+    
 ## One RFID Smart Feeder Preview
 ![One RFID Smart Feeder](https://github.com/user-attachments/assets/0636003e-04ab-495c-8f28-d032610c9b19)
 
