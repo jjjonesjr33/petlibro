@@ -41,8 +41,8 @@ class PetLibroSelectEntityDescription(SelectEntityDescription, PetLibroEntityDes
     """A class that describes device select entities."""
 
     method: Callable[[_DeviceT, str], Awaitable[None]]
-    options: List[str] = field(default_factory=list)
-    current_option: Optional[Callable[[_DeviceT], str]] = None
+    options: list[str]
+    current_option: Optional[Callable[[_DeviceT], str]]
 class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
     """PETLIBRO sensor entity."""
 
