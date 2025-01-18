@@ -1,26 +1,26 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Device is already configured",
-            "reauth_successful": "Reauthentication successful"
+            "already_configured": "Das Gerät ist bereits konfiguriert",
+            "reauth_successful": "Neuanmeldung erfolgreich"
         },
         "error": {
-            "cannot_connect": "Failed to connect",
-            "invalid_auth": "Invalid authentication",
-            "unknown": "Unexpected error"
+            "cannot_connect": "Verbindung fehlgeschlagen",
+            "invalid_auth": "Anmeldedaten ungültig",
+            "unknown": "Unbekannter Fehler"
         },
         "step": {
             "user": {
                 "data": {
                     "email": "Email",
-                    "password": "Password",
+                    "password": "Passwort",
                     "region": "Region"
                 }
             },
             "reauth_confirm": {
-                "description": "The PETLIBRO integration needs to re-authenticate your account",
+                "description": "Die PETLIBRO Integration muss sich erneut anmelden",
                 "data": {
-                    "password": "Password"
+                    "password": "Passwort"
                 }
             }
         }
@@ -28,186 +28,177 @@
     "entity": {
         "sensor": {
             "device_sn": {
-                "name": "Device SN"
+                "name": "Seriennummer"
             },
             "mac_address": {
-                "name": "MAC Address"
+                "name": "MAC Adresse"
             },
             "wifi_ssid": {
                 "name": "Wi-Fi SSID"
             },
             "wifi_rssi": {
-                "name": "Wi-Fi Signal Strength"
+                "name": "Wi-Fi Signalstärke"
             },
             "remaining_desiccant": {
-                "name": "Desiccant Remaining Days"
+                "name": "Verbleibende Tage Trockenmittel"
             },
             "battery_state": {
-                "name": "Battery Level"
+                "name": "Batterielevel"
             },
             "electric_quantity": {
-                "name": "Battery / AC %"
+                "name": "Batterie %"
             },
             "today_feeding_quantity": {
-                "name": "Today's Feeding Quantity"
+                "name": "Futtermenge heute"
             },
             "today_feeding_times": {
-                "name": "Today's Feeding Times"
+                "name": "Fütterzeiten heute"
             },
             "today_eating_times": {
-                "name": "Today's Eating Times"
+                "name": "Esszeiten heute"
             },
             "today_eating_time": {
-                "name": "Today's Total Eating Time"
+                "name": "Esszeit gesamt"
             },
             "feeding_plan_state": {
-                "name": "Today's Feeding Plan"
+                "name": "Heutiger Essensplan"
             },
             "today_total_ml": {
-                "name": "Today's Water Consumption (mL)"
+                "name": "Heutige Wassermenge (mL)"
             },
             "weight": {
-                "name": "Current Weight"
+                "name": "Aktuelles Gewicht"
             },
             "weight_percent": {
-                "name": "Remaining Water"
+                "name": "Verbleibendes Wasser"
             },
             "use_water_interval": {
-                "name": "Water Interval"
+                "name": "Wasser Intervall"
             },
             "use_water_duration": {
-                "name": "Water Time Duration"
+                "name": "Wasser Dauer"
             },
             "remaining_filter_days": {
-                "name": "Remaining Filter Day"
+                "name": "Verbleibende Tage Filter"
             },
             "remaining_cleaning_days": {
-                "name": "Remaining Cleaning Days"
+                "name": "Verbleibende Tage bis zur nächsten Reinigung"
             },
             "resolution": {
-                "name": "Camera Resolution"
+                "name": "Kameraauflösung"
             },
             "night_vision": {
-                "name": "Night Vision Mode"
+                "name": "Nachtsicht"
             },
             "enable_video_record": {
-                "name": "Video Recording Enabled"
+                "name": "Videoaufnahmen aktiviert"
             },
             "video_record_switch": {
-                "name": "Video Recording Switch"
+                "name": "Videoaufnahmen Schalter"
             },
             "video_record_mode": {
-                "name": "Video Recording Mode"
+                "name": "Modus für Videoaufnahmen"
             },
             "next_feeding_day": {
-                "name": "Feeding Schedule"
+                "name": "Nächste Fütterung"
             },
             "next_feeding_time": {
-                "name": "Feeding Begins"
+                "name": "Beginn nächste Fütterung"
             },
             "next_feeding_end_time": {
-                "name": "Feeding Ends"
+                "name": "Ende nächste Fütterung"
             },
             "feeding_plan": {
-                "name": "Feeding Plan"
+                "name": "Essensplan"
             },
             "temperature": {
-                "name": "Temperature"
+                "name": "Temperatur"
             },
             "plate_position": {
-                "name": "Plate position"
+                "name": "Tellerposition"
             }
         },
         "switch": {
             "child_lock_switch": {
-                "name": "Buttons Lock"
+                "name": "Tastensperre"
             },
             "enable_light": {
-                "name": "Enable Display"
+                "name": "Licht aktivieren"
             },
             "enable_sound": {
-                "name": "Enable Sound"
-            },
-            "manual_feed_now": {
-                "name": "Manually Open/Close Lid"
+                "name": "Ton aktivieren"
             }
         },
         "button": {
             "manual_feed": {
-                "name": "Manual Feed"
+                "name": "Manuell füttern"
             },
             "manual_cleaning": {
-                "name": "Manual Cleaning"
+                "name": "Manuell reinigen"
             },
             "enable_feeding_plan": {
-                "name": "Enable Feeding Plan"
+                "name": "Essensplan aktivieren"
             },
             "disable_feeding_plan": {
-                "name": "Disable Feeding Plan"
+                "name": "Futterplan deaktivieren"
             },
             "manual_lid_open": {
-                "name": "Manually Open Lid"
+                "name": "Jetzt öffnen"
             },
             "display_on": {
-                "name": "Turn On Display"
+                "name": "Display anschalten"
             },
             "display_off": {
-                "name": "Turn Off Display"
+                "name": "Display ausschalten"
             },
             "sound_on": {
-                "name": "Turn On Sound"
+                "name": "Ton anschalten"
             },
             "sound_off": {
-                "name": "Turn Off Sound"
+                "name": "Ton ausschalten"
             },
             "desiccant_reset": {
-                "name": "Desiccant Replaced"
-            },
-            "ring_bell": {
-                "name": "Ring Bell"
-            },
-            "rotate_food_bowl": {
-                "name": "Rotate Food Bowl"
+                "name": "Trockenmittel gewechselt"
             }
         },
         "binary_sensor": {
             "door_state": {
-                "name": "Lid"
+                "name": "Klappe"
             },
             "food_dispenser_state": {
-                "name": "Food Dispenser"
+                "name": "Futterausgabe"
             },
             "door_blocked": {
-                "name": "Lid Status"
+                "name": "Klappe"
             },
             "food_low": {
-                "name": "Food Status"
+                "name": "Futtermenge"
             },
             "online": {
                 "name": "Wi-Fi"
             },
             "whether_in_sleep_mode": {
-                "name": "Sleep Mode"
+                "name": "Standby Modus"
             },
             "enable_low_battery_notice": {
-                "name": "Battery Status"
+                "name": "Batteriestatus"
             },
             "child_lock_switch": {
-                "name": "Buttons Lock"
+                "name": "Tastensperre"
             },
             "sound_switch": {
-                "name": "Sound Status"
+                "name": "Ton Modus"
             },
             "display_switch": {
-                "name": "Display Status"
+                "name": "Displaymodus"
             }
         },
         "number": {
             "sound_level": {
-                "name": "Volume Level"
+                "name": "Lautstärke"
             },
             "desiccant_frequency": {
-                "name": "Desiccant Frequency"
+                "name": "Trockenmittel Häufigkeit"
             }
         }
     }

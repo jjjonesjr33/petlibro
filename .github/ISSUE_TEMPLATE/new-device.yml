@@ -1,7 +1,7 @@
-name: New device
-description: Suggest a non Tuya PETLIBRO device to add
+name: ⚙️ New Device
+description: Suggest a Non-Tuya Petlibro device to add.
 title: "[Device]: "
-labels: ["New device", "Triage"]
+labels: ["Enhancement"]
 assignees:
   - jjjonesjr33
 body:
