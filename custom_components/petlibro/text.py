@@ -40,7 +40,6 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 class PetLibroTextEntityDescription(TextEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device text entities."""
     native_value: Callable[[_DeviceT], str] = lambda _: True
-    method: Callable[[_DeviceT, str], Any] = field(default=lambda _: True)  # Default lambda function
 
 class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
     """PETLIBRO text entity."""
