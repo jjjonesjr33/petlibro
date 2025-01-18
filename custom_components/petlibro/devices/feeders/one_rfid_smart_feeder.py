@@ -418,3 +418,7 @@ class OneRFIDSmartFeeder(Device):
     @property
     def display_text(self) -> str:
         return self._data.get("getDefaultMatrix", {}).get("screenLetter", "ERROR")
+    
+    async def set_display_text(self, value: str) -> None:
+        _LOGGER.debug(f"Setting display text to {value} for {self.serial}")
+        self._display_text_internal = value  # Update the internal state

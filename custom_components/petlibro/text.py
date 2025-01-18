@@ -57,12 +57,11 @@ class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
         return str(state)
     
     async def async_set_value(self, native_value: str) -> None:
-        """Set the text value for the entity."""
+        """Set the current text value locally."""
         _LOGGER.debug(f"Setting text value '{native_value}' for {self.device.name}")
-        # Update the value directly on the device attribute
-        setattr(self.device, self.entity_description.key, native_value)
-        _LOGGER.debug(f"Updated '{self.entity_description.key}' to '{native_value}' for {self.device.name}")
-        self.async_write_ha_state()  # Notify Home Assistant of state changes
+        await self.device.set_display_text(native_value)  # Update internally without API call
+        self.async_write_ha_state()  # Update the frontend to reflect the change
+        _LOGGER.debug(f"Text value '{native_value}' set successfully for {self.device.name}")
 
 DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
     Feeder: [
