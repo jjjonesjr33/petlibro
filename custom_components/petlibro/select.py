@@ -104,7 +104,7 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
         PetLibroSelectEntityDescription[OneRFIDSmartFeeder](
             key="lid_speed",
             translation_key="lid_speed",
-            icon="mdi:volume-high",
+            icon="mdi:speedometer",
             current_selection=lambda device: device.lid_speed,
             method=lambda device, current_selection: device.set_lid_speed(PetLibroSelectEntity.map_value_to_api(key="lid_speed", current_selection=current_selection)),
             options_list=['Slow','Medium','Fast'],
@@ -113,7 +113,7 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
         PetLibroSelectEntityDescription[OneRFIDSmartFeeder](
             key="lid_mode",
             translation_key="lid_mode",
-            icon="mdi:volume-high",
+            icon="mdi:arrow-oscillating",
             current_selection=lambda device: device.lid_mode,
             method=lambda device, current_selection: device.set_lid_mode(PetLibroSelectEntity.map_value_to_api(key="lid_mode", current_selection=current_selection)),
             options_list=['Stay Open','Open On Detection'],

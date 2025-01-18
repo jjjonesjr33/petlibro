@@ -402,7 +402,7 @@ class OneRFIDSmartFeeder(Device):
 
     @property
     def lid_close_time(self) -> float:
-        return self._data.get("getAttributeSetting", {}).get("volume", 0)
+        return self._data.get("getAttributeSetting", {}).get("closeDoorTimeSec", 0)
 
     async def set_lid_close_time(self, value: float) -> None:
         _LOGGER.debug(f"Setting lid close time to {value} for {self.serial}")
