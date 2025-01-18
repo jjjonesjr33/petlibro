@@ -39,7 +39,7 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 @dataclass(frozen=True)
 class PetLibroTextEntityDescription(TextEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device text entities."""
-    value: Callable[[_DeviceT], str] = lambda _: True
+    native_value: Callable[[_DeviceT], str] = lambda _: True
 
 class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
     """PETLIBRO text entity."""
