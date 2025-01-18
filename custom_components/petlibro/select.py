@@ -41,8 +41,9 @@ class PetLibroSelectEntityDescription(SelectEntityDescription, PetLibroEntityDes
     """A class that describes device select entities."""
 
     method: Callable[[_DeviceT, str],  Any]
-    options: list[str]
+    options_list: list[str]
     current_option: Callable[[_DeviceT], str] | None = None
+
 class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
     """PETLIBRO sensor entity."""
 
@@ -93,7 +94,7 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             translation_key="lid_speed",
             icon="mdi:volume-high",
             method=lambda device, current_option: device.set_lid_speed(PetLibroSelectEntity.map_value_to_api("lid_speed",current_option)),
-            options=['Slow','Medium','Fast'],
+            options_list=['Slow','Medium','Fast'],
             current_option=lambda device: device.lid_speed,
             name="Lid Speed"
         ),
@@ -102,7 +103,7 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             translation_key="lid_mode",
             icon="mdi:volume-high",
             method=lambda device, current_option: device.set_lid_speed(PetLibroSelectEntity.map_value_to_api("lid_mode",current_option)),
-            options=['Stay Open','Open On Detection'],
+            options_list=['Stay Open','Open On Detection'],
             current_option=lambda device: device.lid_mode,
             name="Lid Mode"
         )
