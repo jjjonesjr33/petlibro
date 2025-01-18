@@ -70,7 +70,7 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
             _LOGGER.error(f"Error setting current option {current_selection} for {self.device.name}: {e}")
 
     @staticmethod
-    def map_value_to_api(*, key: str, value: str) -> str:
+    def map_value_to_api(*, key: str, current_selection: str) -> str:
         """Map user-friendly values to API-compatible values."""
         mappings = {
             "lid_speed": {
@@ -83,7 +83,7 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
                 "Open On Detection": "CUSTOM"
             }
         }
-        return mappings.get(key, {}).get(value, "unknown")
+        return mappings.get(key, {}).get(current_selection, "unknown")
 
 DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
     Feeder: [
