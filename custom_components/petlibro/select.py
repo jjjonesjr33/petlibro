@@ -91,8 +91,8 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
                 "Fast": "FAST"
             },
             "lid_mode": {
-                "Stay Open": "KEEP_OPEN",
-                "Open On Detection": "CUSTOM"
+                "Open Mode (Stays Open Until Closed)": "KEEP_OPEN",
+                "Personal Mode (Opens on Detection)": "CUSTOM"
             }
         }
         return mappings.get(key, {}).get(current_selection, "unknown")
@@ -116,7 +116,7 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             icon="mdi:arrow-oscillating",
             current_selection=lambda device: device.lid_mode,
             method=lambda device, current_selection: device.set_lid_mode(PetLibroSelectEntity.map_value_to_api(key="lid_mode", current_selection=current_selection)),
-            options_list=['Stay Open','Open On Detection'],
+            options_list=['Open Mode (Stays Open Until Closed)','Personal Mode (Opens on Detection)'],
             name="Lid Mode"
         )
     ]
