@@ -40,9 +40,9 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 class PetLibroSelectEntityDescription(SelectEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device select entities."""
 
-    current_option: Callable[[_DeviceT], str] = lambda _: True
     options: List[str]
     method: Callable[[_DeviceT, str], Awaitable[None]]
+    current_option: Callable[[_DeviceT], str] = lambda _: True
 
 class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
     """PETLIBRO sensor entity."""
@@ -70,7 +70,7 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
             _LOGGER.error(f"Error setting current option {current_option} for {self.device.name}: {e}")
 
     @staticmethod
-    def map_value_to_api(key: str, value: str) -> str:
+    def map_value_to_api(*, key: str, value: str) -> str:
         """Map user-friendly values to API-compatible values."""
         mappings = {
             "lid_speed": {
