@@ -40,6 +40,7 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 class PetLibroTextEntityDescription(TextEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device text entities."""
     native_value: Callable[[_DeviceT], str] = lambda _: True
+    method: Callable[[_DeviceT, str], Any] = field(default=lambda _: True)  # Default lambda function
 
 class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
     """PETLIBRO text entity."""
@@ -59,12 +60,7 @@ class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
     async def async_set_value(self, value: str) -> None:
         """Set the current_option of the text."""
         _LOGGER.debug(f"Setting current option {value} for {self.device.name}")
-        try:
-            _LOGGER.debug(f"Calling method with current option={value} for {self.device.name}")
-            await self.entity_description.method(self.device, value)
-            _LOGGER.debug(f"Current option {value} set successfully for {self.device.name}")
-        except Exception as e:
-            _LOGGER.error(f"Error setting current option {value} for {self.device.name}: {e}")
+        # Dont do anything after setting the text. we will only do something on selection from the select entity.
 
 DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
     Feeder: [
