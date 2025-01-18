@@ -40,8 +40,8 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 class PetLibroSelectEntityDescription(SelectEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device select entities."""
 
-    options_list: list[str]
-    method: Callable[[_DeviceT, str],  Any] = lambda _: True
+    options_list: list[str] = field(default_factory=list)
+    method: Callable[[_DeviceT, str], Any] = lambda _: True
     current_selection: Callable[[_DeviceT], str] | None = None
 
 class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
