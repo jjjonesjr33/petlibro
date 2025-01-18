@@ -56,9 +56,9 @@ class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
         _LOGGER.debug(f"Retrieved current option for '{self.entity_description.key}', {self.device.name}: {state}")
         return str(state)
     
-    async def async_set_value(self, value: str) -> None:
+    async def async_set_value(self, native_value: str) -> None:
         """Set the current_option of the text."""
-        _LOGGER.debug(f"Setting current option {value} for {self.device.name}")
+        _LOGGER.debug(f"Setting current option {native_value} for {self.device.name}")
         # Dont do anything after setting the text. we will only do something on selection from the select entity.
 
 DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
