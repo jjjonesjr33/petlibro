@@ -40,9 +40,9 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 class PetLibroSelectEntityDescription(SelectEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device select entities."""
 
-    method: Callable[[_DeviceT, str],  Any]
-    options_list: list[str]
     current_selection: Callable[[_DeviceT], str] | None = None
+    method: Callable[[_DeviceT, str],  Any] = lambda _: True
+    options_list: list[str]
 
 class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
     """PETLIBRO sensor entity."""
@@ -93,18 +93,18 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             key="lid_speed",
             translation_key="lid_speed",
             icon="mdi:volume-high",
+            current_selection=lambda device: device.lid_speed,
             method=lambda device, current_selection: device.set_lid_speed(PetLibroSelectEntity.map_value_to_api("lid_speed",current_selection)),
             options_list=['Slow','Medium','Fast'],
-            current_selection=lambda device: device.lid_speed,
             name="Lid Speed"
         ),
         PetLibroSelectEntityDescription[OneRFIDSmartFeeder](
             key="lid_mode",
             translation_key="lid_mode",
             icon="mdi:volume-high",
+            current_selection=lambda device: device.lid_mode,
             method=lambda device, current_selection: device.set_lid_speed(PetLibroSelectEntity.map_value_to_api("lid_mode",current_selection)),
             options_list=['Stay Open','Open On Detection'],
-            current_selection=lambda device: device.lid_mode,
             name="Lid Mode"
         )
     ]
