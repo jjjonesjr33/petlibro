@@ -50,7 +50,7 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
     entity_description: PetLibroSelectEntityDescription[_DeviceT]
 
     @property
-    def current_option(self) -> str:
+    def current_option(self) -> str | None:
         """Return the current current_option."""
         state = getattr(self.device, self.entity_description.key, None)
         if state is None:
