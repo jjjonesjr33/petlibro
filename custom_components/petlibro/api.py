@@ -434,6 +434,38 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set sound level for device {serial}: {e}")
             raise
 
+    async def set_lid_speed(self, serial: str, value: str):
+        """Set the lid speed."""
+        _LOGGER.debug(f"Setting lid speed: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/setting/updateCoverSetting", json={
+                "deviceSn": serial,
+                "coverOpenMode": 0,
+                "coverCloseSpeed": value,
+                "closeDoorTimeSec": 0
+            })
+            _LOGGER.debug(f"Lid speed set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set lid speed for device {serial}: {e}")
+            raise
+
+    async def set_lid_mode(self, serial: str, value: str):
+        """Set the lid mode."""
+        _LOGGER.debug(f"Setting lid mode: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/setting/updateCoverSetting", json={
+                "deviceSn": serial,
+                "coverOpenMode": value,
+                "coverCloseSpeed": 0,
+                "closeDoorTimeSec": 0
+            })
+            _LOGGER.debug(f"Lid mode set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set lid mode for device {serial}: {e}")
+            raise
+
     async def set_manual_feed(self, serial: str) -> JSON:
         """Trigger manual feeding for a specific device."""
         _LOGGER.debug(f"Triggering manual feeding for device with serial: {serial}")

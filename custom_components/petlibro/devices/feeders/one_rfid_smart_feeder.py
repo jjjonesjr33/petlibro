@@ -353,3 +353,29 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger desiccant reset for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
+
+    @property
+    def lid_speed(self) -> str:
+        return self._data.get("getAttributeSetting", {}).get("coverCloseSpeed", "FAST")
+
+    async def set_lid_speed(self, value: str) -> None:
+        _LOGGER.debug(f"Setting lid speed to {value} for {self.serial}")
+        try:
+            await self.api.set_lid_speed(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set lid speed for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting lid speed: {err}")
+
+    @property
+    def lid_mode(self) -> str:
+        return self._data.get("getAttributeSetting", {}).get("coverOpenMode", "CUSTOM")
+
+    async def set_lid_mode(self, value: str) -> None:
+        _LOGGER.debug(f"Setting lid mode to {value} for {self.serial}")
+        try:
+            await self.api.set_lid_mode(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set lid mode for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting lid mode: {err}")

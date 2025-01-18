@@ -200,6 +200,14 @@
             "desiccant_frequency": {
                 "name": "Trockenmittel Häufigkeit"
             }
+        },
+        "select": {
+            "lid_speed": {
+                "name": "Deckelgeschwindigkeit"
+            },
+            "lid_mode": {
+                "name": "Deckelmodus"
+            }
         }
     }
 }
