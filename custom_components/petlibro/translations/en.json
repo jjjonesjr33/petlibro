@@ -214,21 +214,21 @@
             }
         },
         "select": {
-        "lid_speed": {
-            "name": "Lid Speed",
-            "options": {
-                "Slow": "Slow",
-                "Medium": "Medium",
-                "Fast": "Fast"
+            "lid_speed": {
+                "name": "Lid Speed",
+                "options": {
+                    "Slow": "Slow",
+                    "Medium": "Medium",
+                    "Fast": "Fast"
+                }
+            },
+            "lid_mode": {
+                "name": "Lid Mode",
+                "options": {
+                    "Open Mode (Stays Open Until Closed)": "Open Mode (Stays Open Until Closed)",
+                    "Personal Mode (Opens on Detection)": "Personal Mode (Opens on Detection)"
+                }
             }
-        },
-        "lid_mode": {
-            "name": "Lid Mode",
-            "options": {
-                "Open Mode (Stays Open Until Closed)": "Open Mode (Stays Open Until Closed)",
-                "Personal Mode (Opens on Detection)": "Personal Mode (Opens on Detection)"
-            }
-        }
         }
     }
 }
