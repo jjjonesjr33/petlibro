@@ -15,8 +15,6 @@ from .const import DOMAIN
 from homeassistant.components.select import (
     SelectEntity,
     SelectEntityDescription,
-    SelectDeviceClass,
-
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -45,17 +43,11 @@ class PetLibroSelectEntityDescription(SelectEntityDescription, PetLibroEntityDes
     current_option: Callable[[_DeviceT], str] = lambda _: True
     options: List[str]
     method: Callable[[_DeviceT, str], Awaitable[None]]
-    device_class: Optional[SelectDeviceClass] = None
 
 class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
     """PETLIBRO sensor entity."""
 
     entity_description: PetLibroSelectEntityDescription[_DeviceT]
-
-    @cached_property
-    def device_class(self) -> SelectDeviceClass | None:
-        """Return the device class to use in the frontend, if any."""
-        return self.entity_description.device_class
 
     @property
     def current_option(self) -> str:
