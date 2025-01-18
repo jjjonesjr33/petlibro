@@ -42,7 +42,7 @@ class PetLibroSelectEntityDescription(SelectEntityDescription, PetLibroEntityDes
 
     method: Callable[[_DeviceT, str],  Any]
     options_list: list[str]
-    current_option: Callable[[_DeviceT], str] | None = None
+    current_selection: Callable[[_DeviceT], str] | None = None
 
 class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
     """PETLIBRO sensor entity."""
@@ -59,15 +59,15 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
         _LOGGER.debug(f"Retrieved current option for '{self.entity_description.key}', {self.device.name}: {state}")
         return str(state)
     
-    async def async_select_option(self, current_option: str) -> None:
+    async def async_select_option(self, current_selection: str) -> None:
         """Set the current_option of the select."""
-        _LOGGER.debug(f"Setting current option {current_option} for {self.device.name}")
+        _LOGGER.debug(f"Setting current option {current_selection} for {self.device.name}")
         try:
-            _LOGGER.debug(f"Calling method with current option={current_option} for {self.device.name}")
-            await self.entity_description.method(self.device, current_option)
-            _LOGGER.debug(f"Current option {current_option} set successfully for {self.device.name}")
+            _LOGGER.debug(f"Calling method with current option={current_selection} for {self.device.name}")
+            await self.entity_description.method(self.device, current_selection)
+            _LOGGER.debug(f"Current option {current_selection} set successfully for {self.device.name}")
         except Exception as e:
-            _LOGGER.error(f"Error setting current option {current_option} for {self.device.name}: {e}")
+            _LOGGER.error(f"Error setting current option {current_selection} for {self.device.name}: {e}")
 
     @staticmethod
     def map_value_to_api(*, key: str, value: str) -> str:
@@ -93,18 +93,18 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             key="lid_speed",
             translation_key="lid_speed",
             icon="mdi:volume-high",
-            method=lambda device, current_option: device.set_lid_speed(PetLibroSelectEntity.map_value_to_api("lid_speed",current_option)),
+            method=lambda device, current_selection: device.set_lid_speed(PetLibroSelectEntity.map_value_to_api("lid_speed",current_selection)),
             options_list=['Slow','Medium','Fast'],
-            current_option=lambda device: device.lid_speed,
+            current_selection=lambda device: device.lid_speed,
             name="Lid Speed"
         ),
         PetLibroSelectEntityDescription[OneRFIDSmartFeeder](
             key="lid_mode",
             translation_key="lid_mode",
             icon="mdi:volume-high",
-            method=lambda device, current_option: device.set_lid_speed(PetLibroSelectEntity.map_value_to_api("lid_mode",current_option)),
+            method=lambda device, current_selection: device.set_lid_speed(PetLibroSelectEntity.map_value_to_api("lid_mode",current_selection)),
             options_list=['Stay Open','Open On Detection'],
-            current_option=lambda device: device.lid_mode,
+            current_selection=lambda device: device.lid_mode,
             name="Lid Mode"
         )
     ]
