@@ -50,6 +50,18 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
     entity_description: PetLibroSelectEntityDescription[_DeviceT]
 
     @property
+    def options(self) -> list[str]:
+        """Return the list of available options for the select."""
+        # This should return the options that are available for selection.
+        # Use the options_list field from the entity_description.
+        if self.entity_description.options_list:
+            return self.entity_description.options_list
+        else:
+            # If there are no options, return an empty list or log an error.
+            _LOGGER.error(f"No options available for select entity {self.name}")
+            return []
+
+    @property
     def current_option(self) -> str | None:
         """Return the current current_option."""
         state = getattr(self.device, self.entity_description.key, None)
