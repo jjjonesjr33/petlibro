@@ -353,3 +353,62 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger desiccant reset for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
+
+    @property
+    def lid_speed(self) -> str:
+        """Return the user-friendly lid speed (mapped directly from the API value)."""
+        api_value = self._data.get("getAttributeSetting", {}).get("coverCloseSpeed", "FAST")
+        
+        # Direct mapping inside the property
+        if api_value == "FAST":
+            return "Fast"
+        elif api_value == "MEDIUM":
+            return "Medium"
+        elif api_value == "SLOW":
+            return "Slow"
+        else:
+            return "Unknown"
+
+    async def set_lid_speed(self, value: str) -> None:
+        _LOGGER.debug(f"Setting lid speed to {value} for {self.serial}")
+        try:
+            await self.api.set_lid_speed(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set lid speed for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting lid speed: {err}")
+
+    @property
+    def lid_mode(self) -> str:
+        """Return the user-friendly lid mode (mapped directly from the API value)."""
+        api_value = self._data.get("getAttributeSetting", {}).get("coverOpenMode", "CUSTOM")
+        
+        # Direct mapping inside the property
+        if api_value == "KEEP_OPEN":
+            return "Open Mode (Stays Open Until Closed)"
+        elif api_value == "CUSTOM":
+            return "Personal Mode (Opens on Detection)"
+        else:
+            return "Unknown"
+
+    async def set_lid_mode(self, value: str) -> None:
+        _LOGGER.debug(f"Setting lid mode to {value} for {self.serial}")
+        try:
+            await self.api.set_lid_mode(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set lid mode for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting lid mode: {err}")
+
+    @property
+    def lid_close_time(self) -> float:
+        return self._data.get("getAttributeSetting", {}).get("closeDoorTimeSec", 0)
+
+    async def set_lid_close_time(self, value: float) -> None:
+        _LOGGER.debug(f"Setting lid close time to {value} for {self.serial}")
+        try:
+            await self.api.set_lid_close_time(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set lid close time for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting lid close time: {err}")

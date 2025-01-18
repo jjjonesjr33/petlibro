@@ -52,6 +52,7 @@ PLATFORMS_BY_TYPE = {
         Platform.SWITCH,
         Platform.BUTTON,
         Platform.NUMBER,
+        Platform.SELECT,
     ),
     PolarWetFoodFeeder: (
         Platform.SENSOR,

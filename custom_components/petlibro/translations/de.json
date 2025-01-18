@@ -199,6 +199,17 @@
             },
             "desiccant_frequency": {
                 "name": "Trockenmittel Häufigkeit"
+            },
+            "lid_close_time": {
+                "name": "Deckelschließzeit"
+            }
+        },
+        "select": {
+            "lid_speed": {
+                "name": "Deckelgeschwindigkeit"
+            },
+            "lid_mode": {
+                "name": "Deckelmodus"
             }
         }
     }

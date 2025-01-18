@@ -112,6 +112,18 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             value=lambda device: device.sound_level,
             method=lambda device, value: device.set_sound_level(value),
             name="Sound Level"
+        ),
+        PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
+            key="lid_close_time",
+            translation_key="lid_close_time",
+            icon="mdi:timer",
+            native_unit_of_measurement="s",
+            native_max_value=10,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.lid_close_time,
+            method=lambda device, value: device.set_lid_close_time(value),
+            name="Lid Close Time"
         )
     ],
     PolarWetFoodFeeder: [
