@@ -206,10 +206,19 @@
         },
         "select": {
             "lid_speed": {
-                "name": "Deckelgeschwindigkeit"
+                "name": "Deckelgeschwindigkeit",
+                "options": {
+                    "Slow": "Langsam",
+                    "Medium": "Mittel",
+                    "Fast": "Schnell"
+                }
             },
             "lid_mode": {
-                "name": "Deckelmodus"
+                "name": "Deckelmodus",
+                "options": {
+                    "Open Mode (Stays Open Until Closed)": "Offener Modus (Bleibt offen, bis er geschlossen wird)",
+                    "Personal Mode (Opens on Detection)": "Persönlicher Modus (Öffnet sich bei Erkennung)"
+                }
             }
         }
     }
