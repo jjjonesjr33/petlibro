@@ -41,7 +41,7 @@ class PetLibroTextEntityDescription(TextEntityDescription, PetLibroEntityDescrip
     """A class that describes device text entities."""
 
 class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
-    """PETLIBRO sensor entity."""
+    """PETLIBRO text entity."""
 
     entity_description: PetLibroTextEntityDescription[_DeviceT]
 
@@ -77,7 +77,7 @@ DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
             native_max=100,
             native_min=1,
             pattern=r"^(?!\s*$)[a-zA-Z0-9 ]{1,20}$",
-            native_value=lambda device: device.display_text,
+            value=lambda device: device.display_text,
             name="Text on Display"
         )
     ]
