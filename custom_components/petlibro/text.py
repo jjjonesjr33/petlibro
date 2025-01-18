@@ -57,9 +57,11 @@ class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
         return str(state)
     
     async def async_set_value(self, native_value: str) -> None:
-        """Set the current_option of the text."""
-        _LOGGER.debug(f"Setting current option {native_value} for {self.device.name}")
-        # Dont do anything after setting the text. we will only do something on selection from the select entity.
+        """Set the text value for the entity."""
+        _LOGGER.debug(f"Setting text value '{native_value}' for {self.device.name}")
+        self._current_value = native_value  # Update the internal state
+        self.async_write_ha_state()  # Notify Home Assistant of the state change
+        _LOGGER.debug(f"Text value '{native_value}' set successfully for {self.device.name}")
 
 DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
     Feeder: [
