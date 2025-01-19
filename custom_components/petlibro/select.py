@@ -93,6 +93,13 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
             "lid_mode": {
                 "Open Mode (Stays Open Until Closed)": "KEEP_OPEN",
                 "Personal Mode (Opens on Detection)": "CUSTOM"
+            },
+            "display_icon": {
+                "Heart": 5,
+                "Dog": 6,
+                "Cat": 7,
+                "Elk": 8,
+                "Text": None,
             }
         }
         return mappings.get(key, {}).get(current_selection, "unknown")
@@ -118,6 +125,15 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             method=lambda device, current_selection: device.set_lid_mode(PetLibroSelectEntity.map_value_to_api(key="lid_mode", current_selection=current_selection)),
             options_list=['Open Mode (Stays Open Until Closed)','Personal Mode (Opens on Detection)'],
             name="Lid Mode"
+        ),
+        PetLibroSelectEntityDescription[OneRFIDSmartFeeder](
+            key="display_icon",
+            translation_key="display_icon",
+            icon="mdi:arrow-oscillating",
+            current_selection=lambda device: device.display_icon,
+            method=lambda device, current_selection: device.set_display_icon(PetLibroSelectEntity.map_value_to_api(key="display_icon", current_selection=current_selection)),
+            options_list=['Heart','Dog','Cat','Elk','Text'],
+            name="Icon to Display"
         )
     ]
 }

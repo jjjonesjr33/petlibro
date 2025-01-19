@@ -525,6 +525,22 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set lid mode for device {serial}: {e}")
             raise
 
+    async def set_display_icon(self, serial: str, value: float):
+        """Set the display icon."""
+        _LOGGER.debug(f"Setting display icon: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/device/displayMatrix", json={
+                "deviceSn": serial,
+                "screenDisplayId": value,
+                "screenDisplayMatrix": None,
+                "screenLetter": None
+            })
+            _LOGGER.debug(f"Display icon set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set display icon for device {serial}: {e}")
+            raise
+
     async def set_manual_feed(self, serial: str) -> JSON:
         """Trigger manual feeding for a specific device."""
         _LOGGER.debug(f"Triggering manual feeding for device with serial: {serial}")

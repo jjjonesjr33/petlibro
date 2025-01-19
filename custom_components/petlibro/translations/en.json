@@ -219,6 +219,9 @@
             },
             "lid_mode": {
                 "name": "Lid Mode"
+            },
+            "display_icon": {
+                "name": "What to Display"
             }
         },
         "text": {

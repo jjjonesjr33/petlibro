@@ -424,3 +424,29 @@ class OneRFIDSmartFeeder(Device):
         """Update the display text locally without writing to the API."""
         _LOGGER.debug(f"Setting display text locally to {value} for {self.serial}")
         self.update_data({"getDefaultMatrix": {"screenLetter": value}})
+
+    @property
+    def display_icon(self) -> str:
+        """Return the user-friendly display icon (mapped directly from the API value)."""
+        api_value = self._data.get("getDefaultMatrix", {}).get("screenDisplayId", None)
+        
+        # Direct mapping inside the property
+        if api_value == "5":
+            return "Heart"
+        elif api_value == "6":
+            return "Dog"
+        elif api_value == "7":
+            return "Cat"
+        elif api_value == "8":
+            return "Elk"
+        else:
+            return "Text"
+
+    async def set_display_icon(self, value: float) -> None:
+        _LOGGER.debug(f"Setting display icon to {value} for {self.serial}")
+        try:
+            await self.api.set_display_icon(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set display icon for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting display icon: {err}")

@@ -210,6 +210,9 @@
             },
             "lid_mode": {
                 "name": "Deckelmodus"
+            },
+            "display_icon": {
+                "name": "Symbol auf dem Display"
             }
         },
         "text": {
