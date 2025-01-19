@@ -129,7 +129,7 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
         PetLibroSelectEntityDescription[OneRFIDSmartFeeder](
             key="display_icon",
             translation_key="display_icon",
-            icon="mdi:arrow-oscillating",
+            icon="mdi:monitor-star",
             current_selection=lambda device: device.display_icon,
             method=lambda device, current_selection: device.set_display_icon(PetLibroSelectEntity.map_value_to_api(key="display_icon", current_selection=current_selection)),
             options_list=['Heart','Dog','Cat','Elk','Text'],

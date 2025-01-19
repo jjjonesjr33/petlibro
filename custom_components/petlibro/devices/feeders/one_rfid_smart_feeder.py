@@ -447,6 +447,7 @@ class OneRFIDSmartFeeder(Device):
         try:
             await self.api.set_display_icon(self.serial, value)
             await self.refresh()  # Refresh the state after the action
+            self.async_schedule_update_ha_state() 
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set display icon for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting display icon: {err}")
