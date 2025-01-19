@@ -60,9 +60,10 @@ class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
         """Set the current text value locally."""
         _LOGGER.debug(f"Setting text value '{native_value}' for {self.device.name}")
         await self.device.set_display_text(native_value)  # Update internally without API call
-        self.async_write_ha_state()  # Update the frontend to reflect the change
+        state = self._display_text_internal
+        self.async_write_ha_state(state)  # Update the frontend to reflect the change
         _LOGGER.debug(f"Text value '{native_value}' set successfully for {self.device.name}")
-        await self.async_update_ha_state()  # Manually force a state update
+        await self.async_update_ha_state(state)  # Manually force a state update
 
 DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
     Feeder: [
