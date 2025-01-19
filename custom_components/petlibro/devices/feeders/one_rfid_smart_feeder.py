@@ -414,11 +414,17 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set lid close time for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting lid close time: {err}")
+    
+    _display_text_internal: str | None = None
 
     @property
     def display_text(self) -> str:
         return self._data.get("getDefaultMatrix", {}).get("screenLetter", "ERROR")
-    
+
+    @display_text.setter
+    def display_text(self, value: str) -> None:
+        self._display_text_internal = value
+
     async def set_display_text(self, value: str) -> None:
         _LOGGER.debug(f"Setting display text to {value} for {self.serial}")
         self._display_text_internal = value  # Update the internal state
