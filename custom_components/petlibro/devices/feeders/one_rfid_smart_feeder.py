@@ -426,18 +426,18 @@ class OneRFIDSmartFeeder(Device):
         self.update_data({"getDefaultMatrix": {"screenLetter": value}})
 
     @property
-    def display_icon(self) -> str:
+    def display_icon(self) -> float:
         """Return the user-friendly display icon (mapped directly from the API value)."""
         api_value = self._data.get("getDefaultMatrix", {}).get("screenDisplayId", None)
         
         # Direct mapping inside the property
-        if api_value == "5":
+        if api_value == 5:
             return "Heart"
-        elif api_value == "6":
+        elif api_value == 6:
             return "Dog"
-        elif api_value == "7":
+        elif api_value == 7:
             return "Cat"
-        elif api_value == "8":
+        elif api_value == 8:
             return "Elk"
         else:
             return "Text"
