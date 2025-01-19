@@ -33,6 +33,7 @@ from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
+from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
@@ -93,6 +94,10 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             name = "Manual Feed Quantity"
         ),
     ],
+    GranarySmartFeeder: [
+    ],
+    GranarySmartCameraFeeder: [
+    ],
     OneRFIDSmartFeeder: [
         PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
             key="desiccant_frequency",
@@ -118,8 +123,28 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             value=lambda device: device.sound_level,
             method=lambda device, value: device.set_sound_level(value),
             name="Sound Level"
+        ),
+        PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
+            key="lid_close_time",
+            translation_key="lid_close_time",
+            icon="mdi:timer",
+            native_unit_of_measurement="s",
+            native_max_value=10,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.lid_close_time,
+            method=lambda device, value: device.set_lid_close_time(value),
+            name="Lid Close Time"
         )
-    ]
+    ],
+    PolarWetFoodFeeder: [
+    ],
+    SpaceSmartFeeder: [
+    ],
+    DockstreamSmartFountain: [
+    ],
+    DockstreamSmartRFIDFountain: [
+    ],
 }
 
 async def async_setup_entry(

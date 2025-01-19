@@ -434,6 +434,56 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set sound level for device {serial}: {e}")
             raise
 
+    async def set_lid_close_time(self, serial: str, value: float):
+        """Set the lid close time."""
+        _LOGGER.debug(f"Setting sound level: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/setting/updateCoverSetting", json={
+                "deviceSn": serial,
+                "coverOpenMode": None,
+                "coverCloseSpeed": None,
+                "closeDoorTimeSec": value
+            })
+            _LOGGER.debug(f"Lid close time set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set lid close time for device {serial}: {e}")
+            raise
+
+
+    async def set_lid_speed(self, serial: str, value: str):
+        """Set the lid speed."""
+        _LOGGER.debug(f"Setting lid speed: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/setting/updateCoverSetting", json={
+                "deviceSn": serial,
+                "coverOpenMode": None,
+                "coverCloseSpeed": value,
+                "closeDoorTimeSec": None
+            })
+            _LOGGER.debug(f"Lid speed set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set lid speed for device {serial}: {e}")
+            raise
+
+    async def set_lid_mode(self, serial: str, value: str):
+        """Set the lid mode."""
+        _LOGGER.debug(f"Setting lid mode: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/setting/updateCoverSetting", json={
+                "deviceSn": serial,
+                "coverOpenMode": value,
+                "coverCloseSpeed": None,
+                "closeDoorTimeSec": None
+            })
+            _LOGGER.debug(f"Lid mode set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set lid mode for device {serial}: {e}")
+            raise
+
+    async def set_manual_feed(self, serial: str) -> JSON:
     async def set_manual_feed(self, serial: str, feed_value: int) -> JSON:
         """Trigger manual feeding for a specific device."""
         _LOGGER.debug(f"Triggering manual feeding for device with serial: {serial}")

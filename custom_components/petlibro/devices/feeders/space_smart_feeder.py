@@ -1,33 +1,29 @@
 import aiohttp
 
-from ...api import make_api_call
-from aiohttp import ClientSession, ClientError
-from ...exceptions import PetLibroAPIError
-from ..device import Device
 from typing import cast
 from logging import getLogger
+from ...exceptions import PetLibroAPIError
+from ..device import Device
 
 _LOGGER = getLogger(__name__)
 
-class OneRFIDSmartFeeder(Device):
+class SpaceSmartFeeder(Device):  # Inherit directly from Device
     async def refresh(self):
         """Refresh the device data from the API."""
         try:
-            await super().refresh()  # This calls the refresh method in GranaryFeeder (which also inherits from Device)
+            await super().refresh()  # Call the refresh method from Device
     
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
-            attribute_settings = await self.api.device_attribute_settings(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
-                "realInfo": real_info or {},
-                "getAttributeSetting": attribute_settings or {}
+                "realInfo": real_info or {}
             })
         except PetLibroAPIError as err:
-            _LOGGER.error(f"Error refreshing data for OneRFIDSmartFeeder: {err}")
+            _LOGGER.error(f"Error refreshing data for SpaceSmartFeeder: {err}")
 
     @property
     def available(self) -> bool:
@@ -47,14 +43,6 @@ class OneRFIDSmartFeeder(Device):
         return self._data.get("grainStatus", {}).get("todayFeedingTimes", 0)
 
     @property
-    def today_eating_times(self) -> int:
-        return self._data.get("grainStatus", {}).get("todayEatingTimes", 0)
-
-    @property
-    def today_eating_time(self) -> int:
-        return self._data.get("grainStatus", {}).get("petEatingTime", 0)
-
-    @property
     def feeding_plan_state(self) -> bool:
         """Return the state of the feeding plan, based on API data."""
         return bool(self._data.get("enableFeedingPlan", False))
@@ -64,16 +52,8 @@ class OneRFIDSmartFeeder(Device):
         return cast(str, self._data.get("realInfo", {}).get("batteryState", "unknown"))
 
     @property
-    def door_state(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("barnDoorState", False))
-
-    @property
     def food_dispenser_state(self) -> bool:
         return not bool(self._data.get("realInfo", {}).get("grainOutletState", True))
-
-    @property
-    def door_blocked(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("barnDoorError", False))
 
     @property
     def food_low(self) -> bool:
@@ -175,46 +155,14 @@ class OneRFIDSmartFeeder(Device):
         return self._data.get("realInfo", {}).get("closeDoorTimeSec", 0)
 
     @property
-    def display_switch(self) -> bool:
+    def screen_display_switch(self) -> bool:
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
-
-    @property
-    def child_lock_switch(self) -> bool:
-        return not self._data.get("realInfo", {}).get("childLockSwitch", False)
 
     @property
     def remaining_desiccant(self) -> str:
         """Get the remaining desiccant days."""
         return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
     
-    @property
-    def desiccant_frequency(self) -> float:
-        return self._data.get("realInfo", {}).get("changeDesiccantFrequency", 0)
-
-    async def set_desiccant_frequency(self, value: float) -> None:
-        _LOGGER.debug(f"Setting desiccant frequency to {value} for {self.serial}")
-        try:
-            await self.api.set_desiccant_frequency(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set desiccant frequency for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting desiccantfrequency: {err}")
-    def sound_switch(self) -> bool:
-        return self._data.get("realInfo", {}).get("soundSwitch", False)
-
-    @property
-    def sound_level(self) -> float:
-        return self._data.get("getAttributeSetting", {}).get("volume", 0)
-
-    async def set_sound_level(self, value: float) -> None:
-        _LOGGER.debug(f"Setting sound level to {value} for {self.serial}")
-        try:
-            await self.api.set_sound_level(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set sound level for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting sound level: {err}")
-
     # Error-handling updated for set_feeding_plan
     async def set_feeding_plan(self, value: bool) -> None:
         _LOGGER.debug(f"Setting feeding plan to {value} for {self.serial}")
@@ -294,121 +242,3 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
-
-    # Method for manual lid opening
-    async def set_manual_lid_open(self) -> None:
-        _LOGGER.debug(f"Triggering manual lid opening for {self.serial}")
-        try:
-            await self.api.set_manual_lid_open(self.serial)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to trigger manual lid opening for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error triggering manual lid opening: {err}")
-
-    # Method for display turn on
-    async def set_display_on(self) -> None:
-        _LOGGER.debug(f"Turning on the display matrix for {self.serial}")
-        try:
-            await self.api.set_display_on(self.serial)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to turn on the display for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error turning on the display: {err}")
-
-    # Method for display matrix turn off
-    async def set_display_off(self) -> None:
-        _LOGGER.debug(f"Turning off the display for {self.serial}")
-        try:
-            await self.api.set_display_off(self.serial)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to turn off the display for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error turning off the display: {err}")
-
-    # Method for sound turn on
-    async def set_sound_on(self) -> None:
-        _LOGGER.debug(f"Turning on the sound for {self.serial}")
-        try:
-            await self.api.set_sound_on(self.serial)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to turn on the sound for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error turning on the sound: {err}")
-
-    # Method for sound turn off
-    async def set_sound_off(self) -> None:
-        _LOGGER.debug(f"Turning off the sound for {self.serial}")
-        try:
-            await self.api.set_sound_off(self.serial)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to turn off the sound for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error turning off the sound: {err}")
-
-    async def set_desiccant_reset(self) -> None:
-        _LOGGER.debug(f"Triggering desiccant reset for {self.serial}")
-        try:
-            await self.api.set_desiccant_reset(self.serial)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to trigger desiccant reset for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
-
-    @property
-    def lid_speed(self) -> str:
-        """Return the user-friendly lid speed (mapped directly from the API value)."""
-        api_value = self._data.get("getAttributeSetting", {}).get("coverCloseSpeed", "FAST")
-        
-        # Direct mapping inside the property
-        if api_value == "FAST":
-            return "Fast"
-        elif api_value == "MEDIUM":
-            return "Medium"
-        elif api_value == "SLOW":
-            return "Slow"
-        else:
-            return "Unknown"
-
-    async def set_lid_speed(self, value: str) -> None:
-        _LOGGER.debug(f"Setting lid speed to {value} for {self.serial}")
-        try:
-            await self.api.set_lid_speed(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set lid speed for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting lid speed: {err}")
-
-    @property
-    def lid_mode(self) -> str:
-        """Return the user-friendly lid mode (mapped directly from the API value)."""
-        api_value = self._data.get("getAttributeSetting", {}).get("coverOpenMode", "CUSTOM")
-        
-        # Direct mapping inside the property
-        if api_value == "KEEP_OPEN":
-            return "Open Mode (Stays Open Until Closed)"
-        elif api_value == "CUSTOM":
-            return "Personal Mode (Opens on Detection)"
-        else:
-            return "Unknown"
-
-    async def set_lid_mode(self, value: str) -> None:
-        _LOGGER.debug(f"Setting lid mode to {value} for {self.serial}")
-        try:
-            await self.api.set_lid_mode(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set lid mode for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting lid mode: {err}")
-
-    @property
-    def lid_close_time(self) -> float:
-        return self._data.get("getAttributeSetting", {}).get("closeDoorTimeSec", 0)
-
-    async def set_lid_close_time(self, value: float) -> None:
-        _LOGGER.debug(f"Setting lid close time to {value} for {self.serial}")
-        try:
-            await self.api.set_lid_close_time(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set lid close time for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting lid close time: {err}")

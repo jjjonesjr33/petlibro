@@ -27,6 +27,7 @@ from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
+from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
@@ -614,6 +615,77 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:rotate-3d-variant",
             name="Plate Position",
             should_report=lambda device: device.plate_position is not None,
+        ),
+    ],
+    SpaceSmartFeeder: [
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="device_sn",
+            translation_key="device_sn",
+            icon="mdi:identifier",
+            name="Device SN"
+        ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="mac",
+            translation_key="mac_address",
+            icon="mdi:network",
+            name="MAC Address"
+        ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="wifi_ssid",
+            translation_key="wifi_ssid",
+            icon="mdi:wifi",
+            name="Wi-Fi SSID"
+        ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="wifi_rssi",
+            translation_key="wifi_rssi",
+            icon="mdi:wifi",
+            native_unit_of_measurement="dBm",
+            name="Wi-Fi Signal Strength"
+        ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="battery_state",
+            translation_key="battery_state",
+            icon="mdi:battery",
+            name="Battery Level"
+        ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="electric_quantity",
+            translation_key="electric_quantity",
+            icon="mdi:battery",
+            native_unit_of_measurement="%",
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Battery / AC %"
+        ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="feeding_plan_state",
+            translation_key="feeding_plan_state",
+            icon="mdi:calendar-check",
+            name="Feeding Plan State",
+            should_report=lambda device: device.feeding_plan_state is not None,
+        ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="today_feeding_quantity",
+            translation_key="today_feeding_quantity",
+            icon="mdi:scale",
+            native_unit_of_measurement_fn=unit_of_measurement_feeder,
+            device_class_fn=device_class_feeder,
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Today Feeding Quantity"
+        ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="today_feeding_times",
+            translation_key="today_feeding_times",
+            icon="mdi:history",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Today Feeding Times"
+        ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="pump_air_state",
+            translation_key="pump_air_state",
+            icon="mdi:air-filter",
+            name="Pump Air State"
         ),
     ],
     DockstreamSmartFountain: [

@@ -208,6 +208,17 @@
             },
             "desiccant_frequency": {
                 "name": "Desiccant Frequency"
+            },
+            "lid_close_time": {
+                "name": "Lid Close Time"
+            }
+        },
+        "select": {
+            "lid_speed": {
+                "name": "Lid Speed"
+            },
+            "lid_mode": {
+                "name": "Lid Mode"
             }
         }
     }
