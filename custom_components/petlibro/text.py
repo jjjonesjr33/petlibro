@@ -48,21 +48,14 @@ class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
 
     @property
     def native_value(self) -> str | None:
-        """Return the current current_option."""
-        state = getattr(self.device, self.entity_description.key, None)
-        if state is None:
-            _LOGGER.warning(f"Current option '{self.entity_description.key}' is None for device {self.device.name}")
-            return None
-        _LOGGER.debug(f"Retrieved current option for '{self.entity_description.key}', {self.device.name}: {state}")
-        return str(state)
+        """Return the current display text."""
+        return self.device.display_text
     
     async def async_set_value(self, native_value: str) -> None:
         """Set the current text value locally."""
         _LOGGER.debug(f"Setting text value '{native_value}' for {self.device.name}")
-        await self.device.set_display_text(native_value)  # Update internally without API call
-        self.async_write_ha_state()  # Update the frontend to reflect the change
-        _LOGGER.debug(f"Text value '{native_value}' set successfully for {self.device.name}")
-        await self.async_update_ha_state()  # Manually force a state update
+        await self.device.set_display_text(native_value)  # Local update only
+        self.async_write_ha_state()  # Notify HA of the local change
 
 DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
     Feeder: [
@@ -76,7 +69,6 @@ DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
             native_max=100,
             native_min=1,
             pattern=r"^(?!\s*$)[a-zA-Z0-9 ]{1,20}$",
-            native_value=lambda device: device.display_text,
             name="Text on Display"
         )
     ]
