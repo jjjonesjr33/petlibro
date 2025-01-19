@@ -422,8 +422,12 @@ class OneRFIDSmartFeeder(Device):
 
     async def set_display_text(self, value: str) -> None:
         """Update the display text locally without writing to the API."""
-        _LOGGER.debug(f"Setting display text locally to {value} for {self.serial}")
-        self.update_data({"getDefaultMatrix": {"screenLetter": value}})
+        if value.strip():  # Only update if the value is not empty
+            _LOGGER.debug(f"Setting display text locally to '{value}' for {self.serial}")
+            self.update_data({"getDefaultMatrix": {"screenLetter": value}})
+        else:
+            _LOGGER.debug(f"Clearing display text for {self.serial}")
+            self.update_data({"getDefaultMatrix": {"screenLetter": ""}})  # Clear the text if empty
 
     @property
     def display_icon(self) -> float:
