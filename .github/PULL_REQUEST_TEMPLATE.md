@@ -1,30 +1,8 @@
-<!--
-==== STOP ====================
-======== STOP ================
-============ STOP ============
-================ STOP ========
-==================== STOP ====
-
-⚠️ Before opening this pull request please review the guidelines in the checklist below.
-
-If this PR does not meet those guidelines it will not be accepted, and everyone will be sad.
--->
-
 ## Proposed change
-
-<!--
-Please include a summary of the change. Screenshots and/or videos can also be helpful if appropriate.
-
-New service widgets should include example(s) of relevant API output as well as updates to the docs for the new widget.
--->
 
 Closes # (issue)
 
 ## Type of change
-
-<!--
-What type of change does your PR introduce to Homepage?
--->
 
 - [ ] New device.
 - [ ] Bug fix (non-breaking change which fixes an issue).
