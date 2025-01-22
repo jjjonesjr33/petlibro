@@ -164,5 +164,3 @@ Get the folder `custom_components/petlibro` in your HA `config/custom_components
   > Only one device can be login at the same time.
   >
   > If you to wan to keep your phone connected, create another account for this integration and share your device to it.
-
-*testing webhook*
