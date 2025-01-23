@@ -435,9 +435,7 @@ class OneRFIDSmartFeeder(Device):
         api_value = self._data.get("getDefaultMatrix", {}).get("screenDisplayId", None)
         
         # Direct mapping inside the property
-        if api_value == 4:
-            return "Hellow"
-        elif api_value == 5:
+        if api_value == 5:
             return "Heart"
         elif api_value == 6:
             return "Dog"
