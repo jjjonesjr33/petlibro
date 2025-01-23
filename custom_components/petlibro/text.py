@@ -52,11 +52,15 @@ class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
         return self.device.display_text
     
     async def async_set_value(self, native_value: str) -> None:
-        """Set the current text value locally."""
-        _LOGGER.debug(f"Setting text value '{native_value}' for {self.device.name}")
-        await self.device.set_display_text(native_value)  # Local update only
-        self.async_write_ha_state()  # Notify HA of the local change
-
+        """Set the current text value."""
+        _LOGGER.debug(f"Setting value {native_value} for {self.device.name}")
+        try:
+            # Regular case for sound_level or other methods that only need a value
+            _LOGGER.debug(f"Calling method with value={native_value} for {self.device.name}")
+            await self.device.set_display_text(native_value)
+            _LOGGER.debug(f"Value {native_value} set successfully for {self.device.name}")
+        except Exception as e:
+            _LOGGER.error(f"Error setting value {vanative_valuelue} for {self.device.name}: {e}")
 DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
     Feeder: [
     ],

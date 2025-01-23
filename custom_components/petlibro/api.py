@@ -541,6 +541,22 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set display icon for device {serial}: {e}")
             raise
 
+    async def set_display_text(self, serial: str, value: str):
+        """Set the display text."""
+        _LOGGER.debug(f"Setting display text: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/device/displayMatrix", json={
+                "deviceSn": serial,
+                "screenDisplayId": None,
+                "screenDisplayMatrix": None,
+                "screenLetter": value
+            })
+            _LOGGER.debug(f"Display text set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set display text for device {serial}: {e}")
+            raise
+
     async def set_manual_feed(self, serial: str) -> JSON:
         """Trigger manual feeding for a specific device."""
         _LOGGER.debug(f"Triggering manual feeding for device with serial: {serial}")

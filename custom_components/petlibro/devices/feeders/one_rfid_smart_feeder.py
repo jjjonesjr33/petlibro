@@ -421,13 +421,13 @@ class OneRFIDSmartFeeder(Device):
         return self._data.get("getDefaultMatrix", {}).get("screenLetter", "ERROR")
 
     async def set_display_text(self, value: str) -> None:
-        """Update the display text locally without writing to the API."""
-        if value.strip():  # Only update if the value is not empty
-            _LOGGER.debug(f"Setting display text locally to '{value}' for {self.serial}")
-            self.update_data({"getDefaultMatrix": {"screenLetter": value}})
-        else:
-            _LOGGER.debug(f"Clearing display text for {self.serial}")
-            self.update_data({"getDefaultMatrix": {"screenLetter": ""}})  # Clear the text if empty
+        _LOGGER.debug(f"Setting display text to {value} for {self.serial}")
+        try:
+            await self.api.set_display_text(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set display text for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting display text: {err}")
 
     @property
     def display_icon(self) -> float:
@@ -435,7 +435,9 @@ class OneRFIDSmartFeeder(Device):
         api_value = self._data.get("getDefaultMatrix", {}).get("screenDisplayId", None)
         
         # Direct mapping inside the property
-        if api_value == 5:
+        if api_value == 4:
+            return "Hellow"
+        elif api_value == 5:
             return "Heart"
         elif api_value == 6:
             return "Dog"
@@ -444,7 +446,7 @@ class OneRFIDSmartFeeder(Device):
         elif api_value == 8:
             return "Elk"
         else:
-            return "Text"
+            return "Unknown"
 
     async def set_display_icon(self, value: float) -> None:
         _LOGGER.debug(f"Setting display icon to {value} for {self.serial}")

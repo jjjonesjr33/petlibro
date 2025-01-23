@@ -109,11 +109,11 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
                 "Personal Mode (Opens on Detection)": "CUSTOM"
             },
             "display_icon": {
+                "Hello": 4,
                 "Heart": 5,
                 "Dog": 6,
                 "Cat": 7,
                 "Elk": 8,
-                "Text": None,
             }
         }
         return mappings.get(key, {}).get(current_selection, "unknown")
@@ -146,7 +146,7 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             icon="mdi:monitor-star",
             current_selection=lambda device: device.display_icon,
             method=lambda device, current_selection: device.set_display_icon(PetLibroSelectEntity.map_value_to_api(key="display_icon", current_selection=current_selection)),
-            options_list=['Heart','Dog','Cat','Elk','Text'],
+            options_list=['Hello','Heart','Dog','Cat','Elk','Text'],
             name="Icon to Display"
         )
     ]
