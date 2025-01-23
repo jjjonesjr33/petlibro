@@ -60,7 +60,7 @@ class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
             await self.device.set_display_text(native_value)
             _LOGGER.debug(f"Value {native_value} set successfully for {self.device.name}")
         except Exception as e:
-            _LOGGER.error(f"Error setting value {vanative_valuelue} for {self.device.name}: {e}")
+            _LOGGER.error(f"Error setting value {native_value} for {self.device.name}: {e}")
 DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
     Feeder: [
     ],

@@ -75,20 +75,6 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
         """Set the current_option of the select."""
         _LOGGER.debug(f"Setting current option {current_selection} for {self.device.name}")
         try:
-            if current_selection == "Text":
-                # Fetch the current text from the Text entity
-                text_value = self.device.display_text
-                if text_value.strip():  # Ensure it's not just spaces
-                    # Set the display icon to Text
-                    await self.entity_description.method(self.device, "Text")
-                    _LOGGER.debug(f"Display text set to: {text_value}")
-                else:
-                    _LOGGER.warning(f"Cannot display text: {text_value} is empty.")
-            else:
-                # Reset the text if something other than "Text" is selected
-                await self.device.set_display_text("")  # Set text to blank
-                await self.entity_description.method(self.device, current_selection)
-                _LOGGER.debug(f"Current option {current_selection} set successfully for {self.device.name}")
             _LOGGER.debug(f"Calling method with current option={current_selection} for {self.device.name}")
             await self.entity_description.method(self.device, current_selection)
             _LOGGER.debug(f"Current option {current_selection} set successfully for {self.device.name}")
