@@ -95,8 +95,30 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
         ),
     ],
     GranarySmartFeeder: [
+        PetLibroNumberEntityDescription[GranarySmartFeeder](
+            key ="manual_feed_quantity",
+            translation_key ="manual_feed_quantity",
+            native_unit_of_measurement = "  / 12 cups",
+            native_max_value = 12,
+            native_min_value = 1,
+            native_step = 1,
+            value = lambda device: device.manual_feed_quantity,
+            method = lambda device, value: device.set_manual_feed_quantity(value),
+            name = "Manual Feed Quantity"
+        ), 
     ],
     GranarySmartCameraFeeder: [
+        PetLibroNumberEntityDescription[GranarySmartCameraFeeder](
+            key ="manual_feed_quantity",
+            translation_key ="manual_feed_quantity",
+            native_unit_of_measurement = "  / 12 cups",
+            native_max_value = 12,
+            native_min_value = 1,
+            native_step = 1,
+            value = lambda device: device.manual_feed_quantity,
+            method = lambda device, value: device.set_manual_feed_quantity(value),
+            name = "Manual Feed Quantity"
+        ),
     ],
     OneRFIDSmartFeeder: [
         PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
@@ -135,11 +157,33 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             value=lambda device: device.lid_close_time,
             method=lambda device, value: device.set_lid_close_time(value),
             name="Lid Close Time"
-        )
+        ),
+        PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
+            key="manual_feed_quantity",
+            translation_key="manual_feed_quantity",
+            native_unit_of_measurement=" / 12 cups",
+            native_max_value=12,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: getattr(device, "manual_feed_quantity", 1),  # Default to 1 if not set
+            method=lambda device, value: device.set_manual_feed_quantity(value),
+            name="Manual Feed Quantity"
+        ),
     ],
     PolarWetFoodFeeder: [
     ],
     SpaceSmartFeeder: [
+        PetLibroNumberEntityDescription[SpaceSmartFeeder](
+            key ="manual_feed_quantity",
+            translation_key ="manual_feed_quantity",
+            native_unit_of_measurement = "  / 12 cups",
+            native_max_value = 12,
+            native_min_value = 1,
+            native_step = 1,
+            value = lambda device: device.manual_feed_quantity,
+            method = lambda device, value: device.set_manual_feed_quantity(value),
+            name = "Manual Feed Quantity"
+        ),
     ],
     DockstreamSmartFountain: [
     ],
@@ -190,4 +234,3 @@ async def async_setup_entry(
 
         # Add number entities to Home Assistant
         async_add_entities(entities)
-
