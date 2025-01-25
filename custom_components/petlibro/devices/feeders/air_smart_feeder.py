@@ -9,10 +9,10 @@ _LOGGER = getLogger(__name__)
 
 class AirSmartFeeder(Device):  # Inherit directly from Device
     def __init__(self, *args, **kwargs):
+        """Initialize the feeder with default values."""
         super().__init__(*args, **kwargs)
-        # Set the conversion mode explicitly for this feeder type
         self.conversion_mode = "1/24"  # Static definition for AirSmartFeeder
-        self.manual_feed_quantity = 1 # Static definition for AirSmartFeeder
+        self._manual_feed_quantity = None  # Default to None initially
 
     async def refresh(self):
         """Refresh the device data from the API."""
@@ -170,6 +170,13 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
     def remaining_desiccant(self) -> str:
         """Get the remaining desiccant days."""
         return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
+    
+    @property
+    def manual_feed_quantity(self):
+        if self._manual_feed_quantity is None:
+            _LOGGER.warning(f"manual_feed_quantity is None for {self.serial}, setting default to 1.")
+            self._manual_feed_quantity = 1  # Default value
+        return self._manual_feed_quantity
 
     # Error-handling updated for set_feeding_plan
     async def set_feeding_plan(self, value: bool) -> None:
@@ -230,31 +237,27 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set sound switch for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting sound switch: {err}")
-    '''
-    @property
-    def manual_feed_quantity(self) -> int:
-        return self.set_manual_feed_quantity(self.serial, 1)
-
-    async def set_manual_feed_quantity(self, serial: str, value: int):
-        """Set the manual feed quantity"""
-        _LOGGER.debug(f"Setting manual feed quantity: serial={serial}, value={value}")
-        self.manual_feed_quantity = value
-        return self.manual_feed_quantity
-    '''
-
-    async def set_manual_feed_quantity(self, value: float):
-        """Set the manual feed quantity"""
+        
+    @manual_feed_quantity.setter
+    def manual_feed_quantity(self, value: float):
+        """Set the manual feed quantity."""
         _LOGGER.debug(f"Setting manual feed quantity: serial={self.serial}, value={value}")
-        self.manual_feed_quantity = value
+        self._manual_feed_quantity = value
+    
+    async def set_manual_feed_quantity(self, value: float):
+        """Set the manual feed quantity with a default value handling"""
+        _LOGGER.debug(f"Setting manual feed quantity: serial={self.serial}, value={value}")
+        self.manual_feed_quantity = max(1, min(value, 24))  # Ensure value is within valid range
         await self.refresh()
 
     # Method for manual feeding
     async def set_manual_feed(self) -> None:
         _LOGGER.debug(f"Triggering manual feed for {self.serial}")
         try:
-            if hasattr(self, "manual_feed_quantity"):
-                await self.api.set_manual_feed(self.serial, self.manual_feed_quantity)
-                await self.refresh()  # Refresh the state after the action
+            feed_quantity = getattr(self, "manual_feed_quantity", 1)  # Default to 1 if not set
+            await self.api.set_manual_feed(self.serial, feed_quantity)
+            await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger manual feed for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feed: {err}")
+            
