@@ -47,7 +47,7 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
     Feeder: [
     ],
     AirSmartFeeder: [
-         PetLibroButtonEntityDescription[AirSmartFeeder](
+        PetLibroButtonEntityDescription[AirSmartFeeder](
             key="manual_feed",
             translation_key="manual_feed",
             set_fn=lambda device: device.set_manual_feed(),
