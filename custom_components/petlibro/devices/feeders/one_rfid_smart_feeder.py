@@ -454,3 +454,22 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set display icon for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting display icon: {err}")
+
+    @property
+    def display_selection(self) -> str:
+        display_text = self._data.get("getDefaultMatrix", {}).get("screenLetter", None)
+        display_icon = self._data.get("getDefaultMatrix", {}).get("screenDisplayId", None)
+
+        if isinstance(display_text, str):
+            return f"Displaying Text: {display_text}"
+        
+        if isinstance(display_icon, float):
+            icon_map = {
+                5.0: "Heart",
+                6.0: "Dog",
+                7.0: "Cat",
+                8.0: "Elk",
+            }
+            return f"Displaying Icon: {icon_map.get(display_icon, 'Unknown')}"
+
+        return "No valid display data found"
