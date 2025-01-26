@@ -463,12 +463,12 @@ class OneRFIDSmartFeeder(Device):
         if isinstance(display_text, str):
             return f"Displaying Text: {display_text}"
         
-        if isinstance(display_icon, float):
+        if isinstance(display_icon, int):
             icon_map = {
-                5.0: "Heart",
-                6.0: "Dog",
-                7.0: "Cat",
-                8.0: "Elk",
+                5: "Heart",
+                6: "Dog",
+                7: "Cat",
+                8: "Elk",
             }
             return f"Displaying Icon: {icon_map.get(display_icon, 'Unknown')}"
 
