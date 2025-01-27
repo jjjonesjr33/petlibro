@@ -116,6 +116,9 @@
             },
             "plate_position": {
                 "name": "Tellerposition"
+            },
+            "display_selection": {
+                "name": "Anzeigewert"
             }
         },
         "switch": {
@@ -210,6 +213,14 @@
             },
             "lid_mode": {
                 "name": "Deckelmodus"
+            },
+            "display_icon": {
+                "name": "Symbol auf dem Display"
+            }
+        },
+        "text": {
+            "display_text": {
+                "name": "Text auf dem Display"
             }
         }
     }

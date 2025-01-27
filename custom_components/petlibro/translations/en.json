@@ -116,6 +116,9 @@
             },
             "plate_position": {
                 "name": "Plate position"
+            },
+            "display_selection": {
+                "name": "Display Value"
             }
         },
         "switch": {
@@ -219,6 +222,14 @@
             },
             "lid_mode": {
                 "name": "Lid Mode"
+            },
+            "display_icon": {
+                "name": "Icon on Display"
+            }
+        },
+        "text": {
+            "display_text": {
+                "name": "Text on Display"
             }
         }
     }

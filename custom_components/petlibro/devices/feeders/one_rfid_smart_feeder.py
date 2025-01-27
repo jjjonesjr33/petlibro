@@ -24,12 +24,14 @@ class OneRFIDSmartFeeder(Device):
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
+            get_default_matrix = await self.api.get_default_matrix(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
-                "getAttributeSetting": attribute_settings or {}
+                "getAttributeSetting": attribute_settings or {},
+                "getDefaultMatrix": get_default_matrix or {}
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for OneRFIDSmartFeeder: {err}")
@@ -437,3 +439,62 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set lid close time for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting lid close time: {err}")
+    
+    @property
+    def display_text(self) -> str:
+        """Return the current display text from local data."""
+        return self._data.get("getDefaultMatrix", {}).get("screenLetter", "ERROR")
+
+    async def set_display_text(self, value: str) -> None:
+        _LOGGER.debug(f"Setting display text to {value} for {self.serial}")
+        try:
+            await self.api.set_display_text(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set display text for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting display text: {err}")
+
+    @property
+    def display_icon(self) -> float:
+        """Return the user-friendly display icon (mapped directly from the API value)."""
+        api_value = self._data.get("getDefaultMatrix", {}).get("screenDisplayId", None)
+        
+        # Direct mapping inside the property
+        if api_value == 5:
+            return "Heart"
+        elif api_value == 6:
+            return "Dog"
+        elif api_value == 7:
+            return "Cat"
+        elif api_value == 8:
+            return "Elk"
+        else:
+            return "Unknown"
+
+    async def set_display_icon(self, value: float) -> None:
+        _LOGGER.debug(f"Setting display icon to {value} for {self.serial}")
+        try:
+            await self.api.set_display_icon(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set display icon for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting display icon: {err}")
+
+    @property
+    def display_selection(self) -> str:
+        display_text = self._data.get("getDefaultMatrix", {}).get("screenLetter", None)
+        display_icon = self._data.get("getDefaultMatrix", {}).get("screenDisplayId", None)
+
+        if isinstance(display_text, str):
+            return f"Displaying Text: {display_text}"
+        
+        if isinstance(display_icon, int):
+            icon_map = {
+                5: "Heart",
+                6: "Dog",
+                7: "Cat",
+                8: "Elk",
+            }
+            return f"Displaying Icon: {icon_map.get(display_icon, 'Unknown')}"
+
+        return "No valid display data found"

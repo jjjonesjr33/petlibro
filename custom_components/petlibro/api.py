@@ -55,6 +55,10 @@ class PetLibroSession:
         kwargs["json"] = json_data
         return await self.request("POST", path, **kwargs)
 
+    async def get(self, path: str, params: dict = None, **kwargs: Any) -> JSON:
+        """GET method for the PetLibro API."""
+        return await self.request("GET", path, params=params, **kwargs)
+
     async def request(self, method: str, url: str, **kwargs: Any) -> JSON:
         """Make a request."""
         joined_url = urljoin(self.base_url, url)
@@ -305,6 +309,44 @@ class PetLibroAPI:
             _LOGGER.error(f"Error fetching baseInfo for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching baseInfo for device {device_id}: {e}")
 
+    async def get_default_matrix(self, device_sn: str) -> dict:
+        """
+        Fetch the default matrix for a device using a GET request.
+        
+        :param device_sn: The serial number of the device.
+        :return: The default matrix data.
+        """
+        # Check cache for recently fetched data
+        now = datetime.utcnow()
+        cache_key = f"{device_sn}_getDefaultMatrix"
+        last_call_time = self._last_api_call_times.get(cache_key)
+
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Using cached response for getDefaultMatrix: {device_sn}")
+            return self._cached_responses.get(cache_key, {})
+
+        # Make the API call
+        try:
+            # Copy the default headers to include them in the request
+            headers = self.session.headers.copy()
+            headers.update({
+                "accept-encoding": "gzip",
+            })
+
+            response = await self.session.get(
+                path="/device/device/getDefaultMatrix",
+                params={"deviceSn": device_sn},
+                headers=headers
+            )
+
+            # Cache the response
+            self._last_api_call_times[cache_key] = now
+            self._cached_responses[cache_key] = response
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Error fetching default matrix for device {device_sn}: {e}")
+            raise PetLibroAPIError(f"Failed to fetch default matrix: {e}")
+
     async def logout(self):
         """Logout of the API and reset the token"""
         await self.session.post("/member/auth/logout")
@@ -335,7 +377,7 @@ class PetLibroAPI:
 
     async def device_feeding_plan_today_new(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/feedingPlan/todayNew", serial)
-    
+
     async def device_wet_feeding_plan(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/wetFeedingPlan/wetListV3", serial)
 
@@ -483,6 +525,38 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set lid mode for device {serial}: {e}")
             raise
 
+
+    async def set_display_icon(self, serial: str, value: float):
+        """Set the display icon."""
+        _LOGGER.debug(f"Setting display icon: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/device/displayMatrix", json={
+                "deviceSn": serial,
+                "screenDisplayId": value,
+                "screenDisplayMatrix": None,
+                "screenLetter": None
+            })
+            _LOGGER.debug(f"Display icon set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set display icon for device {serial}: {e}")
+            raise
+
+    async def set_display_text(self, serial: str, value: str):
+        """Set the display text."""
+        _LOGGER.debug(f"Setting display text: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/device/displayMatrix", json={
+                "deviceSn": serial,
+                "screenDisplayId": None,
+                "screenDisplayMatrix": None,
+                "screenLetter": value
+            })
+            _LOGGER.debug(f"Display text set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set display text for device {serial}: {e}")
+            raise
 
     async def set_manual_feed(self, serial: str, feed_value=1) -> JSON: # Provide a default argument for the feed value just in case this works differently with other feeders
         """Trigger manual feeding for a specific device."""
