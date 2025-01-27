@@ -10,6 +10,11 @@ from logging import getLogger
 _LOGGER = getLogger(__name__)
 
 class OneRFIDSmartFeeder(Device):
+    def __init__(self, *args, **kwargs):
+        """Initialize the feeder with default values."""
+        super().__init__(*args, **kwargs)
+        self._manual_feed_quantity = None  # Default to None initially
+
     async def refresh(self):
         """Refresh the device data from the API."""
         try:
@@ -192,6 +197,13 @@ class OneRFIDSmartFeeder(Device):
     @property
     def desiccant_frequency(self) -> float:
         return self._data.get("realInfo", {}).get("changeDesiccantFrequency", 0)
+    
+    @property
+    def manual_feed_quantity(self):
+        if self._manual_feed_quantity is None:
+            _LOGGER.warning(f"manual_feed_quantity is None for {self.serial}, setting default to 1.")
+            self._manual_feed_quantity = 1  # Default value
+        return self._manual_feed_quantity
 
     async def set_desiccant_frequency(self, value: float) -> None:
         _LOGGER.debug(f"Setting desiccant frequency to {value} for {self.serial}")
@@ -277,11 +289,24 @@ class OneRFIDSmartFeeder(Device):
             _LOGGER.error(f"Failed to set sound switch for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting sound switch: {err}")
 
+    @manual_feed_quantity.setter
+    def manual_feed_quantity(self, value: float):
+        """Set the manual feed quantity."""
+        _LOGGER.debug(f"Setting manual feed quantity: serial={self.serial}, value={value}")
+        self._manual_feed_quantity = value
+    
+    async def set_manual_feed_quantity(self, value: float):
+        """Set the manual feed quantity with a default value handling"""
+        _LOGGER.debug(f"Setting manual feed quantity: serial={self.serial}, value={value}")
+        self.manual_feed_quantity = max(1, min(value, 12))  # Ensure value is within valid range
+        await self.refresh()
+
     # Method for manual feeding
     async def set_manual_feed(self) -> None:
         _LOGGER.debug(f"Triggering manual feed for {self.serial}")
         try:
-            await self.api.set_manual_feed(self.serial)
+            feed_quantity = getattr(self, "manual_feed_quantity", 1)  # Default to 1 if not set
+            await self.api.set_manual_feed(self.serial, feed_quantity)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger manual feed for {self.serial}: {err}")
