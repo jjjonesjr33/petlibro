@@ -127,7 +127,7 @@ async def async_setup_entry(
     ]
 
     if not entities:
-        _LOGGER.warning("No switches added, entities list is empty!")
+        _LOGGER.debug("No switches added, entities list is empty!")
     else:
         # Log the number of entities and their details
         _LOGGER.debug("Adding %d PetLibro switches", len(entities))
