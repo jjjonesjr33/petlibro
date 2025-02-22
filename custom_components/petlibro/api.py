@@ -95,7 +95,7 @@ class PetLibroSession:
                 raise PetLibroAPIError(f"Request failed with status: {resp.status}")
 
             if data.get("code") == 1009:  # NOT_YET_LOGIN error code
-                _LOGGER.warning(f"NOT_YET_LOGIN error occurred for {joined_url}. Trying re-login.")
+                _LOGGER.debug(f"NOT_YET_LOGIN error occurred for {joined_url}. Trying re-login.")
                 # Trigger a re-login and get the new token
                 new_token = await self.re_login()
                 kwargs["headers"]["token"] = new_token
