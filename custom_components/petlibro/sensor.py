@@ -7,20 +7,26 @@ from dataclasses import dataclass
 from logging import getLogger
 from collections.abc import Callable
 from datetime import datetime
-from typing import Any, cast
-from .const import DOMAIN
+import time
+from typing import Any, cast, Optional
+
+from .const import (
+    DOMAIN, 
+    API_CONNECTION_SENSOR_KEY, 
+    COMMAND_QUEUE_SENSOR_KEY,
+    FRESHNESS_THRESHOLD_CRITICAL,
+    FRESHNESS_THRESHOLD_WARNING
+)
 from homeassistant.components.sensor.const import SensorStateClass, SensorDeviceClass
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
-from homeassistant.const import UnitOfMass, UnitOfVolume
+from homeassistant.const import UnitOfMass, UnitOfVolume, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
-from .hub import PetLibroHub  # Adjust the import path as necessary
+from homeassistant.config_entries import ConfigEntry
 
-_LOGGER = getLogger(__name__)
-
+from .hub import PetLibroHub
 from .devices import Device
-from .devices.device import Device
+from .devices.device import Device, CONNECTION_ONLINE, CONNECTION_DEGRADED, CONNECTION_OFFLINE
 from .devices.feeders.feeder import Feeder
 from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
@@ -30,7 +36,9 @@ from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
-from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
+from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription, EnhancedPetLibroEntity
+
+_LOGGER = getLogger(__name__)
 
 def icon_for_gauge_level(gauge_level: int | None = None, offset: int = 0) -> str:
     """Return a gauge icon valid identifier."""
@@ -182,6 +190,339 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         if (device_class := self.entity_description.device_class_fn(self.device)) is not None:
             return device_class
         return super().device_class
+
+
+class EnhancedPetLibroSensorEntity(EnhancedPetLibroEntity[_DeviceT], SensorEntity):
+    """Enhanced PETLIBRO sensor entity with improved reliability features."""
+
+    entity_description: PetLibroSensorEntityDescription[_DeviceT]
+    
+    def __init__(self, device, hub, description):
+        """Initialize the enhanced sensor."""
+        super().__init__(device, hub, description)
+        
+        # Dictionary to keep track of the last known state for each sensor key
+        self._last_sensor_state = {}
+        
+    @property
+    def native_value(self) -> float | datetime | str | None:
+        """Return the state with enhanced caching behavior."""
+        sensor_key = self.entity_description.key
+        
+        # Get the value from the device (could be live or cached)
+        val = None
+        
+        # Handle feeding_plan_state as "On" or "Off"
+        if sensor_key == "feeding_plan_state":
+            feeding_plan_active = getattr(self.device, sensor_key, False)
+            # Log only if the state has changed
+            if self._last_sensor_state.get(sensor_key) != feeding_plan_active:
+                _LOGGER.debug(f"Raw {sensor_key} for device {self.device.serial}: {feeding_plan_active}")
+                self._last_sensor_state[sensor_key] = feeding_plan_active
+            return "On" if feeding_plan_active else "Off"
+
+        # Handle today_eating_time as raw seconds value
+        elif sensor_key == "today_eating_time":
+            eating_time_seconds = getattr(self.device, sensor_key, 0)
+            return eating_time_seconds
+
+        # Handle today_feeding_quantity as raw numeric value, converting to cups
+        elif sensor_key == "today_feeding_quantity":
+            feeding_quantity = getattr(self.device, sensor_key, 0)
+            # Determine the conversion factor based on device-specific attributes or context
+            conversion_factor = 1 / 12  # Default conversion factor
+            if hasattr(self.device, "conversion_mode") and self.device.conversion_mode == "1/24":
+                conversion_factor = 1 / 24
+            
+            cups = feeding_quantity * conversion_factor
+            return f"{round(cups, 2)}"
+
+        # Handle wifi_rssi to display only the numeric value
+        elif sensor_key == "wifi_rssi":
+            wifi_rssi = getattr(self.device, sensor_key, None)
+            if wifi_rssi is not None:
+                if self._last_sensor_state.get(sensor_key) != wifi_rssi:
+                    _LOGGER.debug(f"Raw {sensor_key} for device {self.device.serial}: {wifi_rssi}")
+                    self._last_sensor_state[sensor_key] = wifi_rssi
+                return wifi_rssi
+
+        # Handle weight in grams and convert to ounces
+        elif sensor_key == "weight":
+            weight_in_grams = getattr(self.device, sensor_key, 0.0)
+            ounces = round(weight_in_grams * 0.035274, 2)
+            return ounces
+            
+        # Default behavior for other sensors
+        if self.entity_description.should_report(self.device):
+            val = getattr(self.device, sensor_key, None)
+            # Log only if the state has changed
+            if self._last_sensor_state.get(sensor_key) != val:
+                _LOGGER.debug(f"Raw {sensor_key} for device {self.device.serial}: {val}")
+                self._last_sensor_state[sensor_key] = val
+            return val
+        return None
+        
+    @property
+    def extra_state_attributes(self):
+        """Return entity specific state attributes with data freshness information."""
+        attrs = super().extra_state_attributes or {}
+        
+        # Add original entity-specific attributes from PetLibroSensorEntity
+        # For example, you might want to add custom attributes based on sensor type
+        
+        # For wifi signal sensors, add signal quality indicators
+        if self.entity_description.key == "wifi_rssi":
+            rssi = getattr(self.device, "wifi_rssi", None)
+            if rssi is not None:
+                if rssi >= -50:
+                    attrs["signal_quality"] = "excellent"
+                elif rssi >= -60:
+                    attrs["signal_quality"] = "good"
+                elif rssi >= -70:
+                    attrs["signal_quality"] = "fair"
+                else:
+                    attrs["signal_quality"] = "poor"
+        
+        return attrs
+
+    @property
+    def icon(self) -> str | None:
+        """Return the icon to use in the frontend, if any."""
+        if (icon := self.entity_description.icon_fn(self.state)) is not None:
+            return icon
+        return super().icon
+
+    @property
+    def native_unit_of_measurement(self) -> str | None:
+        """Return the native unit of measurement to use in the frontend, if any."""
+        # For temperature, display as Fahrenheit
+        if self.entity_description.key == "temperature":
+            return "°F"
+        # For today_feeding_quantity, display as cups in the frontend
+        if self.entity_description.key == "today_feeding_quantity":
+            return "cups"
+        # For today_eating_time, display as seconds in the frontend
+        elif self.entity_description.key == "today_eating_time":
+            return "s"
+        # For wifi_rssi, display as dBm
+        elif self.entity_description.key == "wifi_rssi":
+            return "dBm"
+        # For weight, display as ounces in the frontend
+        elif self.entity_description.key == "weight":
+            return "oz"
+        # For use_water_interval and use_water_duration, display as minutes
+        elif self.entity_description.key in ["use_water_interval", "use_water_duration"]:
+            return "min"
+        # For weight_percent, display as a percentage
+        elif self.entity_description.key == "weight_percent":
+            return "%"
+        # For electric_quantity, display as a percentage
+        elif self.entity_description.key == "electric_quantity":
+            return "%"
+        # Default behavior for other sensors
+        return self.entity_description.native_unit_of_measurement_fn(self.device)
+
+    @property
+    def device_class(self) -> SensorDeviceClass | None:
+        """Return the device class to use in the frontend, if any."""
+        if (device_class := self.entity_description.device_class_fn(self.device)) is not None:
+            return device_class
+        return super().device_class
+
+
+class PetLibroConnectionSensor(SensorEntity):
+    """Sensor for showing the connection state with the PetLibro API."""
+    
+    _attr_icon = "mdi:cloud-connection"
+    _attr_name = "PetLibro API Connection"
+    _attr_unique_id = API_CONNECTION_SENSOR_KEY
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    
+    def __init__(self, hub: PetLibroHub):
+        """Initialize with hub reference."""
+        self.hub = hub
+        self.api = hub.api
+        self._attr_device_info = {
+            "identifiers": {(DOMAIN, "petlibro_api")},
+            "name": "PetLibro API",
+            "manufacturer": "PetLibro"
+        }
+    
+    @property
+    def native_value(self) -> str:
+        """Return the connection state."""
+        if not hasattr(self.api, "connection_state"):
+            return "unknown"
+            
+        # Return the connection state from the API client
+        return self.api.connection_state
+        
+    @property
+    def extra_state_attributes(self):
+        """Return additional attributes."""
+        attrs = {}
+        
+        # Add connection stats if available
+        if hasattr(self.api, "connection_stats"):
+            stats = self.api.connection_stats
+            attrs.update({
+                "success_rate": stats.get("success_rate", 0),
+                "last_success": stats.get("last_success", 0),
+                "consecutive_errors": stats.get("consecutive_errors", 0),
+                "total_api_calls": stats.get("total_calls", 0),
+                "total_errors": stats.get("total_errors", 0)
+            })
+            
+            # Add human-readable last success time
+            last_success = stats.get("last_success", 0)
+            if last_success:
+                attrs["last_success_time"] = datetime.fromtimestamp(last_success).strftime("%Y-%m-%d %H:%M:%S")
+                
+                # Add time since last success in minutes
+                attrs["minutes_since_success"] = int((time.time() - last_success) / 60)
+        
+        return attrs
+
+
+class PetLibroCommandQueueSensor(SensorEntity):
+    """Sensor for showing command queue status."""
+    
+    _attr_icon = "mdi:playlist-check"
+    _attr_name = "PetLibro Command Queue"
+    _attr_unique_id = COMMAND_QUEUE_SENSOR_KEY
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
+
+class PetLibroNotificationHistorySensor(SensorEntity):
+    """Sensor showing notification history."""
+    
+    _attr_icon = "mdi:bell-outline"
+    _attr_name = "PetLibro Notification History"
+    _attr_unique_id = "petlibro_notification_history"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    
+    def __init__(self, hub: PetLibroHub):
+        """Initialize with hub reference."""
+        self.hub = hub
+        self._attr_device_info = {
+            "identifiers": {(DOMAIN, "petlibro_api")},
+            "name": "PetLibro API",
+            "manufacturer": "PetLibro"
+        }
+    
+    @property
+    def native_value(self) -> str:
+        """Return the number of notifications in history."""
+        if not hasattr(self.hub, "notification_manager"):
+            return "Not available"
+            
+        history = self.hub.get_notification_history()
+        return f"{len(history)} notifications"
+        
+    @property
+    def extra_state_attributes(self):
+        """Return notification history."""
+        if not hasattr(self.hub, "notification_manager"):
+            return {}
+            
+        history = self.hub.get_notification_history()
+        return {
+            "notifications": [
+                {
+                    "title": item["title"],
+                    "message": item["message"],
+                    "timestamp": item["timestamp"],
+                    "importance": item["importance"],
+                    "time": datetime.fromtimestamp(item["timestamp"]).strftime("%Y-%m-%d %H:%M:%S")
+                }
+                for item in history
+            ]
+        }
+
+
+class PetLibroCompactCommandQueueSensor(SensorEntity):
+    """Compact sensor for showing command queue status."""
+    
+    _attr_icon = "mdi:playlist-check"
+    _attr_name = "PetLibro Command Queue"
+    _attr_unique_id = COMMAND_QUEUE_SENSOR_KEY
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    
+    def __init__(self, hub: PetLibroHub):
+        """Initialize with hub reference."""
+        self.hub = hub
+        self._attr_device_info = {
+            "identifiers": {(DOMAIN, "petlibro_api")},
+            "name": "PetLibro API",
+            "manufacturer": "PetLibro"
+        }
+    
+    @property
+    def native_value(self) -> str:
+        """Return the number of pending commands."""
+        if not hasattr(self.hub, "command_queue") or not self.hub.command_queue:
+            return "Not available"
+            
+        pending = 0
+        if hasattr(self.hub.command_queue, "queue"):
+            pending = sum(1 for cmd in self.hub.command_queue.queue 
+                        if getattr(cmd, "status", "") == "pending")
+        
+        return f"{pending} pending"
+        
+    @property
+    def extra_state_attributes(self):
+        """Return additional attributes."""
+        if not hasattr(self.hub, "command_queue") or not self.hub.command_queue:
+            return {}
+            
+        queue = self.hub.command_queue
+        attrs = {}
+        
+        if hasattr(queue, "queue"):
+            pending_count = sum(1 for cmd in queue.queue if getattr(cmd, "status", "") == "pending")
+            executing_count = sum(1 for cmd in queue.queue if getattr(cmd, "status", "") == "executing")
+            failed_count = sum(1 for cmd in queue.queue if getattr(cmd, "status", "") == "failed")
+            
+            attrs.update({
+                "pending_count": pending_count,
+                "executing_count": executing_count,
+                "failed_count": failed_count,
+                "processing": getattr(queue, "processing", False)
+            })
+            
+            # Add recent commands info
+            if hasattr(queue, "queue") and queue.queue:
+                attrs["recent_commands"] = []
+                sorted_cmds = sorted(
+                    queue.queue, 
+                    key=lambda x: getattr(x, "created_at", 0), 
+                    reverse=True
+                )[:5]
+                
+                for cmd in sorted_cmds:
+                    cmd_info = {
+                        "id": getattr(cmd, "id", "unknown"),
+                        "device_id": getattr(cmd, "device_id", "unknown"),
+                        "command": getattr(cmd, "command", "unknown"),
+                        "status": getattr(cmd, "status", "unknown")
+                    }
+                    
+                    # Add timestamps if available
+                    created_at = getattr(cmd, "created_at", None)
+                    if created_at:
+                        cmd_info["created_at"] = created_at
+                        # Add human-readable time
+                        cmd_info["created_time"] = datetime.fromtimestamp(created_at).strftime("%Y-%m-%d %H:%M:%S")
+                        
+                    # Add retry info if available
+                    retries = getattr(cmd, "retries", None)
+                    if retries is not None:
+                        cmd_info["retries"] = retries
+                        
+                    attrs["recent_commands"].append(cmd_info)
+        
+        return attrs
 
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
@@ -870,13 +1211,21 @@ async def async_setup_entry(
     _LOGGER.debug("Devices in hub: %s", devices)
 
     # Create sensor entities for each device based on the sensor map
-    entities = [
-        PetLibroSensorEntity(device, hub, description)
-        for device in devices  # Iterate through devices from the hub
-        for device_type, entity_descriptions in DEVICE_SENSOR_MAP.items()
-        if isinstance(device, device_type)
-        for description in entity_descriptions
-    ]
+    entities = []
+    
+    # Add device-specific sensors using enhanced entity
+    for device in devices:
+        for device_type, entity_descriptions in DEVICE_SENSOR_MAP.items():
+            if isinstance(device, device_type):
+                for description in entity_descriptions:
+                    entities.append(EnhancedPetLibroSensorEntity(device, hub, description))
+    
+    # Add diagnostic sensors
+    entities.extend([
+        PetLibroConnectionSensor(hub),
+        PetLibroNotificationHistorySensor(hub),
+        PetLibroCommandQueueSensor(hub),
+    ])
 
     if not entities:
         _LOGGER.warning("No sensors added, entities list is empty!")
@@ -884,8 +1233,7 @@ async def async_setup_entry(
         # Log the number of entities and their details
         _LOGGER.debug("Adding %d PetLibro sensors", len(entities))
         for entity in entities:
-            _LOGGER.debug("Adding sensor entity: %s for device %s", entity.entity_description.name, entity.device.name)
+            _LOGGER.debug("Adding sensor entity: %s", getattr(entity, "name", str(entity)))
 
         # Add sensor entities to Home Assistant
         async_add_entities(entities)
-

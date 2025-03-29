@@ -11,3 +11,7 @@ class PetLibroCannotConnect(PetLibroAPIError):
 
 class PetLibroInvalidAuth(PetLibroAPIError):
     """Error to indicate there is invalid auth."""
+
+
+class PetLibroConnectionError(PetLibroAPIError):
+    """Error to indicate a network connection issue."""

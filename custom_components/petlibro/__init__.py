@@ -1,10 +1,14 @@
 import logging
 
 from datetime import timedelta  # For managing the update interval
+
+import voluptuous as vol
+
 from homeassistant.core import HomeAssistant
 from homeassistant.const import Platform
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed  # For coordinator and update handling
 from .devices import Device
 from .devices.feeders.feeder import Feeder
@@ -16,11 +20,25 @@ from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
-from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD, PLATFORMS, UPDATE_INTERVAL_SECONDS  # Assuming UPDATE_INTERVAL_SECONDS is defined in const
+
+from .const import (
+    DOMAIN, CONF_EMAIL, CONF_PASSWORD, PLATFORMS, UPDATE_INTERVAL_SECONDS,
+    CONF_MIN_UPDATE_INTERVAL, CONF_MAX_UPDATE_INTERVAL, CONF_ADAPTIVE_POLLING,
+)
 from .hub import PetLibroHub
 
 _LOGGER = logging.getLogger(__name__)
 
+# Configuration schema for YAML configuration
+CONFIG_SCHEMA = vol.Schema(
+    {
+        DOMAIN: vol.Schema({
+            vol.Optional(CONF_MIN_UPDATE_INTERVAL, default=30): cv.positive_int,
+            vol.Optional(CONF_MAX_UPDATE_INTERVAL, default=600): cv.positive_int,
+            vol.Optional(CONF_ADAPTIVE_POLLING, default=True): cv.boolean,
+        })
+    }, extra=vol.ALLOW_EXTRA
+)
 
 # Define the platforms for each device type
 PLATFORMS_BY_TYPE = {
@@ -118,6 +136,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         # Forward entry setups for each platform
         await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+        # Register service to send test notification
+        async def handle_test_notification(call):
+            """Handle the service call to send a test notification."""
+            hub = hass.data[DOMAIN][entry.entry_id]
+            if hasattr(hub, "notification_manager"):
+                await hub.notification_manager._send_notification(
+                    message="This is a test notification from the PetLibro integration.",
+                    title="PetLibro Test Notification",
+                    notification_id="petlibro_test_notification",
+                    importance="normal"
+                )
+            else:
+                _LOGGER.error("Notification manager not available")
+
+        # Register the service
+        hass.services.async_register(
+            DOMAIN,
+            "send_test_notification",
+            handle_test_notification
+        )
 
         _LOGGER.info(f"Successfully set up PetLibro integration for {email}")
         return True

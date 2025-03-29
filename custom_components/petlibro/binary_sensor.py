@@ -8,7 +8,12 @@ from collections.abc import Callable
 from functools import cached_property
 from typing import Optional
 import logging
-from .const import DOMAIN
+import time
+from .const import (
+    DOMAIN,
+    FRESHNESS_THRESHOLD_CRITICAL,
+    FRESHNESS_THRESHOLD_WARNING
+)
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
@@ -16,12 +21,9 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
-from .hub import PetLibroHub  # Adjust the import path as necessary
+from homeassistant.config_entries import ConfigEntry
 
-
-_LOGGER = logging.getLogger(__name__)
-
+from .hub import PetLibroHub
 from .devices import Device
 from .devices.device import Device
 from .devices.feeders.feeder import Feeder
@@ -33,7 +35,10 @@ from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
-from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
+from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription, EnhancedPetLibroEntity
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -44,8 +49,9 @@ class PetLibroBinarySensorEntityDescription(BinarySensorEntityDescription, PetLi
     should_report: Callable[[_DeviceT], bool] = lambda _: True
     device_class: Optional[BinarySensorDeviceClass] = None
 
+
 class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
-    """PETLIBRO sensor entity."""
+    """PETLIBRO binary sensor entity."""
 
     entity_description: PetLibroBinarySensorEntityDescription[_DeviceT]
 
@@ -84,6 +90,108 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
 
         # Return the state, ensuring it's a boolean
         return bool(state)
+
+
+class EnhancedPetLibroBinarySensorEntity(EnhancedPetLibroEntity[_DeviceT], BinarySensorEntity):
+    """Enhanced PETLIBRO binary sensor entity with improved reliability features."""
+
+    entity_description: PetLibroBinarySensorEntityDescription[_DeviceT]
+
+    def __init__(
+        self, 
+        device: _DeviceT, 
+        hub: PetLibroHub, 
+        description: PetLibroBinarySensorEntityDescription[_DeviceT]
+    ) -> None:
+        """Initialize the enhanced binary sensor."""
+        super().__init__(device, hub, description)
+        self._last_state = None
+        self._initial_log_done = False
+        self._last_state_change = time.time()
+
+    @cached_property
+    def device_class(self) -> BinarySensorDeviceClass | None:
+        """Return the device class to use in the frontend, if any."""
+        return self.entity_description.device_class
+
+    @property
+    def is_on(self) -> bool:
+        """Return True if the binary sensor is on."""
+        # Check if the binary sensor should report its state
+        if not self.entity_description.should_report(self.device):
+            return False
+
+        # Retrieve the state using getattr, defaulting to None if the attribute is missing
+        state = getattr(self.device, self.entity_description.key, None)
+
+        # Check if this is the first time the sensor is being refreshed by checking if _last_state exists
+        last_state = self._last_state
+        initial_log_done = self._initial_log_done  # Track if we've logged the initial state
+
+        # If this is the initial boot, don't log anything but track the state
+        if not initial_log_done:
+            # Mark the initial log as done without logging
+            self._initial_log_done = True  
+        elif last_state != state:
+            # Track state change time
+            self._last_state_change = time.time()
+            
+            # Log state changes: log online with INFO and offline with WARNING
+            if state:
+                _LOGGER.info(f"Device {self.device.name} is online.")
+            else:
+                _LOGGER.warning(f"Device {self.device.name} is offline.")
+
+        # Store the last state for future comparisons
+        self._last_state = state
+
+        # Return the state, ensuring it's a boolean
+        return bool(state)
+    
+    @property
+    def extra_state_attributes(self):
+        """Return entity specific state attributes with data freshness and status information."""
+        attrs = super().extra_state_attributes or {}
+        
+        # Add state-specific attributes for binary sensors
+        
+        # Add the last state change time
+        if hasattr(self, "_last_state_change"):
+            attrs["last_state_change"] = self._last_state_change
+            
+            # Add human-readable time
+            from datetime import datetime
+            attrs["last_state_change_time"] = datetime.fromtimestamp(self._last_state_change).strftime("%Y-%m-%d %H:%M:%S")
+            
+            # Add age of the state in minutes
+            attrs["state_age_minutes"] = int((time.time() - self._last_state_change) / 60)
+        
+        # For connectivity sensors (Wi-Fi), add additional connection info
+        if (self.entity_description.device_class == BinarySensorDeviceClass.CONNECTIVITY and 
+            self.entity_description.key == "online"):
+            
+            # Add signal strength if available
+            wifi_rssi = getattr(self.device, "wifi_rssi", None)
+            if wifi_rssi is not None:
+                attrs["signal_strength"] = wifi_rssi
+                
+                # Add signal quality assessment
+                if wifi_rssi >= -50:
+                    attrs["signal_quality"] = "excellent"
+                elif wifi_rssi >= -60:
+                    attrs["signal_quality"] = "good"
+                elif wifi_rssi >= -70:
+                    attrs["signal_quality"] = "fair"
+                else:
+                    attrs["signal_quality"] = "poor"
+            
+            # Add Wi-Fi SSID if available
+            wifi_ssid = getattr(self.device, "wifi_ssid", None)
+            if wifi_ssid:
+                attrs["wifi_ssid"] = wifi_ssid
+        
+        return attrs
+
 
 DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDescription]] = {
     Feeder: [
@@ -402,7 +510,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,  # Use ConfigEntry
+    entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up PETLIBRO binary sensors using config entry."""
@@ -413,7 +521,7 @@ async def async_setup_entry(
         _LOGGER.error("Hub not found for entry: %s", entry.entry_id)
         return
 
-    # Ensure that the devices are loaded (if load_devices is not already called elsewhere)
+    # Ensure that the devices are loaded
     if not hub.devices:
         _LOGGER.warning("No devices found in hub during binary sensor setup.")
         return
@@ -425,13 +533,13 @@ async def async_setup_entry(
     _LOGGER.debug("Devices in hub: %s", devices)
 
     # Create binary sensor entities for each device based on the binary sensor map
-    entities = [
-        PetLibroBinarySensorEntity(device, hub, description)
-        for device in devices  # Iterate through devices from the hub
-        for device_type, entity_descriptions in DEVICE_BINARY_SENSOR_MAP.items()
-        if isinstance(device, device_type)
-        for description in entity_descriptions
-    ]
+    entities = []
+    
+    for device in devices:
+        for device_type, entity_descriptions in DEVICE_BINARY_SENSOR_MAP.items():
+            if isinstance(device, device_type):
+                for description in entity_descriptions:
+                    entities.append(EnhancedPetLibroBinarySensorEntity(device, hub, description))
 
     if not entities:
         _LOGGER.warning("No binary sensors added, entities list is empty!")
@@ -443,4 +551,3 @@ async def async_setup_entry(
 
         # Add binary sensor entities to Home Assistant
         async_add_entities(entities)
-
