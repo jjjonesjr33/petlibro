@@ -2,12 +2,16 @@
   "domain": "petlibro",
   "name": "PETLIBRO",
   "codeowners": [
-    "@jjjonesjr33"
+    "@ssmithTaylor"
   ],
   "config_flow": true,
-  "documentation": "https://github.com/jjjonesjr33/petlibro",
+  "documentation": "https://github.com/ssmithTaylor/petlibro",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/jjjonesjr33/petlibro/issues",
-  "version": "1.0.21"
+  "issue_tracker": "https://github.com/ssmithTaylor/petlibro/issues",
+  "version": "1.0.21",
+  "requirements": [],
+  "dependencies": [],
+  "homeassistant": "2023.7.0",
+  "version_added": "2023.7.0"
 }

@@ -3,7 +3,7 @@ import asyncio
 from logging import getLogger
 from asyncio import gather
 from collections.abc import Mapping
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Dict
 from datetime import datetime, timedelta
 
 from homeassistant.core import HomeAssistant
