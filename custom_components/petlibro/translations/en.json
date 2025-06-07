@@ -217,6 +217,12 @@
             },
             "lid_close_time": {
                 "name": "Lid Close Time"
+            },
+            "water_interval": {
+                "name": "Water Interval"
+            },
+            "water_dispensing_duration": {
+                "name": "Water Dispensing Duration"
             }
         },
         "select": {
@@ -228,6 +234,9 @@
             },
             "display_icon": {
                 "name": "Icon on Display"
+            },
+            "water_dispensing_mode": {
+                "name": "Water Dispensing Mode"
             }
         },
         "text": {

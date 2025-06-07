@@ -509,6 +509,44 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set lid speed for device {serial}: {e}")
             raise
 
+    async def set_water_interval(self, serial: str, value: float, current_mode: int, current_duration: float):
+        """Set the water interval."""
+        _LOGGER.debug(f"Setting water interval: serial={serial}, value={value}")
+        try:
+            # Generate a dynamic request ID for the mode switch.
+            request_id = str(uuid.uuid4()).replace("-", "")
+            response = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "requestId": request_id,
+                "useWaterType": current_mode,
+                "useWaterInterval": value,
+                "useWaterDuration": current_duration
+            })
+            _LOGGER.debug(f"Water interval set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set water interval for device {serial}: {e}")
+            raise
+
+    async def set_water_dispensing_duration(self, serial: str, value: float, current_mode: int, current_interval: float):
+        """Set the water interval."""
+        _LOGGER.debug(f"Setting water dispensing duration: serial={serial}, value={value}")
+        try:
+            # Generate a dynamic request ID for the mode switch.
+            request_id = str(uuid.uuid4()).replace("-", "")
+            response = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "requestId": request_id,
+                "useWaterType": current_mode,
+                "useWaterInterval": current_interval,
+                "useWaterDuration": value
+            })
+            _LOGGER.debug(f"Water dispensing duration set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set water dispensing duration for device {serial}: {e}")
+            raise
+
     async def set_lid_mode(self, serial: str, value: str):
         """Set the lid mode."""
         _LOGGER.debug(f"Setting lid mode: serial={serial}, value={value}")
@@ -525,6 +563,24 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set lid mode for device {serial}: {e}")
             raise
 
+    async def set_water_dispensing_mode(self, serial: str, value: int):
+        """Set the water dispensing mode."""
+        _LOGGER.debug(f"Setting water dispensing mode: serial={serial}, value={value}")
+        try:
+            # Generate a dynamic request ID for the mode switch.
+            request_id = str(uuid.uuid4()).replace("-", "")
+            response = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "requestId": request_id,
+                "useWaterType": value,
+                "useWaterInterval": None,
+                "useWaterDuration": None
+            })
+            _LOGGER.debug(f"Water dispensing mode set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set water dispensing mode for device {serial}: {e}")
+            raise
 
     async def set_display_icon(self, serial: str, value: float):
         """Set the display icon."""

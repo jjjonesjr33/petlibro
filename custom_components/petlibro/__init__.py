@@ -72,12 +72,16 @@ PLATFORMS_BY_TYPE = {
         Platform.BINARY_SENSOR,
         Platform.SWITCH,
         Platform.BUTTON,
+        Platform.NUMBER,
+        Platform.SELECT,
     ),
     DockstreamSmartRFIDFountain: (
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
         Platform.SWITCH,
         Platform.BUTTON,
+        Platform.NUMBER,
+        Platform.SELECT,
     ),
 }
 

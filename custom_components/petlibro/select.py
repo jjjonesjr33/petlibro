@@ -99,6 +99,10 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
                 "Dog": 6,
                 "Cat": 7,
                 "Elk": 8,
+            },
+            "water_dispensing_mode": {
+                "Flowing Water (Constant)": 0,
+                "Intermittent Water (Scheduled)": 1,
             }
         }
         return mappings.get(key, {}).get(current_selection, "unknown")
@@ -134,6 +138,28 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             options_list=['Heart','Dog','Cat','Elk'],
             name="Icon to Display"
         )
+    ],
+    DockstreamSmartRFIDFountain: [
+        PetLibroSelectEntityDescription[DockstreamSmartRFIDFountain](
+            key="water_dispensing_mode",
+            translation_key="water_dispensing_mode",
+            icon="mdi:arrow-oscillating",
+            current_selection=lambda device: device.water_dispensing_mode,
+            method=lambda device, current_selection: device.set_water_dispensing_mode(PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)),
+            options_list=['Flowing Water (Constant)','Intermittent Water (Scheduled)'],
+            name="Water Dispensing Mode"
+        ), 
+    ],
+    DockstreamSmartFountain: [
+        PetLibroSelectEntityDescription[DockstreamSmartFountain](
+            key="water_dispensing_mode",
+            translation_key="water_dispensing_mode",
+            icon="mdi:arrow-oscillating",
+            current_selection=lambda device: device.water_dispensing_mode,
+            method=lambda device, current_selection: device.set_water_dispensing_mode(PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)),
+            options_list=['Flowing Water (Constant)','Intermittent Water (Scheduled)'],
+            name="Water Dispensing Mode"
+        ), 
     ]
 }
 
