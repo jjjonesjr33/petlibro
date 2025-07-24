@@ -66,7 +66,7 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
             return None
         _LOGGER.debug(f"Retrieved value for '{self.entity_description.key}', {self.device.name}: {state}")
         return float(state)
-    
+
     async def async_set_native_value(self, value: float) -> None:
         """Set the value of the number."""
         _LOGGER.debug(f"Setting value {value} for {self.device.name}")
@@ -105,7 +105,20 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             value = lambda device: device.manual_feed_quantity,
             method = lambda device, value: device.set_manual_feed_quantity(value),
             name = "Manual Feed Quantity"
-        ), 
+        ),
+        PetLibroNumberEntityDescription[GranarySmartFeeder](
+            key="desiccant_frequency",
+            translation_key="desiccant_frequency",
+            icon="mdi:calendar-alert",
+            native_unit_of_measurement="Days",
+            mode="box",
+            native_max_value=60,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.desiccant_frequency,
+            method=lambda device, value: device.set_desiccant_frequency(value),
+            name="Desiccant Frequency"
+        ),
     ],
     GranarySmartCameraFeeder: [
         PetLibroNumberEntityDescription[GranarySmartCameraFeeder](

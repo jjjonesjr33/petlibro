@@ -84,6 +84,12 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
+        ),
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
+            key="desiccant_reset",
+            translation_key="desiccant_reset",
+            set_fn=lambda device: device.set_desiccant_reset(),
+            name="Desiccant Replaced"
         )
     ],
     GranarySmartCameraFeeder: [
@@ -277,7 +283,3 @@ async def async_setup_entry(
 
         # Add button entities to Home Assistant
         async_add_entities(entities)
-
-
-
-
