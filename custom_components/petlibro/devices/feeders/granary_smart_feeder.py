@@ -309,13 +309,13 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
 
     async def set_desiccant_frequency(self, value: float) -> None:
-                _LOGGER.debug(f"Setting desiccant frequency to {value} for {self.serial}")
-                try:
-                    await self.api.set_desiccant_frequency(self.serial, value)
-                    await self.refresh()  # Refresh the state after the action
-                except aiohttp.ClientError as err:
-                    _LOGGER.error(f"Failed to set desiccant frequency for {self.serial}: {err}")
-                    raise PetLibroAPIError(f"Error setting desiccantfrequency: {err}")
+        _LOGGER.debug(f"Setting desiccant frequency to {value} for {self.serial}")
+        try:
+            await self.api.set_desiccant_frequency(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set desiccant frequency for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting desiccantfrequency: {err}")
 
     async def set_desiccant_reset(self) -> None:
         _LOGGER.debug(f"Triggering desiccant reset for {self.serial}")
