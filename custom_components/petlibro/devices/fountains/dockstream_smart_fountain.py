@@ -71,14 +71,22 @@ class DockstreamSmartFountain(Device):
         return self._data.get("realInfo", {}).get("weightPercent", 0)
     
     @property
-    def remaining_filter_days(self) -> int:
-        """Get the number of days remaining for the filter replacement."""
-        return self._data.get("realInfo", {}).get("remainingReplacementDays", 0)
+    def remaining_filter_days(self) -> float | None:
+        """Get the remaining desiccant days."""
+        value = self._data.get("realInfo", {}).get("remainingReplacementDays", 0)
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
     
     @property
-    def remaining_cleaning_days(self) -> int:
-        """Get the number of days remaining for machine cleaning."""
-        return self._data.get("realInfo", {}).get("remainingCleaningDays", 0)
+    def remaining_cleaning_days(self) -> float | None:
+        """Get the remaining desiccant days."""
+        value = self._data.get("realInfo", {}).get("remainingCleaningDays", 0)
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
     
     @property
     def vacuum_state(self) -> bool:

@@ -170,9 +170,13 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
 
     @property
-    def remaining_desiccant(self) -> float:
+    def remaining_desiccant(self) -> float | None:
         """Get the remaining desiccant days."""
-        return cast(float, self._data.get("remainingDesiccantDays", 0))
+        value = self._data.get("remainingDesiccantDays")
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
 
     @property
     def last_feed_time(self) -> str | None:
