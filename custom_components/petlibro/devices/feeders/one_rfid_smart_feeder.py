@@ -197,9 +197,13 @@ class OneRFIDSmartFeeder(Device):
         return not self._data.get("realInfo", {}).get("childLockSwitch", False)
 
     @property
-    def remaining_desiccant(self) -> str:
+    def remaining_desiccant(self) -> float | None:
         """Get the remaining desiccant days."""
-        return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
+        value = self._data.get("remainingDesiccantDays")
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
     
     @property
     def desiccant_cycle(self) -> float:
@@ -216,7 +220,7 @@ class OneRFIDSmartFeeder(Device):
 
         if not raw or not isinstance(raw, list):
             return None
-
+        
         for day_entry in raw:
             work_records = day_entry.get("workRecords", [])
             for record in work_records:
@@ -227,7 +231,6 @@ class OneRFIDSmartFeeder(Device):
                         dt = datetime.fromtimestamp(timestamp_ms / 1000)
                         _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
                         return dt.strftime("%Y-%m-%d %H:%M:%S")
-
         return None
     
     @property
