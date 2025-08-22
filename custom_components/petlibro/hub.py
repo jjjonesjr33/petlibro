@@ -15,6 +15,7 @@ from .api import PetLibroAPI  # Use a relative import if inside the same package
 from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD  # Import CONF_EMAIL and CONF_PASSWORD
 from .api import PetLibroAPIError
 from .devices import Device, product_name_map
+from .member import Member
 
 _LOGGER = getLogger(__name__)
 
@@ -26,7 +27,8 @@ class PetLibroHub:
         self.hass = hass
         self._data = data
         self.devices: List[Device] = []  # Initialize devices as an instance variable
-        self.last_refresh_times = {}  # Track the last refresh time for each device
+        self.member: Member = None
+        self.last_refresh_times = {}  # Track the last refresh time for the member & each device
         self.loaded_device_sn = set()  # Track device serial numbers that have already been loaded
         self._last_online_status = {}  # Store online status per device
 
@@ -62,8 +64,8 @@ class PetLibroHub:
         self.coordinator = DataUpdateCoordinator(
             hass,
             _LOGGER,
-            name="petlibro_devices",
-            update_method=self.refresh_devices,  # Calls the refresh_devices method
+            name="petlibro_data",
+            update_method=self.refresh_data,  # Calls the refresh_data method
             update_interval=timedelta(seconds=UPDATE_INTERVAL_SECONDS),  # Use defined interval
         )
 
@@ -104,60 +106,125 @@ class PetLibroHub:
         except Exception as ex:
             _LOGGER.error(f"Error while loading devices: {ex}", exc_info=True)
 
-    async def refresh_devices(self) -> bool:
-        """Refresh all known devices from the PETLIBRO API."""
-        if not self.devices:
-            _LOGGER.warning("No devices to refresh.")
-            return False
+    async def load_member(self) -> None:
+        """Load Petlibro account from the API and initialize it."""
 
-        try:
-            now = datetime.utcnow()
-            _LOGGER.debug("Starting the refresh process for all devices.")
-
-            # Use a list to track refresh tasks and results for logging
-            refresh_tasks = []
-            for device in self.devices:
-                refresh_tasks.append(self._refresh_device_if_needed(device, now))
-
-            # Gather results, allowing for early returns on failures or no-op tasks
-            results = await asyncio.gather(*refresh_tasks, return_exceptions=True)
-
-            # Log the results of the device refresh attempts
-            for device, result in zip(self.devices, results):
-                if isinstance(result, Exception):
-                    _LOGGER.error(f"Error refreshing {device.name} (Serial: {device.serial}): {result}")
-                else:
-                    _LOGGER.debug(f"Successfully refreshed {device.name} (Serial: {device.serial}).")
-
-            _LOGGER.debug("Device refresh process completed.")
-            return True
-
-        except (PetLibroAPIError, ClientResponseError, ClientConnectorError) as ex:
-            _LOGGER.error(f"API-related error during device refresh: {ex}", exc_info=True)
-            raise UpdateFailed(f"Error updating PetLibro devices: {ex}")
-        except Exception as ex:
-            _LOGGER.error(f"Unexpected error during device refresh: {ex}", exc_info=True)
-            raise UpdateFailed(f"Unexpected error: {ex}")
-
-    async def _refresh_device_if_needed(self, device: Device, now: datetime) -> None:
-        """Refresh a device only if enough time has passed since the last refresh."""
-        device_sn = device.serial
-        last_refresh_time = self.last_refresh_times.get(device_sn)
-
-        # Log and skip refresh if the device has been recently refreshed
-        if last_refresh_time and (now - last_refresh_time) < timedelta(seconds=10):
-            _LOGGER.debug(f"Skipping refresh for {device_sn}, last refreshed at {last_refresh_time}.")
+        if self.member:
+            _LOGGER.warning("Member already loaded, skipping initialization.")
             return
 
         try:
-            # Attempt to refresh the device
-            _LOGGER.debug(f"Refreshing device {device_sn}.")
-            await device.refresh()
-            self.last_refresh_times[device_sn] = now  # Update last refresh time
-            _LOGGER.debug(f"Device refresh complete for serial: {device_sn}.")
+            member_info = await self.api.member_info()
+        except Exception:
+            _LOGGER.exception("Error fetching member info.")
+            return
 
-        except Exception as ex:
-            _LOGGER.error(f"Error refreshing {device_sn}: {ex}", exc_info=True)
+        if not member_info:
+            _LOGGER.error("API returned empty member info.")
+            return
+
+        member_email = member_info.get("email")
+        if not member_email:
+            _LOGGER.error("API returned member info without an email: %s", member_info)
+            return
+
+        # Create the member object.
+        self.member = Member(member_info, self.api)
+        self.last_refresh_times[member_email] = datetime.utcnow()
+        _LOGGER.debug("Member loaded successfully: %s", member_email)
+
+    async def refresh_data(self) -> bool:
+        """Refresh all known devices and member info from the PETLIBRO API."""
+
+        if not self.devices and not self.member:
+            _LOGGER.error("No devices or member to refresh.")
+            return False
+        if not self.devices:
+            _LOGGER.warning("No devices to refresh.")
+        if not self.member:
+            _LOGGER.warning("No member to refresh.")
+
+        now = datetime.utcnow()
+        refresh_tasks, data_objects = [], []
+        _LOGGER.debug("Refreshing devices and member info.")
+
+        # Add devices if available
+        if self.devices:
+            for device in self.devices:
+                refresh_tasks.append(self._refresh_data_if_needed(now, device=device))
+                data_objects.append(device)
+
+        # Add member if available
+        if self.member:
+            refresh_tasks.append(self._refresh_data_if_needed(now, member=self.member))
+            data_objects.append(self.member)
+
+        if not refresh_tasks:
+            _LOGGER.warning("Nothing to refresh.")
+            return False
+
+        results = await asyncio.gather(*refresh_tasks, return_exceptions=True)
+
+        failures = 0
+        for obj, result in zip(data_objects, results):  # noqa: B905
+            identifier = getattr(obj, "email", None) or getattr(obj, "serial", "unknown")
+            obj_type = "member" if isinstance(obj, Member) else "device"
+            if isinstance(result, Exception):
+                _LOGGER.error("Failed to refresh %s (%s): %s", obj_type, identifier, result)
+                failures += 1
+            else:
+                _LOGGER.debug("Refreshed %s successfully if needed: %s", obj_type, identifier)
+
+        if failures >= len(data_objects):
+            raise UpdateFailed("All refresh operations failed.")
+
+        if failures:
+            _LOGGER.warning("One or more refresh operations failed.")
+
+        _LOGGER.debug("Data refresh process finished.")
+        return True
+
+    async def _refresh_data_if_needed(
+        self,
+        now: datetime,
+        *,
+        device: Device | None = None,
+        member: Member | None = None,
+    ) -> None:
+        """Refresh a device or member info only if enough time has passed."""
+
+        is_member = member is not None
+        obj = member if is_member else device
+        obj_type_str = "member" if is_member else "device"
+        identifier = obj.email if is_member else obj.serial
+        last_refresh = self.last_refresh_times.get(identifier)
+
+        force_refresh = is_member and getattr(member, "force_refresh", False)
+        refresh_interval = timedelta(seconds=10)
+        if is_member and not force_refresh:
+            refresh_interval = timedelta(hours=6)
+
+        if last_refresh and (now - last_refresh) < refresh_interval:
+            if not force_refresh:
+                _LOGGER.debug(
+                    "Skipping refresh for %s (%s). Last refreshed: %s",
+                    obj_type_str,
+                    identifier,
+                    last_refresh,
+                )
+                return
+            _LOGGER.debug("Member was updated recently, waiting 5s..")
+            await asyncio.sleep(5)
+
+        try:
+            _LOGGER.debug("Refreshing %s: %s", obj_type_str, identifier)
+            await obj.refresh()
+            if is_member:
+                self.member.force_refresh = False
+            self.last_refresh_times[identifier] = now
+            _LOGGER.debug("Refresh complete for %s: %s", obj_type_str, identifier)
+        except Exception:
+            _LOGGER.exception("Error refreshing %s: %s", obj_type_str, identifier)
             raise
 
     async def get_device(self, serial: str) -> Optional[Device]:
@@ -167,9 +234,18 @@ class PetLibroHub:
             _LOGGER.debug(f"Device with serial {serial} not found.")
         return device
 
-    async def async_refresh(self) -> None:
-        """Force a manual refresh of devices."""
-        _LOGGER.debug("Manual refresh triggered for PetLibro devices.")
+    async def async_refresh(self, force_member: bool = False) -> None:
+        """Force a manual data refresh if enough time has passed.
+
+        Optionally force a Member refresh.
+        """
+        if force_member:
+            if self.member:
+                self.member.force_refresh = True
+            else:
+                _LOGGER.warning("Member not loaded, skipping forced member refresh.")
+
+        _LOGGER.debug("Manual data refresh triggered.")
         await self.coordinator.async_request_refresh()
 
     async def async_unload(self) -> bool:

@@ -212,7 +212,7 @@
             "sound_level": {
                 "name": "Geluidsniveau"
             },
-            "desiccant_frequency": {
+            "desiccant_cycle": {
                 "name": "Droogmiddelfrequentie"
             },
             "lid_close_time": {
