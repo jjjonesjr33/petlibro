@@ -58,7 +58,7 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
         PetLibroSwitchEntityDescription[PolarWetFoodFeeder](
             key="manual_feed_now",
             translation_key="manual_feed_now",
-            set_fn=lambda device, value: device.set_manual_feed_now(value),
+            set_fn=lambda device, value: device.set_manual_feed_now(value, device.plate_position),
             name="Manually Open/Close Lid"
         ),
     ],

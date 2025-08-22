@@ -63,14 +63,24 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
 
     @property
     def current_option(self) -> str | None:
-        """Return the current current_option."""
+        """Return the current option."""
+        # Prefer a custom callback if provided (lets us return 'Plate X')
+        if self.entity_description.current_selection is not None:
+            try:
+                state = self.entity_description.current_selection(self.device)
+                return None if state is None else str(state)
+            except Exception as e:
+                _LOGGER.error("current_selection callback failed for %s: %s", self.device.name, e)
+                return None
+
+        # Fallback to attribute lookup by key
         state = getattr(self.device, self.entity_description.key, None)
         if state is None:
-            _LOGGER.warning(f"Current option '{self.entity_description.key}' is None for device {self.device.name}")
+            _LOGGER.warning("Current option '%s' is None for device %s", self.entity_description.key, self.device.name)
             return None
-        _LOGGER.debug(f"Retrieved current option for '{self.entity_description.key}', {self.device.name}: {state}")
+        _LOGGER.debug("Retrieved current option for '%s', %s: %s", self.entity_description.key, self.device.name, state)
         return str(state)
-    
+
     async def async_select_option(self, current_selection: str) -> None:
         """Set the current_option of the select."""
         _LOGGER.debug(f"Setting current option {current_selection} for {self.device.name}")
@@ -103,6 +113,11 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
             "water_dispensing_mode": {
                 "Flowing Water (Constant)": 0,
                 "Intermittent Water (Scheduled)": 1,
+            },
+            "plate_position":{
+                "Plate 1": 1,
+                "Plate 2": 2,
+                "Plate 3": 3,
             }
         }
         return mappings.get(key, {}).get(current_selection, "unknown")
@@ -159,6 +174,17 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             method=lambda device, current_selection: device.set_water_dispensing_mode(PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)),
             options_list=['Flowing Water (Constant)','Intermittent Water (Scheduled)'],
             name="Water Dispensing Mode"
+        ),
+    ],
+    PolarWetFoodFeeder: [
+        PetLibroSelectEntityDescription[PolarWetFoodFeeder](
+            key="plate_position",
+            translation_key="plate_position",
+            icon="mdi:rotate-3d-variant",
+            current_selection=lambda d: f"Plate {d.plate_position}" if d.plate_position else None,
+            method=lambda d, opt: d.set_plate_position(int(opt.split()[-1])),
+            options_list=["Plate 1", "Plate 2", "Plate 3"],
+            name="Plate Position"
         ), 
     ]
 }

@@ -14,15 +14,26 @@ class DockstreamSmartFountain(Device):
 
     async def refresh(self):
         """Refresh the device data from the API."""
-        await super().refresh()  # Call the refresh method from the parent class (Device)
+        try:
+            await super().refresh()  # Call the refresh method from the parent class (Device)
         
-        # Fetch real info from the API
-        real_info = await self.api.device_real_info(self.serial)
+            # Fetch real info from the API
+            real_info = await self.api.device_real_info(self.serial)
+            attribute_settings = await self.api.device_attribute_settings(self.serial)
+            get_upgrade = await self.api.get_device_upgrade(self.serial)
+            get_work_record = await self.api.get_device_work_record(self.serial)
+            get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
 
-        # Update internal data with fetched API data
-        self.update_data({
-            "realInfo": real_info or {}
-        })
+            # Update internal data with fetched API data
+            self.update_data({
+                "realInfo": real_info or {},
+                "getAttributeSetting": attribute_settings or {},
+                "getUpgrade": get_upgrade or {},
+                "getfeedingplantoday": get_feeding_plan_today or {},
+                "workRecord": get_work_record if get_work_record is not None else []
+            })
+        except PetLibroAPIError as err:
+            _LOGGER.error(f"Error refreshing data for DockstreamSmartFountain: {err}")
 
     @property
     def available(self) -> bool:
@@ -71,14 +82,22 @@ class DockstreamSmartFountain(Device):
         return self._data.get("realInfo", {}).get("weightPercent", 0)
     
     @property
-    def remaining_filter_days(self) -> int:
-        """Get the number of days remaining for the filter replacement."""
-        return self._data.get("realInfo", {}).get("remainingReplacementDays", 0)
+    def remaining_filter_days(self) -> float | None:
+        """Get the remaining desiccant days."""
+        value = self._data.get("realInfo", {}).get("remainingReplacementDays", 0)
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
     
     @property
-    def remaining_cleaning_days(self) -> int:
-        """Get the number of days remaining for machine cleaning."""
-        return self._data.get("realInfo", {}).get("remainingCleaningDays", 0)
+    def remaining_cleaning_days(self) -> float | None:
+        """Get the remaining desiccant days."""
+        value = self._data.get("realInfo", {}).get("remainingCleaningDays", 0)
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
     
     @property
     def vacuum_state(self) -> bool:
@@ -118,6 +137,11 @@ class DockstreamSmartFountain(Device):
     async def set_sound_switch(self, value: bool):
         """Enable or disable the sound."""
         await self.api.set_sound_switch(self.serial, value)
+        await self.refresh()
+
+    async def set_manual_cleaning(self):
+        """Trigger manual cleaning action."""
+        await self.api.set_manual_cleaning(self.serial)
         await self.refresh()
 
     @property
@@ -262,3 +286,36 @@ class DockstreamSmartFountain(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to turn off the indicator for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error turning off the indicator: {err}")
+
+    @property
+    def update_available(self) -> bool:
+        """Return True if an update is available, False otherwise."""
+        return bool(self._data.get("getUpgrade", {}).get("jobItemId"))
+    
+    @property
+    def update_release_notes(self) -> str | None:
+        """Return release notes if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("upgradeDesc") if upgrade_data else None
+    
+    @property
+    def update_version(self) -> str | None:
+        """Return target version if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("targetVersion") if upgrade_data else None
+    
+    @property
+    def update_name(self) -> str | None:
+        """Return update job name if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("jobName") if upgrade_data else None
+    
+    @property
+    def update_progress(self) -> float:
+        """Return update progress as a float, or 0 if not updating."""
+        upgrade_data = self._data.get("getUpgrade")
+        if not upgrade_data:
+            return 0.0
+
+        progress = upgrade_data.get("progress")
+        return float(progress) if progress is not None else 0.0
