@@ -203,7 +203,7 @@
             "sound_level": {
                 "name": "Lautstärke"
             },
-            "desiccant_frequency": {
+            "desiccant_cycle": {
                 "name": "Trockenmittel Häufigkeit"
             },
             "lid_close_time": {

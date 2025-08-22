@@ -209,7 +209,7 @@
             "sound_level": {
                 "name": "खंड स्तर"
             },
-            "desiccant_frequency": {
+            "desiccant_cycle": {
                 "name": "डेसिकेंट आवृत्ति"
             },
             "lid_close_time": {

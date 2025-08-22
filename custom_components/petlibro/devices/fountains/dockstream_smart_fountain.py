@@ -189,6 +189,52 @@ class DockstreamSmartFountain(Device):
             raise PetLibroAPIError(f"Error setting water dispensing duration using {current_mode} & {current_interval}: {err}")
 
     @property
+    def cleaning_cycle(self) -> float:
+        return self._data.get("realInfo", {}).get("machineCleaningFrequency", 0)
+
+    async def set_cleaning_cycle(self, value: float) -> None:
+        _LOGGER.debug(f"Setting cleaning cycle to {value} for {self.serial}")
+        try:
+            key = "MACHINE_CLEANING"
+            await self.api.set_filter_cycle(self.serial, value, key)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set cleaning cycle using {key} for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting cleaning cycle using {key}: {err}")
+
+    @property
+    def filter_cycle(self) -> float:
+        return self._data.get("realInfo", {}).get("filterReplacementFrequency", 0)
+
+    async def set_filter_cycle(self, value: float) -> None:
+        _LOGGER.debug(f"Setting filter cycle to {value} for {self.serial}")
+        try:
+            key = "FILTER_ELEMENT"
+            await self.api.set_filter_cycle(self.serial, value, key)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set filter cycle using {key} for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting filter cycle using {key}: {err}")
+
+    async def set_cleaning_reset(self) -> None:
+        _LOGGER.debug(f"Triggering machine cleaning reset for {self.serial}")
+        try:
+            await self.api.set_cleaning_reset(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger machine cleaning reset for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering machine cleaning reset: {err}")
+
+    async def set_filter_reset(self) -> None:
+        _LOGGER.debug(f"Triggering filter reset for {self.serial}")
+        try:
+            await self.api.set_filter_reset(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger filter reset for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering filter reset: {err}")
+
+    @property
     def today_total_ml(self) -> int:
         """Get the total milliliters of water used today."""
         return self._data.get("realInfo", {}).get("todayTotalMl", 0)

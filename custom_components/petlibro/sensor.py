@@ -16,6 +16,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
 from .hub import PetLibroHub  # Adjust the import path as necessary
+from .member import MemberEntity
 
 _LOGGER = getLogger(__name__)
 
@@ -933,34 +934,51 @@ async def async_setup_entry(
         _LOGGER.error("Hub not found for entry: %s", entry.entry_id)
         return
 
+    # Ensure that the member is loaded
+    if not (member := hub.member):
+        _LOGGER.warning("No member found in hub during sensor setup.")
+
     # Ensure that the devices are loaded
-    if not hub.devices:
+    if not (devices := hub.devices):
         _LOGGER.warning("No devices found in hub during sensor setup.")
+
+    if not (devices or member):
         return
 
-    # Log the contents of the hub data for debugging
-    _LOGGER.debug("Hub data: %s", hub)
+    entities = []
 
-    devices = hub.devices  # Devices should already be loaded in the hub
-    _LOGGER.debug("Devices in hub: %s", devices)
+    if devices:
+        # Log the contents of the hub data for debugging
+        _LOGGER.debug("Hub data: %s", hub)
 
-    # Create sensor entities for each device based on the sensor map
-    entities = [
-        PetLibroSensorEntity(device, hub, description)
-        for device in devices  # Iterate through devices from the hub
-        for device_type, entity_descriptions in DEVICE_SENSOR_MAP.items()
-        if isinstance(device, device_type)
-        for description in entity_descriptions
-    ]
+        # Devices should already be loaded in the hub
+        _LOGGER.debug("Devices in hub: %s", devices)
+
+        # Create sensor entities for each device based on the sensor map
+        entities.extend(
+            [
+                PetLibroSensorEntity(device, hub, description)
+                for device in devices  # Iterate through devices from the hub
+                for device_type, entity_descriptions in DEVICE_SENSOR_MAP.items()
+                if isinstance(device, device_type)
+                for description in entity_descriptions
+            ]
+        )
 
     if not entities:
-        _LOGGER.warning("No sensors added, entities list is empty!")
+        _LOGGER.warning("No device sensors added, entities list is empty!")
     else:
         # Log the number of entities and their details
         _LOGGER.debug("Adding %d PetLibro sensors", len(entities))
         for entity in entities:
             _LOGGER.debug("Adding sensor entity: %s for device %s", entity.entity_description.name, entity.device.name)
 
+    # Create Member sensor entity for front-end use.
+    if member:
+        entities.append(MemberEntity(member))
+        _LOGGER.debug("Adding sensor entity for Petlibro member: %s", member.email)
+
+    if entities:
         # Add sensor entities to Home Assistant
         async_add_entities(entities)
 

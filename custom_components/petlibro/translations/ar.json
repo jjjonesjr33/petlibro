@@ -209,7 +209,7 @@
             "sound_level": {
                 "name": "مستوى الحجم"
             },
-            "desiccant_frequency": {
+            "desiccant_cycle": {
                 "name": "تردد الجفاف"
             },
             "lid_close_time": {
