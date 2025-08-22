@@ -2,6 +2,7 @@ import aiohttp
 
 from ...api import make_api_call
 from aiohttp import ClientSession, ClientError
+import asyncio
 from datetime import datetime
 from ...exceptions import PetLibroAPIError
 from ..device import Device
@@ -19,6 +20,8 @@ class PolarWetFoodFeeder(Device):
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
+            attribute_settings = await self.api.device_attribute_settings(self.serial)
+            get_upgrade = await self.api.get_device_upgrade(self.serial)
             wet_feeding_plan = await self.api.device_wet_feeding_plan(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
     
@@ -26,6 +29,8 @@ class PolarWetFoodFeeder(Device):
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
+                "getAttributeSetting": attribute_settings or {},
+                "getUpgrade": get_upgrade or {},
                 "wetFeedingPlan": wet_feeding_plan or {},
                 "getfeedingplantoday": get_feeding_plan_today or {}
             })
@@ -149,7 +154,7 @@ class PolarWetFoodFeeder(Device):
 
     @property
     def whether_in_sleep_mode(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("whetherInSleepMode", False))
+        return bool(self._data.get("getAttributeSetting", {}).get("enableSleepMode", False))
 
     @property
     def enable_low_battery_notice(self) -> bool:
@@ -167,19 +172,48 @@ class PolarWetFoodFeeder(Device):
     def feeding_plan_today_data(self) -> str:
         return self._data.get("getfeedingplantoday", {})
 
-    async def set_manual_feed_now(self, start: bool) -> None:
+    async def set_manual_feed_now(self, start: bool, plate: int) -> None:
+        plate = plate if plate is not None else self.plate_position
         try:
             if start:
-                _LOGGER.debug(f"Triggering manual feed now for {self.serial}")
-                await self.api.set_manual_feed_now(self.serial)
+                _LOGGER.debug(f"Triggering manual feed now for {self.serial} with plate no.{plate}")
+                await self.api.set_manual_feed_now(self.serial, plate)
             else:
                 _LOGGER.debug(f"Triggering stop feed now for {self.serial}")
                 await self.api.set_stop_feed_now(self.serial, self.manual_feed_id)
             
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to trigger manual feed now for {self.serial}: {err}")
+            _LOGGER.error(f"Failed to trigger manual feed now for {self.serial} with plate no.{plate}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feed now: {err}")
+    
+    async def set_plate_position(self, value: str | int) -> None:
+        """Rotate bowl to requested plate (1-3)"""
+        try:
+            target = int(value)
+        except (TypeError, ValueError):
+            raise PetLibroAPIError(f"Invalid plate value: {value!r}")
+        if target not in (1, 2, 3):
+            # Raise an error if plate count somehow became less than 1 or more than 3.
+            raise PetLibroAPIError(f"Plate must be 1, 2, or 3, got {target}")
+
+        # Ensure we know current position
+        if not self.plate_position:
+            await self.refresh()
+        curr = self.plate_position or 1
+
+        steps = (target - curr) % 3
+        _LOGGER.debug("Rotate-to-plate: curr=%s target=%s steps=%s for %s", curr, target, steps, self.serial)
+
+        # didnt test other cooldowns, may be able reduce.
+        ROTATE_COOLDOWN = 0.6
+        for _ in range(steps):
+            await self.api.set_rotate_food_bowl(self.serial)
+            await asyncio.sleep(ROTATE_COOLDOWN)
+            await self.refresh()
+
+        # Final refresh so sensor/current_option show the target
+        await self.refresh()
 
     async def rotate_food_bowl(self) -> None:
         _LOGGER.debug(f"Triggering rotate food bowl for {self.serial}")
@@ -242,3 +276,61 @@ class PolarWetFoodFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger reposition the schedule for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering reposition schedule: {err}")
+
+    @property
+    def light_switch(self) -> bool:
+        """Check if the light is enabled."""
+        return bool(self._data.get("realInfo", {}).get("lightSwitch", False))
+
+    # Method for indicator turn on
+    async def set_light_on(self) -> None:
+        _LOGGER.debug(f"Turning on the indicator for {self.serial}")
+        try:
+            await self.api.set_light_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the indicator for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the indicator: {err}")
+
+    # Method for indicator turn off
+    async def set_light_off(self) -> None:
+        _LOGGER.debug(f"Turning off the indicator for {self.serial}")
+        try:
+            await self.api.set_light_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the indicator for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the indicator: {err}")
+
+    @property
+    def update_available(self) -> bool:
+        """Return True if an update is available, False otherwise."""
+        return bool(self._data.get("getUpgrade", {}).get("jobItemId"))
+    
+    @property
+    def update_release_notes(self) -> str | None:
+        """Return release notes if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("upgradeDesc") if upgrade_data else None
+    
+    @property
+    def update_version(self) -> str | None:
+        """Return target version if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("targetVersion") if upgrade_data else None
+    
+    @property
+    def update_name(self) -> str | None:
+        """Return update job name if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("jobName") if upgrade_data else None
+    
+    @property
+    def update_progress(self) -> float:
+        """Return update progress as a float, or 0 if not updating."""
+        upgrade_data = self._data.get("getUpgrade")
+        if not upgrade_data:
+            return 0.0
+
+        progress = upgrade_data.get("progress")
+        return float(progress) if progress is not None else 0.0

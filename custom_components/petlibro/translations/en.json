@@ -126,6 +126,9 @@
             "last_feed_time": {
                 "name": "Last Feed Time"
             },
+            "last_feed_quantity": {
+                "name": "Last Feed Quantity"
+            },
             "feeding_plan_state": {
                 "name": "Today's Feeding Plan"
             },
@@ -181,10 +184,31 @@
                 "name": "Temperature"
             },
             "plate_position": {
-                "name": "Plate position"
+                "name": "Plate Position"
             },
             "display_selection": {
                 "name": "Display Value"
+            },
+            "vacuum_mode": {
+                "name": "Vacuum Mode"
+            },
+            "battery_charge_state": {
+                "name": "Battery Status"
+            },
+            "today_drinking_time": {
+                "name": "Today's Total Drinking Time"
+            },
+            "today_drinking_count": {
+                "name": "Today's Total Drinking Times"
+            },
+            "yesterday_drinking_count": {
+                "name": "Yesterday's Total Drinking Times"
+            },
+            "today_avg_time": {
+                "name": "Today's Average Drinking Time"
+            },
+            "yesterday_total_ml": {
+                "name": "Yesterday's Water Consumption (mL)"
             }
         },
         "switch": {
@@ -229,6 +253,12 @@
             "sound_off": {
                 "name": "Turn Off Sound"
             },
+            "sleep_on": {
+                "name": "Turn On Sleep Mode"
+            },
+            "sleep_off": {
+                "name": "Turn Off Sleep Mode"
+            },
             "desiccant_reset": {
                 "name": "Desiccant Reset"
             },
@@ -241,6 +271,12 @@
             },
             "reposition_schedule": {
                 "name": "Reposition Schedule"
+            },
+            "light_on": {
+                "name": "Turn On Indicator"
+            },
+            "light_off": {
+                "name": "Turn Off Indicator"
             },
             "cleaning_reset": {
                 "name": "Cleaning Reset"
@@ -255,6 +291,12 @@
             },
             "food_dispenser_state": {
                 "name": "Food Dispenser"
+            },
+            "food_outlet_state": {
+                "name": "Food Outlet"
+            },
+            "vacuum_state": {
+                "name": "Vacuum State"
             },
             "door_blocked": {
                 "name": "Lid Status"
@@ -279,6 +321,12 @@
             },
             "display_switch": {
                 "name": "Display Status"
+            },
+            "light_switch": {
+                "name": "Indicator"
+            },
+            "power_state": {
+                "name": "Power State"
             }
         },
         "number": {
@@ -294,11 +342,17 @@
             "water_interval": {
                 "name": "Water Interval"
             },
+            "water_low_threshold": {
+                "name": "Water Low Threshold"
+            },
+            "water_sensing_delay": {
+                "name": "Water Sensing Delay"
+            },
             "water_dispensing_duration": {
                 "name": "Water Dispensing Duration"
             },
             "cleaning_cycle": {
-                "name": "Cleanining Cycle"
+                "name": "Cleaning Cycle"
             },
             "filter_cycle": {
                 "name": "Filter Cycle"
@@ -316,11 +370,19 @@
             },
             "water_dispensing_mode": {
                 "name": "Water Dispensing Mode"
+            },
+            "plate_position": {
+                "name": "Plate Position"
             }
         },
         "text": {
             "display_text": {
                 "name": "Text on Display"
+            }
+        },
+        "update": {
+            "firmware": {
+                "name": "Update"
             }
         }
     }

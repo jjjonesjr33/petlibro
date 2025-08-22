@@ -23,6 +23,7 @@
 ### Fountains
 * Dockstream Smart Fountain (PLWF105)
 * Dockstream RFID Smart Fountain (PLWF305)
+* Dockstream 2 Smart Cordless Fountain (PLWF116)
 
 ### Some Devices / May or may not work as intended
 
@@ -39,10 +40,9 @@
 # In Development
 #### This is still a WIP integration, features may or may not be removed at any time. If you have suggestions please let me know.
 > [!NOTE]
-  >* Buttons to reset Cleaning/Filter/Desiccant - (PLAF103), (PLAF203), (PLAF301), (PLWF105), (PLWF305)
   >* Switches to be added - Child Lock/Button Lock, Screen/Display, and Volume - (PLAF103), (PLAF203), (PLAF301)
-  >* Tracking RFID per pet intance eat/drink - Both (PLAF301) & (PLWF305) - Currently missing the API to setup tracking.
-  >* Live camera feed for Granary Smart Camera Feeder (PLAF203) - Currently missing the API to setup live stream.
+  >* Tracking RFID per pet intance eat/drink - (PLWF305) - API Information gathered, working on implementation.
+  >* Live camera feed for Granary Smart Camera Feeder (PLAF203) - Currently missing the API to setup live stream. Seems to connect via Kalay TUTK, if you have any experience integrating with this platform, please reach out to help us implement this.
 
 # NOTICE
 #### Alpha/Beta state notice for this plugin:
@@ -76,9 +76,9 @@ Get the folder `custom_components/petlibro` in your HA `config/custom_components
 
 - Enter your credentials.
 
-  > Only one device can be login at the same time.
+  > Only one device can be logged in at the same time.
   >
-  > If you to wan to keep your phone connected, create another account for this integration and share your device to it.
+  > If you to want to keep your phone's app connected, create another account for this integration and share your device to it.
 
 ## Star History
 

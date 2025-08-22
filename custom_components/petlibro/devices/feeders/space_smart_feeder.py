@@ -23,12 +23,19 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
+            attribute_settings = await self.api.device_attribute_settings(self.serial)
+            get_upgrade = await self.api.get_device_upgrade(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
+            get_device_events = await self.api.device_events(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
+                "getAttributeSetting": attribute_settings or {},
+                "getfeedingplantoday": get_feeding_plan_today or {},
+                "getDeviceEvents": get_device_events or {},
+                "getUpgrade": get_upgrade or {},
                 "getfeedingplantoday": get_feeding_plan_today or {}
             })
         except PetLibroAPIError as err:
@@ -61,10 +68,6 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         return cast(str, self._data.get("realInfo", {}).get("batteryState", "unknown"))
 
     @property
-    def food_dispenser_state(self) -> bool:
-        return not bool(self._data.get("realInfo", {}).get("grainOutletState", True))
-
-    @property
     def food_low(self) -> bool:
         return not bool(self._data.get("realInfo", {}).get("surplusGrain", True))
 
@@ -93,7 +96,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
 
     @property
     def whether_in_sleep_mode(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("whetherInSleepMode", False))
+        return bool(self._data.get("getAttributeSetting", {}).get("enableSleepMode", False))
 
     @property
     def enable_low_battery_notice(self) -> bool:
@@ -140,6 +143,11 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         return self._data.get("realInfo", {}).get("enableLight", False)
 
     @property
+    def light_switch(self) -> bool:
+        """Check if the light is enabled."""
+        return bool(self._data.get("realInfo", {}).get("lightSwitch", False))
+
+    @property
     def vacuum_state(self) -> bool:
         return self._data.get("realInfo", {}).get("vacuumState", False)
 
@@ -168,10 +176,33 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
 
     @property
-    def remaining_desiccant(self) -> str:
+    def remaining_desiccant(self) -> float | None:
         """Get the remaining desiccant days."""
-        return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
-    
+        value = self._data.get("remainingDesiccantDays")
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
+
+    @property
+    def sound_switch(self) -> bool:
+        return self._data.get("realInfo", {}).get("soundSwitch", False)
+
+    @property
+    def vacuum_state(self) -> bool:
+        events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
+        return any(event.get("eventKey") == "VACUUM_FAILED" for event in events)
+
+    @property
+    def food_dispenser_state(self) -> bool:
+        events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
+        return any(event.get("eventKey") == "GRAIN_OUTLET_BLOCKED_OVERTIME" for event in events)
+ 
+    @property
+    def food_outlet_state(self) -> bool:
+        events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
+        return any(event.get("eventKey") == "FOOD_OUTLET_DOOR_FAILED_CLOSE" for event in events)
+      
     @property
     def last_feed_time(self) -> datetime | None:
         """Return the recordTime of the last successful grain output as a datetime object (UTC)."""
@@ -180,7 +211,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
 
         if not raw or not isinstance(raw, list):
             return None
-
+        
         for day_entry in raw:
             work_records = day_entry.get("workRecords", [])
             for record in work_records:
@@ -192,6 +223,20 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
                         _LOGGER.debug("Returning datetime object: %s", dt.isoformat())
                         return dt
         return None
+
+    @property
+    def last_feed_quantity(self) -> int | None:
+        """Return the last feed amount in raw grain count."""
+        raw = self._data.get("workRecord", [])
+        if not raw or not isinstance(raw, list):
+            return 0
+
+        for day_entry in raw:
+            for record in day_entry.get("workRecords", []):
+                _LOGGER.debug("Evaluating record type: %s", record.get("type"))
+                if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
+                    return record.get("actualGrainNum") or 0
+        return 0
 
     @property
     def feeding_plan_today_data(self) -> str:
@@ -296,3 +341,132 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
+
+    @property
+    def vacuum_mode(self) -> str:
+        api_value =  self._data.get("realInfo", {}).get("vacuumMode", "NORMAL")
+
+        # Direct mapping inside the property
+        if api_value == "LEARNING":
+            return "Study"
+        elif api_value == "NORMAL":
+            return "Normal"
+        elif api_value == "MANUAL":
+            return "Manual"
+        else:
+            return "Unknown"
+
+    async def set_vacuum_mode(self, value: str) -> None:
+        _LOGGER.debug(f"Setting vacuum mode to {value} for {self.serial}")
+        try:
+            await self.api.set_vacuum_mode(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set vacuum mode for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting vacuum mode: {err}")
+
+    # Method for sound turn on
+    async def set_sound_on(self) -> None:
+        _LOGGER.debug(f"Turning on the sound for {self.serial}")
+        try:
+            await self.api.set_sound_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the sound for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the sound: {err}")
+
+    # Method for sound turn off
+    async def set_sound_off(self) -> None:
+        _LOGGER.debug(f"Turning off the sound for {self.serial}")
+        try:
+            await self.api.set_sound_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the sound for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the sound: {err}")
+
+    @property
+    def sound_level(self) -> float:
+        return self._data.get("getAttributeSetting", {}).get("volume", 0)
+
+    async def set_sound_level(self, value: float) -> None:
+        _LOGGER.debug(f"Setting sound level to {value} for {self.serial}")
+        try:
+            await self.api.set_sound_level(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set sound level for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting sound level: {err}")
+
+    # Method for indicator turn on
+    async def set_light_on(self) -> None:
+        _LOGGER.debug(f"Turning on the indicator for {self.serial}")
+        try:
+            await self.api.set_light_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the indicator for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the indicator: {err}")
+
+    # Method for indicator turn off
+    async def set_light_off(self) -> None:
+        _LOGGER.debug(f"Turning off the indicator for {self.serial}")
+        try:
+            await self.api.set_light_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the indicator for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the indicator: {err}")
+
+    # Method for light turn on
+    async def set_sleep_on(self) -> None:
+        _LOGGER.debug(f"Turning on sleep mode for {self.serial}")
+        try:
+            await self.api.set_sleep_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on sleep mode for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on sleep mode: {err}")
+
+    # Method for light turn off
+    async def set_sleep_off(self) -> None:
+        _LOGGER.debug(f"Turning off sleep mode for {self.serial}")
+        try:
+            await self.api.set_sleep_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off sleep mode for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off sleep mode: {err}")
+
+    @property
+    def update_available(self) -> bool:
+        """Return True if an update is available, False otherwise."""
+        return bool(self._data.get("getUpgrade", {}).get("jobItemId"))
+    
+    @property
+    def update_release_notes(self) -> str | None:
+        """Return release notes if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("upgradeDesc") if upgrade_data else None
+    
+    @property
+    def update_version(self) -> str | None:
+        """Return target version if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("targetVersion") if upgrade_data else None
+    
+    @property
+    def update_name(self) -> str | None:
+        """Return update job name if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("jobName") if upgrade_data else None
+    
+    @property
+    def update_progress(self) -> float:
+        """Return update progress as a float, or 0 if not updating."""
+        upgrade_data = self._data.get("getUpgrade")
+        if not upgrade_data:
+            return 0.0
+
+        progress = upgrade_data.get("progress")
+        return float(progress) if progress is not None else 0.0

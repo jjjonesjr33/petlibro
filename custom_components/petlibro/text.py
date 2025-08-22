@@ -32,8 +32,10 @@ from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
+from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
+from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
 @dataclass(frozen=True)
@@ -71,6 +73,14 @@ class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
 DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
     Feeder: [
     ],
+    AirSmartFeeder: [
+    ],
+    GranarySmartFeeder: [
+    ],
+    GranarySmartCameraFeeder: [
+    ],
+    PolarWetFoodFeeder: [
+    ],
     OneRFIDSmartFeeder: [
         PetLibroTextEntityDescription[OneRFIDSmartFeeder](
             key="display_text",
@@ -82,7 +92,15 @@ DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
             pattern=r"^(?!\s*$)[a-zA-Z0-9 ]{1,20}$",
             name="Text on Display"
         )
-    ]
+    ],
+    SpaceSmartFeeder: [
+    ],
+    DockstreamSmartFountain: [
+    ],
+    DockstreamSmartRFIDFountain: [
+    ],
+    Dockstream2SmartCordlessFountain: [
+    ],
 }
 
 async def async_setup_entry(

@@ -36,6 +36,7 @@ from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
+from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
 @dataclass(frozen=True)
@@ -197,6 +198,18 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             method = lambda device, value: device.set_manual_feed_quantity(value),
             name = "Manual Feed Quantity"
         ),
+        PetLibroNumberEntityDescription[SpaceSmartFeeder](
+            key="sound_level",
+            translation_key="sound_level",
+            icon="mdi:volume-high",
+            native_unit_of_measurement="%",
+            native_max_value=100,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.sound_level,
+            method=lambda device, value: device.set_sound_level(value),
+            name="Sound Level"
+        ),
     ],
     DockstreamSmartFountain: [
         PetLibroNumberEntityDescription[DockstreamSmartFountain](
@@ -234,7 +247,7 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             native_step=1,
             value=lambda device: device.cleaning_cycle,
             method=lambda device, value: device.set_cleaning_cycle(value),
-            name="Machine Cleaning Cycle"
+            name="Cleaning Cycle"
         ),
         PetLibroNumberEntityDescription[DockstreamSmartFountain](
             key="filter_cycle",
@@ -286,9 +299,63 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             native_step=1,
             value=lambda device: device.cleaning_cycle,
             method=lambda device, value: device.set_cleaning_cycle(value),
-            name="Machine Cleaning Cycle"
+            name="Cleaning Cycle"
         ),
         PetLibroNumberEntityDescription[DockstreamSmartRFIDFountain](
+            key="filter_cycle",
+            translation_key="filter_cycle",
+            icon="mdi:calendar-alert",
+            native_unit_of_measurement="Days",
+            mode="box",
+            native_max_value=60,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.filter_cycle,
+            method=lambda device, value: device.set_filter_cycle(value),
+            name="Filter Cycle"
+        ),
+    ],
+    Dockstream2SmartCordlessFountain: [
+        PetLibroNumberEntityDescription[Dockstream2SmartCordlessFountain](
+            key="water_sensing_delay",
+            translation_key="water_sensing_delay",
+            icon="mdi:timer",
+            mode="slider",
+            native_unit_of_measurement="s",
+            native_max_value=180,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.water_sensing_delay,
+            method=lambda device, value: device.set_water_sensing_delay(value),
+            name="Water Sensing Delay"
+        ),
+        PetLibroNumberEntityDescription[Dockstream2SmartCordlessFountain](
+            key="water_low_threshold",
+            translation_key="water_low_threshold",
+            icon="mdi:gauge",
+            mode="slider",
+            native_unit_of_measurement="mL",
+            native_max_value=3000,
+            native_min_value=650,
+            native_step=1,
+            value=lambda device: device.water_low_threshold,
+            method=lambda device, value: device.set_water_low_threshold(value),
+            name="Water Low Threshold"
+        ),
+        PetLibroNumberEntityDescription[Dockstream2SmartCordlessFountain](
+            key="cleaning_cycle",
+            translation_key="cleaning_cycle",
+            icon="mdi:calendar-alert",
+            native_unit_of_measurement="Days",
+            mode="box",
+            native_max_value=60,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.cleaning_cycle,
+            method=lambda device, value: device.set_cleaning_cycle(value),
+            name="Cleaning Cycle"
+        ),
+        PetLibroNumberEntityDescription[Dockstream2SmartCordlessFountain](
             key="filter_cycle",
             translation_key="filter_cycle",
             icon="mdi:calendar-alert",

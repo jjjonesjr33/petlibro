@@ -17,6 +17,7 @@ from homeassistant.components.select import (
     SelectEntityDescription,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.core import callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
 from .hub import PetLibroHub  # Adjust the import path as necessary
@@ -32,8 +33,10 @@ from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
+from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
+from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
 @dataclass(frozen=True)
@@ -63,20 +66,37 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
 
     @property
     def current_option(self) -> str | None:
-        """Return the current current_option."""
+        # If we've set a current option explicitly and it's valid, prefer it
+        if hasattr(self, "_attr_current_option") and self._attr_current_option in self.options:
+            return self._attr_current_option
+
+        if self.entity_description.current_selection is not None:
+            try:
+                state = self.entity_description.current_selection(self.device)
+                # Only expose labels HA knows about
+                return state if state in self.options else None
+            except Exception as e:
+                _LOGGER.error("current_selection callback failed for %s: %s", self.device.name, e)
+                return None
+
         state = getattr(self.device, self.entity_description.key, None)
         if state is None:
-            _LOGGER.warning(f"Current option '{self.entity_description.key}' is None for device {self.device.name}")
+            _LOGGER.warning("Current option '%s' is None for device %s", self.entity_description.key, self.device.name)
             return None
-        _LOGGER.debug(f"Retrieved current option for '{self.entity_description.key}', {self.device.name}: {state}")
-        return str(state)
-    
+        _LOGGER.debug("Retrieved current option for '%s', %s: %s", self.entity_description.key, self.device.name, state)
+        return state if state in self.options else None
+
     async def async_select_option(self, current_selection: str) -> None:
-        """Set the current_option of the select."""
         _LOGGER.debug(f"Setting current option {current_selection} for {self.device.name}")
         try:
             _LOGGER.debug(f"Calling method with current option={current_selection} for {self.device.name}")
             await self.entity_description.method(self.device, current_selection)
+
+            # Immediately reflect the user's choice if it's a valid option
+            if current_selection in self.options:
+                self._attr_current_option = current_selection
+                self.async_write_ha_state()
+
             _LOGGER.debug(f"Current option {current_selection} set successfully for {self.device.name}")
         except Exception as e:
             _LOGGER.error(f"Error setting current option {current_selection} for {self.device.name}: {e}")
@@ -103,12 +123,36 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
             "water_dispensing_mode": {
                 "Flowing Water (Constant)": 0,
                 "Intermittent Water (Scheduled)": 1,
+                "Sensor-Activated (Near)": 997,
+                "Sensor-Activated (Far)": 998,
+                "Off": 999
+            },
+            "vacuum_mode": {
+                "Study": "LEARNING",
+                "Normal": "NORMAL",
+                "Manual": "MANUAL"
+            },
+            "plate_position": {
+                "Plate 1": 1,
+                "Plate 2": 2,
+                "Plate 3": 3,
             }
         }
         return mappings.get(key, {}).get(current_selection, "unknown")
 
 DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
     Feeder: [
+    ],
+    SpaceSmartFeeder: [
+        PetLibroSelectEntityDescription[SpaceSmartFeeder](
+            key="vacuum_mode",
+            translation_key="vacuum_mode",
+            icon="mdi:air-purifier",
+            current_selection=lambda device: device.vacuum_mode,
+            method=lambda device, current_selection: device.set_vacuum_mode(PetLibroSelectEntity.map_value_to_api(key="vacuum_mode", current_selection=current_selection)),
+            options_list=['Study','Normal','Manual'],
+            name="Vacuum Mode"
+        ),
     ],
     OneRFIDSmartFeeder: [
         PetLibroSelectEntityDescription[OneRFIDSmartFeeder](
@@ -159,6 +203,28 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             method=lambda device, current_selection: device.set_water_dispensing_mode(PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)),
             options_list=['Flowing Water (Constant)','Intermittent Water (Scheduled)'],
             name="Water Dispensing Mode"
+        ),
+    ],
+    Dockstream2SmartCordlessFountain: [
+        PetLibroSelectEntityDescription[Dockstream2SmartCordlessFountain](
+            key="water_dispensing_mode",
+            translation_key="water_dispensing_mode",
+            icon="mdi:arrow-oscillating",
+            current_selection=lambda device: device.water_dispensing_mode,
+            method=lambda device, current_selection: device.set_water_dispensing_mode(PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)),
+            options_list=['Flowing Water (Constant)','Sensor-Activated (Near)','Sensor-Activated (Far)','Off'],
+            name="Water Dispensing Mode"
+        ),
+    ],
+    PolarWetFoodFeeder: [
+        PetLibroSelectEntityDescription[PolarWetFoodFeeder](
+            key="plate_position",
+            translation_key="plate_position",
+            icon="mdi:rotate-3d-variant",
+            current_selection=lambda d: f"Plate {d.plate_position}" if d.plate_position else None,
+            method=lambda d, opt: d.set_plate_position(int(opt.split()[-1])),
+            options_list=["Plate 1", "Plate 2", "Plate 3"],
+            name="Plate Position"
         ), 
     ]
 }

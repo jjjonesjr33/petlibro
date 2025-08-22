@@ -30,6 +30,7 @@ from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
+from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 
 @dataclass(frozen=True)
 class RequiredKeysMixin(Generic[_DeviceT]):
@@ -58,7 +59,7 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
         PetLibroSwitchEntityDescription[PolarWetFoodFeeder](
             key="manual_feed_now",
             translation_key="manual_feed_now",
-            set_fn=lambda device, value: device.set_manual_feed_now(value),
+            set_fn=lambda device, value: device.set_manual_feed_now(value, device.plate_position),
             name="Manually Open/Close Lid"
         ),
     ],
@@ -67,6 +68,8 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
     DockstreamSmartFountain: [
     ],
     DockstreamSmartRFIDFountain: [
+    ],
+    Dockstream2SmartCordlessFountain: [
     ],
 }
 
