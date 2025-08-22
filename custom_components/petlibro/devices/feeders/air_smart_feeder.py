@@ -23,6 +23,7 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
+            get_upgrade = await self.api.get_device_upgrade(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
     
@@ -30,6 +31,7 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
+                "getUpgrade": get_upgrade or {},
                 "getAttributeSetting": attribute_settings or {},
                 "getfeedingplantoday": get_feeding_plan_today or {}
             })
@@ -142,6 +144,11 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
         return self._data.get("realInfo", {}).get("enableLight", False)
 
     @property
+    def light_switch(self) -> bool:
+        """Check if the light is enabled."""
+        return bool(self._data.get("realInfo", {}).get("lightSwitch", False))
+
+    @property
     def vacuum_state(self) -> bool:
         return self._data.get("realInfo", {}).get("vacuumState", False)
 
@@ -169,10 +176,13 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
     def screen_display_switch(self) -> bool:
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
 
-    @property
-    def remaining_desiccant(self) -> float:
+    def remaining_desiccant(self) -> float | None:
         """Get the remaining desiccant days."""
-        return cast(float, self._data.get("remainingDesiccantDays", 0))
+        value = self._data.get("remainingDesiccantDays")
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
 
     @property
     def last_feed_time(self) -> str | None:
@@ -185,7 +195,7 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
 
         if not raw or not isinstance(raw, list):
             return None
-
+        
         for day_entry in raw:
             work_records = day_entry.get("workRecords", [])
             for record in work_records:
@@ -196,32 +206,6 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
                         dt = datetime.fromtimestamp(timestamp_ms / 1000)
                         _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
                         return dt.strftime("%Y-%m-%d %H:%M:%S")
-
-        return None
-
-    @property
-    def last_feed_time(self) -> str | None:
-        """Return the recordTime of the last successful grain output as a formatted string."""
-        _LOGGER.debug("last_feed_time called for device: %s", self.serial)
-        raw = self._data.get("workRecord", [])
-
-        # Log raw to help debug
-        _LOGGER.debug("Raw workRecord (from self._data): %s", raw)
-
-        if not raw or not isinstance(raw, list):
-            return None
-
-        for day_entry in raw:
-            work_records = day_entry.get("workRecords", [])
-            for record in work_records:
-                _LOGGER.debug("Evaluating record type: %s", record.get("type"))
-                if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
-                    timestamp_ms = record.get("recordTime", 0)
-                    if timestamp_ms:
-                        dt = datetime.fromtimestamp(timestamp_ms / 1000)
-                        _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
-                        return dt.strftime("%Y-%m-%d %H:%M:%S")
-
         return None
 
     @property
@@ -318,3 +302,54 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
             _LOGGER.error(f"Failed to trigger manual feed for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feed: {err}")
             
+    async def set_light_on(self) -> None:
+        _LOGGER.debug(f"Turning on the indicator for {self.serial}")
+        try:
+            await self.api.set_light_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the indicator for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the indicator: {err}")
+
+    # Method for indicator turn off
+    async def set_light_off(self) -> None:
+        _LOGGER.debug(f"Turning off the indicator for {self.serial}")
+        try:
+            await self.api.set_light_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the indicator for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the indicator: {err}")
+
+    @property
+    def update_available(self) -> bool:
+        """Return True if an update is available, False otherwise."""
+        return bool(self._data.get("getUpgrade", {}).get("jobItemId"))
+    
+    @property
+    def update_release_notes(self) -> str | None:
+        """Return release notes if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("upgradeDesc") if upgrade_data else None
+    
+    @property
+    def update_version(self) -> str | None:
+        """Return target version if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("targetVersion") if upgrade_data else None
+    
+    @property
+    def update_name(self) -> str | None:
+        """Return update job name if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("jobName") if upgrade_data else None
+    
+    @property
+    def update_progress(self) -> float:
+        """Return update progress as a float, or 0 if not updating."""
+        upgrade_data = self._data.get("getUpgrade")
+        if not upgrade_data:
+            return 0.0
+
+        progress = upgrade_data.get("progress")
+        return float(progress) if progress is not None else 0.0

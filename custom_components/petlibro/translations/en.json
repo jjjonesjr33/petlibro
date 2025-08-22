@@ -181,7 +181,7 @@
                 "name": "Temperature"
             },
             "plate_position": {
-                "name": "Plate position"
+                "name": "Plate Position"
             },
             "display_selection": {
                 "name": "Display Value"
@@ -250,12 +250,17 @@
             "ring_bell": {
                 "name": "Ring Bell"
             },
-
             "rotate_food_bowl": {
                 "name": "Rotate Food Bowl"
             },
             "reposition_schedule": {
                 "name": "Reposition Schedule"
+            },
+            "light_on": {
+                "name": "Turn On Indicator"
+            },
+            "light_off": {
+                "name": "Turn Off Indicator"
             },
             "cleaning_reset": {
                 "name": "Cleaning Reset"
@@ -300,6 +305,9 @@
             },
             "display_switch": {
                 "name": "Display Status"
+            },
+            "light_switch": {
+                "name": "Indicator"
             }
         },
         "number": {
@@ -337,11 +345,19 @@
             },
             "water_dispensing_mode": {
                 "name": "Water Dispensing Mode"
+            },
+            "plate_position": {
+                "name": "Plate Position"
             }
         },
         "text": {
             "display_text": {
                 "name": "Text on Display"
+            }
+        },
+        "update": {
+            "firmware": {
+                "name": "Update"
             }
         }
     }

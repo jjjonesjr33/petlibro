@@ -4,6 +4,7 @@
 # https://api.us.petlibro.com/device/device/baseInfo
 # https://api.us.petlibro.com/device/device/realInfo
 # https://api.us.petlibro.com/device/setting/getAttributeSetting
+# https://api.us.petlibro.com/device/ota/getUpgrade
 # https://api.us.petlibro.com/device/data/grainStatus
 
 from logging import getLogger
@@ -284,6 +285,31 @@ class PetLibroAPI:
             _LOGGER.error(f"Error fetching getAttributeSetting for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching getAttributeSetting for device {device_id}: {e}")
 
+    async def get_device_upgrade(self, device_id: str) -> dict:
+        """Fetch real-time information for a device, with caching to prevent frequent requests."""
+        now = datetime.utcnow()
+        last_call_time = self._last_api_call_times.get(f"{device_id}_getUpgrade")
+
+        # If we made the request within the last 10 seconds, return cached response
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Skipping getUpgrade request for {device_id}, using cached response.")
+            return self._cached_responses.get(f"{device_id}_getUpgrade", {})
+
+        # Otherwise, make the API call and update cache
+        try:
+            response = await self.session.request("POST", "/device/ota/getUpgrade", json={
+                "id": device_id,
+            })
+
+            # Store the time of the API call and the cached response
+            self._last_api_call_times[f"{device_id}_getUpgrade"] = now
+            self._cached_responses[f"{device_id}_getUpgrade"] = response
+
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Error fetching getUpgrade for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching getUpgrade for device {device_id}: {e}")
+
     async def get_device_base_info(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
         now = datetime.utcnow()
@@ -436,6 +462,9 @@ class PetLibroAPI:
 
     async def device_events(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/data/event/deviceEventsV2", serial)
+
+    async def device_upgrade(self, serial: str) -> Dict[str, Any]:
+        return await self.session.post_serial("/device/ota/getUpgrade", serial)
 
     async def device_grain_status(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/data/grainStatus", serial)
@@ -774,7 +803,7 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to trigger manual feeding for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feeding: {err}")
 
-    async def set_manual_feed_now(self, serial: str):
+    async def set_manual_feed_now(self, serial: str, plate: int):
         """Trigger manual feed now for a specific device. This opens the food bowl door."""
         _LOGGER.debug(f"Triggering manual feed now for device with serial: {serial}")
         
@@ -782,9 +811,7 @@ class PetLibroAPI:
             # Send the POST request to trigger manual feeding
             await self.session.post("/device/wetFeedingPlan/manualFeedNow", json={
                 "deviceSn": serial,
-                # The plate ID doesn't matter here - the device will always feed from the current bowl regardless of what the plate ID is.
-                # The app also always uses 1 for the plate ID.
-                "plate": 1
+                "plate": plate 
             })
 
         except aiohttp.ClientError as err:
@@ -877,6 +904,20 @@ class PetLibroAPI:
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger desiccant reset for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
+
+    async def trigger_firmware_upgrade(self, serial: str, job_item_id: str):
+        """Trigger the firmware upgrade for the device."""
+        _LOGGER.debug(f"Triggering firmware upgrade: serial={serial}, jobItemId={job_item_id}")
+        try:
+            response = await self.session.post("/device/ota/doUpgrade", json={
+                "deviceSn": serial,
+                "jobItemId": job_item_id
+            })
+            _LOGGER.debug(f"Firmware upgrade triggered successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to trigger firmware upgrade for device {serial}: {e}")
+            raise
 
     async def set_cleaning_reset(self, serial: str) -> JSON:
         """Trigger machine cleaning reset for a specific device."""
@@ -972,6 +1013,26 @@ class PetLibroAPI:
             "screenDisplayStartTime": None,
             "screenDisplayEndTime": None,
             "screenDisplaySwitch": False
+        })
+
+    async def set_light_on(self, serial: str):
+        """Trigger turn indicator on"""
+        await self.session.post("/device/setting/updateLightingSetting", json={
+            "deviceSn": serial,
+            "lightAgingType": 1,
+            "lightingStartTime": None,
+            "lightingEndTime": None,
+            "lightSwitch": True
+        })
+    
+    async def set_light_off(self, serial: str):
+        """Trigger turn indicator off"""
+        await self.session.post("/device/setting/updateLightingSetting", json={
+            "deviceSn": serial,
+            "lightAgingType": 1,
+            "lightingStartTime": None,
+            "lightingEndTime": None,
+            "lightSwitch": False
         })
 
     async def set_sound_on(self, serial: str):
