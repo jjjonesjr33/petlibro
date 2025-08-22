@@ -325,6 +325,11 @@
             "display_text": {
                 "name": "Text on Display"
             }
+        },
+        "update": {
+            "firmware": {
+                "name": "Update"
+            }
         }
     }
 }

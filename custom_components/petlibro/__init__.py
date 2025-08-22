@@ -83,6 +83,7 @@ PLATFORMS_BY_TYPE = {
         Platform.BUTTON,
         Platform.NUMBER,
         Platform.SELECT,
+        Platform.UPDATE,
     ),
 }
 

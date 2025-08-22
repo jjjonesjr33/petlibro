@@ -22,12 +22,14 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
+            get_upgrade = await self.api.get_device_upgrade(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
+                "getUpgrade": get_upgrade or {},
                 "getfeedingplantoday": get_feeding_plan_today or {}
             })
         except PetLibroAPIError as err:
@@ -167,9 +169,13 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
 
     @property
-    def remaining_desiccant(self) -> str:
+    def remaining_desiccant(self) -> float | None:
         """Get the remaining desiccant days."""
-        return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
+        value = self._data.get("remainingDesiccantDays")
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
     
     @property
     def last_feed_time(self) -> str | None:
@@ -182,7 +188,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
 
         if not raw or not isinstance(raw, list):
             return None
-
+        
         for day_entry in raw:
             work_records = day_entry.get("workRecords", [])
             for record in work_records:
@@ -193,7 +199,6 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
                         dt = datetime.fromtimestamp(timestamp_ms / 1000)
                         _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
                         return dt.strftime("%Y-%m-%d %H:%M:%S")
-
         return None
 
     @property
@@ -299,3 +304,36 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
+
+    @property
+    def update_available(self) -> bool:
+        """Return True if an update is available, False otherwise."""
+        return bool(self._data.get("getUpgrade", {}).get("jobItemId"))
+    
+    @property
+    def update_release_notes(self) -> str | None:
+        """Return release notes if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("upgradeDesc") if upgrade_data else None
+    
+    @property
+    def update_version(self) -> str | None:
+        """Return target version if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("targetVersion") if upgrade_data else None
+    
+    @property
+    def update_name(self) -> str | None:
+        """Return update job name if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("jobName") if upgrade_data else None
+    
+    @property
+    def update_progress(self) -> float:
+        """Return update progress as a float, or 0 if not updating."""
+        upgrade_data = self._data.get("getUpgrade")
+        if not upgrade_data:
+            return 0.0
+
+        progress = upgrade_data.get("progress")
+        return float(progress) if progress is not None else 0.0
