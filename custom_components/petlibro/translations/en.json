@@ -167,16 +167,23 @@
                 "name": "Turn Off Sound"
             },
             "desiccant_reset": {
-                "name": "Desiccant Replaced"
+                "name": "Desiccant Reset"
             },
             "ring_bell": {
                 "name": "Ring Bell"
             },
+
             "rotate_food_bowl": {
                 "name": "Rotate Food Bowl"
             },
             "reposition_schedule": {
                 "name": "Reposition Schedule"
+            },
+            "cleaning_reset": {
+                "name": "Cleaning Reset"
+            },
+            "filter_reset": {
+                "name": "Filter Reset"
             }
         },
         "binary_sensor": {
@@ -215,8 +222,8 @@
             "sound_level": {
                 "name": "Volume Level"
             },
-            "desiccant_frequency": {
-                "name": "Desiccant Frequency"
+            "desiccant_cycle": {
+                "name": "Desiccant Cycle"
             },
             "lid_close_time": {
                 "name": "Lid Close Time"
@@ -226,6 +233,12 @@
             },
             "water_dispensing_duration": {
                 "name": "Water Dispensing Duration"
+            },
+            "cleaning_cycle": {
+                "name": "Cleanining Cycle"
+            },
+            "filter_cycle": {
+                "name": "Filter Cycle"
             }
         },
         "select": {

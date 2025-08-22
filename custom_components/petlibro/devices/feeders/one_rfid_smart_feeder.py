@@ -200,7 +200,7 @@ class OneRFIDSmartFeeder(Device):
         return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
     
     @property
-    def desiccant_frequency(self) -> float:
+    def desiccant_cycle(self) -> float:
         return self._data.get("realInfo", {}).get("changeDesiccantFrequency", 0)
     
     @property
@@ -239,14 +239,17 @@ class OneRFIDSmartFeeder(Device):
             self._manual_feed_quantity = 1  # Default value
         return self._manual_feed_quantity
 
-    async def set_desiccant_frequency(self, value: float) -> None:
-        _LOGGER.debug(f"Setting desiccant frequency to {value} for {self.serial}")
+    async def set_desiccant_cycle(self, value: float) -> None:
+        _LOGGER.debug(f"Setting desiccant cycle to {value} for {self.serial}")
         try:
-            await self.api.set_desiccant_frequency(self.serial, value)
+            key = "DESSICANT"
+            await self.api.set_desiccant_cycle(self.serial, value, key)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set desiccant frequency for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting desiccantfrequency: {err}")
+            _LOGGER.error(f"Failed to set desiccant cycle for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting desiccant cycle: {err}")
+    
+    @property
     def sound_switch(self) -> bool:
         return self._data.get("realInfo", {}).get("soundSwitch", False)
 

@@ -135,17 +135,17 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
     ],
     OneRFIDSmartFeeder: [
         PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
-            key="desiccant_frequency",
-            translation_key="desiccant_frequency",
+            key="desiccant_cycle",
+            translation_key="desiccant_cycle",
             icon="mdi:calendar-alert",
             native_unit_of_measurement="Days",
             mode="box",
             native_max_value=60,
             native_min_value=1,
             native_step=1,
-            value=lambda device: device.desiccant_frequency,
-            method=lambda device, value: device.set_desiccant_frequency(value),
-            name="Desiccant Frequency"
+            value=lambda device: device.desiccant_cycle,
+            method=lambda device, value: device.set_desiccant_cycle(value),
+            name="Desiccant Cycle"
         ),
         PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
             key="sound_level",
@@ -223,6 +223,32 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             method=lambda device, value: device.set_water_dispensing_duration(value),
             name="Water Dispensing Duration"
         ),
+        PetLibroNumberEntityDescription[DockstreamSmartFountain](
+            key="cleaning_cycle",
+            translation_key="cleaning_cycle",
+            icon="mdi:calendar-alert",
+            native_unit_of_measurement="Days",
+            mode="box",
+            native_max_value=60,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.cleaning_cycle,
+            method=lambda device, value: device.set_cleaning_cycle(value),
+            name="Machine Cleaning Cycle"
+        ),
+        PetLibroNumberEntityDescription[DockstreamSmartFountain](
+            key="filter_cycle",
+            translation_key="filter_cycle",
+            icon="mdi:calendar-alert",
+            native_unit_of_measurement="Days",
+            mode="box",
+            native_max_value=60,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.filter_cycle,
+            method=lambda device, value: device.set_filter_cycle(value),
+            name="Filter Cycle"
+        ),
     ],
     DockstreamSmartRFIDFountain: [
         PetLibroNumberEntityDescription[DockstreamSmartRFIDFountain](
@@ -248,6 +274,32 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             value=lambda device: device.water_dispensing_duration,
             method=lambda device, value: device.set_water_dispensing_duration(value),
             name="Water Dispensing Duration"
+        ),
+        PetLibroNumberEntityDescription[DockstreamSmartRFIDFountain](
+            key="cleaning_cycle",
+            translation_key="cleaning_cycle",
+            icon="mdi:calendar-alert",
+            native_unit_of_measurement="Days",
+            mode="box",
+            native_max_value=60,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.cleaning_cycle,
+            method=lambda device, value: device.set_cleaning_cycle(value),
+            name="Machine Cleaning Cycle"
+        ),
+        PetLibroNumberEntityDescription[DockstreamSmartRFIDFountain](
+            key="filter_cycle",
+            translation_key="filter_cycle",
+            icon="mdi:calendar-alert",
+            native_unit_of_measurement="Days",
+            mode="box",
+            native_max_value=60,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.filter_cycle,
+            method=lambda device, value: device.set_filter_cycle(value),
+            name="Filter Cycle"
         ),
     ],
 }
