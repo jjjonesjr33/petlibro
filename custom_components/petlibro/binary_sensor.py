@@ -421,7 +421,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:volume-high",
             should_report=lambda device: device.sound_switch is not None,
             name="Sound Status"
-        }
+        ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
             key="light_switch",
             translation_key="light_switch",
