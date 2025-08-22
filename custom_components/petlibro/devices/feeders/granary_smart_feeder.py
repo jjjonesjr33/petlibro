@@ -18,14 +18,14 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         """Refresh the device data from the API."""
         try:
             await super().refresh()  # Call the refresh method from Device
-    
+
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_default_matrix = await self.api.get_default_matrix(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
-    
+
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
@@ -174,7 +174,7 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
     def remaining_desiccant(self) -> str:
         """Get the remaining desiccant days."""
         return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
-    
+
     @property
     def last_feed_time(self) -> str | None:
         """Return the recordTime of the last successful grain output as a formatted string."""
@@ -210,7 +210,11 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
             _LOGGER.warning(f"manual_feed_quantity is None for {self.serial}, setting default to 1.")
             self._manual_feed_quantity = 1  # Default value
         return self._manual_feed_quantity
-    
+
+    @property
+    def desiccant_frequency(self) -> float:
+        return self._data.get("realInfo", {}).get("changeDesiccantFrequency", 0)
+
     # Error-handling updated for set_feeding_plan
     async def set_feeding_plan(self, value: bool) -> None:
         _LOGGER.debug(f"Setting feeding plan to {value} for {self.serial}")
@@ -276,7 +280,7 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         """Set the manual feed quantity."""
         _LOGGER.debug(f"Setting manual feed quantity: serial={self.serial}, value={value}")
         self._manual_feed_quantity = value
-    
+
     async def set_manual_feed_quantity(self, value: float):
         """Set the manual feed quantity with a default value handling"""
         _LOGGER.debug(f"Setting manual feed quantity: serial={self.serial}, value={value}")
@@ -293,7 +297,7 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger manual feed for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feed: {err}")
-        
+
     # Method for setting the feeding plan
     async def set_feeding_plan(self, value: bool) -> None:
         _LOGGER.debug(f"Setting feeding plan to {value} for {self.serial}")
@@ -303,3 +307,21 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
+
+    async def set_desiccant_frequency(self, value: float) -> None:
+        _LOGGER.debug(f"Setting desiccant frequency to {value} for {self.serial}")
+        try:
+            await self.api.set_desiccant_frequency(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set desiccant frequency for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting desiccantfrequency: {err}")
+
+    async def set_desiccant_reset(self) -> None:
+        _LOGGER.debug(f"Triggering desiccant reset for {self.serial}")
+        try:
+            await self.api.set_desiccant_reset(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger desiccant reset for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
