@@ -955,6 +955,63 @@ class PetLibroAPI:
             "templateName": template_name,
         })
 
+    async def member_info(self) -> dict[str, Any]:
+        """Request Petlibro Account data."""
+        _LOGGER.debug("Requesting member information")
+
+        try:
+            data = await self.session.post("/member/member/info", json={})
+        except Exception as exc:
+            _LOGGER.exception("Failed to fetch member information")
+            raise PetLibroAPIError("Failed to fetch member information") from exc
+
+        if not isinstance(data, dict):
+            raise PetLibroAPIError(f"Invalid member info response format: {data}")
+
+        if not data.get("email"):
+            _LOGGER.warning("Member info response missing email: %s", data)
+
+        _LOGGER.debug("Member info retrieved successfully")
+        return data
+
+    async def member_update_info(
+        self, update_info: dict[str, Any], update_setting: dict[str, Any]
+    ) -> bool:
+        """Update Petlibro account settings."""
+        if not (update_info or update_setting):
+            _LOGGER.debug("No member settings provided for update; skipping request.")
+            return True  # Nothing to update, considered successful.
+
+        _LOGGER.debug(
+            "Attempting to update member settings. Info: %s, Settings: %s",
+            update_info,
+            update_setting,
+        )
+
+        async def _post_update(endpoint: str, payload: dict[str, Any]) -> bool:
+            """Helper to send settings and handle logging."""
+            try:
+                result = await self.session.post(endpoint, json=payload or {})
+            except Exception:
+                _LOGGER.exception("Failed to update via %s", endpoint)
+                return False
+            _LOGGER.debug("%s response (should be None): %s", endpoint, result)
+            return True
+
+        success = True
+        if update_info:
+            success &= await _post_update("/member/member/updateInfo", update_info)
+        if update_setting:
+            success &= await _post_update("/member/member/updateSetting", update_setting)
+
+        if success:
+            _LOGGER.debug("Updating member settings successful.")
+        else:
+            _LOGGER.error("One or more member setting updates failed.")
+
+        return success
+
+
 ## Added this to fix dupe logs
 class PetLibroDataCoordinator(DataUpdateCoordinator):
     def __init__(self, hass, api):

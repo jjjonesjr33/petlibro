@@ -25,6 +25,69 @@
             }
         }
     },
+	"options": {
+        "abort": {
+            "account_update_success": "Account updated",
+            "account_update_nomember": "Member data not loaded, please check logs",
+            "account_update_nochanges": "No settings were changed",
+            "error_check_logs": "Error, please check logs"
+        },
+        "error": {
+            "unknown": "Unexpected error"
+        },
+		"step": {
+			"init": {
+                "menu_options": {
+                    "account_settings": "Account settings"
+                }
+			},
+            "account_settings": {
+                "title": "Account Settings",
+                "description": "For account: {email}",
+                "data": {
+                    "nickname": "Nickname",
+                    "gender": "Gender"
+                },
+                "sections": {
+                    "measurement_unit": {
+                        "name": "Measurement Units",
+                        "data": {
+                            "feedUnitType": "Feeder/Feeding",
+                            "waterUnitType": "Fountain/Drinking",
+                            "weightUnitType": "Weight"
+                        }
+                    }
+
+                }
+            }
+        }
+    },
+    "selector": {
+        "member_gender": {
+            "options": {
+                "male": "Male",
+                "female": "Female",
+                "none": "Prefer not to say"
+            }
+        },
+        "pet_sex": {
+            "options": {
+                "male": "Male",
+                "female": "Female",
+                "none": "None selected"
+            }
+        },
+        "unit_type": {
+            "options": {
+                "cups": "cup (US legal cup)",
+                "ounces": "oz (ounce)",
+                "grams": "g (gram)",
+                "milliliters": "ml (milliliter)",
+                "kilograms": "kg (kilogram)",
+                "pounds": "lb (pound)"
+            }
+        }
+    },
     "entity": {
         "sensor": {
             "device_sn": {

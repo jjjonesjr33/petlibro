@@ -114,6 +114,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         # Store the hub in hass.data
         hass.data.setdefault(DOMAIN, {})[entry.entry_id] = hub
 
+        # Load member only once here
+        await hub.load_member()
+
         # Load devices only once here
         await hub.load_devices()
 
