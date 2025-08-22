@@ -5,7 +5,6 @@ from logging import getLogger
 from ...exceptions import PetLibroAPIError
 from ..device import Device
 from datetime import datetime
-from homeassistant.util import dt as dt_util
 
 _LOGGER = getLogger(__name__)
 
@@ -181,10 +180,13 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
             return None
     
     @property
-    def last_feed_time(self) -> datetime | None:
-        """Return the recordTime of the last successful grain output as a datetime object (UTC)."""
+    def last_feed_time(self) -> str | None:
+        """Return the recordTime of the last successful grain output as a formatted string."""
         _LOGGER.debug("last_feed_time called for device: %s", self.serial)
         raw = self._data.get("workRecord", [])
+
+        # Log raw to help debug
+        _LOGGER.debug("Raw workRecord (from self._data): %s", raw)
 
         if not raw or not isinstance(raw, list):
             return None
@@ -192,13 +194,13 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         for day_entry in raw:
             work_records = day_entry.get("workRecords", [])
             for record in work_records:
+                _LOGGER.debug("Evaluating record type: %s", record.get("type"))
                 if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
                     timestamp_ms = record.get("recordTime", 0)
                     if timestamp_ms:
-                        # HA utility: always return UTC datetime
-                        dt = dt_util.utc_from_timestamp(timestamp_ms / 1000)
-                        _LOGGER.debug("Returning datetime object: %s", dt.isoformat())
-                        return dt
+                        dt = datetime.fromtimestamp(timestamp_ms / 1000)
+                        _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
+                        return dt.strftime("%Y-%m-%d %H:%M:%S")
         return None
 
     @property
