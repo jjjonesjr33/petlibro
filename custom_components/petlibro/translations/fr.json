@@ -209,7 +209,7 @@
             "sound_level": {
                 "name": "Niveau de volume"
             },
-            "desiccant_frequency": {
+            "desiccant_cycle": {
                 "name": "Fréquence dessicante"
             },
             "lid_close_time": {

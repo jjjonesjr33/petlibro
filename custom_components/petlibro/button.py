@@ -84,6 +84,12 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
+        ),
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
+            key="desiccant_reset",
+            translation_key="desiccant_reset",
+            set_fn=lambda device: device.set_desiccant_reset(),
+            name="Desiccant Replaced"
         )
     ],
     GranarySmartCameraFeeder: [
@@ -159,7 +165,7 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             key="desiccant_reset",
             translation_key="desiccant_reset",
             set_fn=lambda device: device.set_desiccant_reset(),
-            name="Desiccant Replaced"
+            name="Desiccant Reset"
         )
     ],
     PolarWetFoodFeeder: [
@@ -203,8 +209,32 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
         ),
     ],
     DockstreamSmartFountain: [
+        PetLibroButtonEntityDescription[DockstreamSmartFountain](
+            key="cleaning_reset",
+            translation_key="cleaning_reset",
+            set_fn=lambda device: device.set_cleaning_reset(),
+            name="Cleaning Reset"
+        ),
+        PetLibroButtonEntityDescription[DockstreamSmartFountain](
+            key="filter_reset",
+            translation_key="filter_reset",
+            set_fn=lambda device: device.set_filter_reset(),
+            name="Filter Reset"
+        )
     ],
     DockstreamSmartRFIDFountain: [
+        PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
+            key="cleaning_reset",
+            translation_key="cleaning_reset",
+            set_fn=lambda device: device.set_cleaning_reset(),
+            name="Cleaning Reset"
+        ),
+        PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
+            key="filter_reset",
+            translation_key="filter_reset",
+            set_fn=lambda device: device.set_filter_reset(),
+            name="Filter Reset"
+        )
     ],
 }
 
@@ -277,7 +307,3 @@ async def async_setup_entry(
 
         # Add button entities to Home Assistant
         async_add_entities(entities)
-
-
-
-
