@@ -34,8 +34,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
                 "getAttributeSetting": attribute_settings or {},
                 "getfeedingplantoday": get_feeding_plan_today or {},
                 "getDeviceEvents": get_device_events or {},
-                "getUpgrade": get_upgrade or {},
-                "getfeedingplantoday": get_feeding_plan_today or {}
+                "getUpgrade": get_upgrade or {}
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for SpaceSmartFeeder: {err}")
@@ -147,10 +146,6 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         return bool(self._data.get("realInfo", {}).get("lightSwitch", False))
 
     @property
-    def vacuum_state(self) -> bool:
-        return self._data.get("realInfo", {}).get("vacuumState", False)
-
-    @property
     def pump_air_state(self) -> bool:
         return self._data.get("realInfo", {}).get("pumpAirState", False)
 
@@ -225,30 +220,6 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
                         _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
                         return dt.strftime("%Y-%m-%d %H:%M:%S")
 
-        return None
-
-    @property
-    def last_feed_time(self) -> str | None:
-        """Return the recordTime of the last successful grain output as a formatted string."""
-        _LOGGER.debug("last_feed_time called for device: %s", self.serial)
-        raw = self._data.get("workRecord", [])
-        
-        # Log raw to help debug
-        _LOGGER.debug("Raw workRecord (from self._data): %s", raw)
-
-        if not raw or not isinstance(raw, list):
-            return None
-        
-        for day_entry in raw:
-            work_records = day_entry.get("workRecords", [])
-            for record in work_records:
-                _LOGGER.debug("Evaluating record type: %s", record.get("type"))
-                if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
-                    timestamp_ms = record.get("recordTime", 0)
-                    if timestamp_ms:
-                        dt = datetime.fromtimestamp(timestamp_ms / 1000)
-                        _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
-                        return dt.strftime("%Y-%m-%d %H:%M:%S")
         return None
 
     @property
@@ -344,16 +315,6 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger manual feed for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feed: {err}")
-
-    # Method for setting the feeding plan
-    async def set_feeding_plan(self, value: bool) -> None:
-        _LOGGER.debug(f"Setting feeding plan to {value} for {self.serial}")
-        try:
-            await self.api.set_feeding_plan(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting feeding plan: {err}")
 
     @property
     def vacuum_mode(self) -> str:
