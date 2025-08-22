@@ -209,7 +209,7 @@
             "sound_level": {
                 "name": "音量水平"
             },
-            "desiccant_frequency": {
+            "desiccant_cycle": {
                 "name": "干燥频率"
             },
             "lid_close_time": {

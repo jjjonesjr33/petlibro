@@ -209,7 +209,7 @@
             "sound_level": {
                 "name": "ভলিউম স্তর"
             },
-            "desiccant_frequency": {
+            "desiccant_cycle": {
                 "name": "ডেসিক্যান্ট ফ্রিকোয়েন্সি"
             },
             "lid_close_time": {

@@ -109,6 +109,12 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_light_off(),
             name="Turn Off Indicator"
         ),
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
+            key="desiccant_reset",
+            translation_key="desiccant_reset",
+            set_fn=lambda device: device.set_desiccant_reset(),
+            name="Desiccant Replaced"
+        )
     ],
     GranarySmartCameraFeeder: [
         PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
@@ -195,7 +201,7 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             key="desiccant_reset",
             translation_key="desiccant_reset",
             set_fn=lambda device: device.set_desiccant_reset(),
-            name="Desiccant Replaced"
+            name="Desiccant Reset"
         )
     ],
     PolarWetFoodFeeder: [
@@ -275,6 +281,18 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_light_off(),
             name="Turn Off Indicator"
         ),
+        PetLibroButtonEntityDescription[DockstreamSmartFountain](
+            key="cleaning_reset",
+            translation_key="cleaning_reset",
+            set_fn=lambda device: device.set_cleaning_reset(),
+            name="Cleaning Reset"
+        ),
+        PetLibroButtonEntityDescription[DockstreamSmartFountain](
+            key="filter_reset",
+            translation_key="filter_reset",
+            set_fn=lambda device: device.set_filter_reset(),
+            name="Filter Reset"
+        )
     ],
     DockstreamSmartRFIDFountain: [
         PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
@@ -289,6 +307,18 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_light_off(),
             name="Turn Off Indicator"
         ),
+        PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
+            key="cleaning_reset",
+            translation_key="cleaning_reset",
+            set_fn=lambda device: device.set_cleaning_reset(),
+            name="Cleaning Reset"
+        ),
+        PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
+            key="filter_reset",
+            translation_key="filter_reset",
+            set_fn=lambda device: device.set_filter_reset(),
+            name="Filter Reset"
+        )
     ],
 }
 
@@ -361,7 +391,3 @@ async def async_setup_entry(
 
         # Add button entities to Home Assistant
         async_add_entities(entities)
-
-
-
-
