@@ -33,7 +33,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
                 "realInfo": real_info or {},
                 "getAttributeSetting": attribute_settings or {},
                 "getfeedingplantoday": get_feeding_plan_today or {},
-                "getDeviceEvents": get_device_events or {}
+                "getDeviceEvents": get_device_events or {},
                 "getUpgrade": get_upgrade or {},
                 "getfeedingplantoday": get_feeding_plan_today or {}
             })
