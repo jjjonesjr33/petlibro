@@ -191,24 +191,6 @@
             },
             "vacuum_mode": {
                 "name": "Vacuum Mode"
-            },
-            "battery_charge_state": {
-                "name": "Battery Status"
-            },
-            "today_drinking_time": {
-                "name": "Today's Total Drinking Time"
-            },
-            "today_drinking_count": {
-                "name": "Today's Total Drinking Times"
-            },
-            "yesterday_drinking_count": {
-                "name": "Yesterday's Total Drinking Times"
-            },
-            "today_avg_time": {
-                "name": "Today's Average Drinking Time"
-            },
-            "yesterday_total_ml": {
-                "name": "Yesterday's Water Consumption (mL)"
             }
         },
         "switch": {
@@ -265,7 +247,6 @@
             "ring_bell": {
                 "name": "Ring Bell"
             },
-
             "rotate_food_bowl": {
                 "name": "Rotate Food Bowl"
             },
@@ -324,9 +305,6 @@
             },
             "light_switch": {
                 "name": "Indicator"
-            },
-            "power_state": {
-                "name": "Power State"
             }
         },
         "number": {

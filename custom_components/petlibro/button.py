@@ -99,6 +99,18 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             name="Disable Feeding Plan"
         ),
         PetLibroButtonEntityDescription[GranarySmartFeeder](
+            key="light_on",
+            translation_key="light_on",
+            set_fn=lambda device: device.set_light_on(),
+            name="Turn On Indicator"
+        ),
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
+            key="light_off",
+            translation_key="light_off",
+            set_fn=lambda device: device.set_light_off(),
+            name="Turn Off Indicator"
+        ),
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
             key="desiccant_reset",
             translation_key="desiccant_reset",
             set_fn=lambda device: device.set_desiccant_reset(),

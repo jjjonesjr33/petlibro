@@ -172,6 +172,11 @@ class PolarWetFoodFeeder(Device):
     def feeding_plan_today_data(self) -> str:
         return self._data.get("getfeedingplantoday", {})
 
+    @property
+    def light_switch(self) -> bool:
+        """Check if the light is enabled."""
+        return bool(self._data.get("realInfo", {}).get("lightSwitch", False))
+
     async def set_manual_feed_now(self, start: bool, plate: int) -> None:
         plate = plate if plate is not None else self.plate_position
         try:
@@ -276,11 +281,6 @@ class PolarWetFoodFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger reposition the schedule for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering reposition schedule: {err}")
-
-    @property
-    def light_switch(self) -> bool:
-        """Check if the light is enabled."""
-        return bool(self._data.get("realInfo", {}).get("lightSwitch", False))
 
     # Method for indicator turn on
     async def set_light_on(self) -> None:

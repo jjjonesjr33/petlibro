@@ -36,7 +36,8 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
                 "getfeedingplantoday": get_feeding_plan_today or {},
                 "getDeviceEvents": get_device_events or {},
                 "getUpgrade": get_upgrade or {},
-                "getfeedingplantoday": get_feeding_plan_today or {}
+                "getfeedingplantoday": get_feeding_plan_today or {},
+                "getUpgrade": get_upgrade or {}
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for SpaceSmartFeeder: {err}")
@@ -146,10 +147,6 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
     def light_switch(self) -> bool:
         """Check if the light is enabled."""
         return bool(self._data.get("realInfo", {}).get("lightSwitch", False))
-
-    @property
-    def vacuum_state(self) -> bool:
-        return self._data.get("realInfo", {}).get("vacuumState", False)
 
     @property
     def pump_air_state(self) -> bool:
@@ -331,16 +328,6 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger manual feed for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feed: {err}")
-
-    # Method for setting the feeding plan
-    async def set_feeding_plan(self, value: bool) -> None:
-        _LOGGER.debug(f"Setting feeding plan to {value} for {self.serial}")
-        try:
-            await self.api.set_feeding_plan(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting feeding plan: {err}")
 
     @property
     def vacuum_mode(self) -> str:

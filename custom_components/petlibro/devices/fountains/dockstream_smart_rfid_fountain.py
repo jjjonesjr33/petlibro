@@ -139,6 +139,11 @@ class DockstreamSmartRFIDFountain(Device):
         await self.api.set_sound_switch(self.serial, value)
         await self.refresh()
     
+    async def set_manual_cleaning(self):
+        """Trigger manual cleaning action."""
+        await self.api.set_manual_cleaning(self.serial)
+        await self.refresh()
+
     @property
     def water_dispensing_mode(self) -> int:
         """Return the user-friendly water dispensing mode (mapped directly from the API value)."""

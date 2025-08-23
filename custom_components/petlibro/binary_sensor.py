@@ -458,36 +458,11 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             name="Wi-Fi"
         ),
         PetLibroBinarySensorEntityDescription[DockstreamSmartRFIDFountain](
-            key="light",
-            translation_key="light",
-            icon="mdi:lightbulb",
-            should_report=lambda device: device.light_switch is not None,
-            name="Indicator"
-        ),
-    ],
-    Dockstream2SmartCordlessFountain: [
-        PetLibroBinarySensorEntityDescription[Dockstream2SmartCordlessFountain](
-            key="online",
-            translation_key="online",
-            icon="mdi:wifi",
-            device_class=BinarySensorDeviceClass.CONNECTIVITY,
-            should_report=lambda device: device.online is not None,
-            name="Wi-Fi"
-        ),
-        PetLibroBinarySensorEntityDescription[Dockstream2SmartCordlessFountain](
             key="light_switch",
             translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
-        ),
-        PetLibroBinarySensorEntityDescription[Dockstream2SmartCordlessFountain](
-            key="power_state",
-            translation_key="power_state",
-            icon="mdi:power-plug",
-            device_class=BinarySensorDeviceClass.PLUG,
-            should_report=lambda device: device.power_state is not None,
-            name="Power State"
         ),
     ]
 }

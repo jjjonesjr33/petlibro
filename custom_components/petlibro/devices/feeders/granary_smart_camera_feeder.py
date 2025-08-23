@@ -209,7 +209,7 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
             return float(value) if value is not None else None
         except (TypeError, ValueError):
             return None
-    
+
     @property
     def last_feed_time(self) -> datetime | None:
         """Return the recordTime of the last successful grain output as a datetime object (UTC)."""
@@ -230,20 +230,6 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
                         _LOGGER.debug("Returning datetime object: %s", dt.isoformat())
                         return dt
         return None
-
-    @property
-    def last_feed_quantity(self) -> int | None:
-        """Return the last feed amount in raw grain count."""
-        raw = self._data.get("workRecord", [])
-        if not raw or not isinstance(raw, list):
-            return 0
-
-        for day_entry in raw:
-            for record in day_entry.get("workRecords", []):
-                _LOGGER.debug("Evaluating record type: %s", record.get("type"))
-                if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
-                    return record.get("actualGrainNum") or 0
-        return 0
 
     @property
     def feeding_plan_today_data(self) -> str:
@@ -348,7 +334,7 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
-        
+
     # Method for indicator turn on
     async def set_light_on(self) -> None:
         _LOGGER.debug(f"Turning on the indicator for {self.serial}")

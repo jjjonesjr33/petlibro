@@ -180,14 +180,12 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
 
     @property
     def remaining_desiccant(self) -> float | None:
-        """Get the remaining desiccant days."""
-        return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
         value = self._data.get("remainingDesiccantDays")
         try:
             return float(value) if value is not None else None
         except (TypeError, ValueError):
             return None
-    
+
     @property
     def last_feed_time(self) -> datetime | None:
         """Return the recordTime of the last successful grain output as a datetime object (UTC)."""
@@ -208,20 +206,6 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
                         _LOGGER.debug("Returning datetime object: %s", dt.isoformat())
                         return dt
         return None
-
-    @property
-    def last_feed_quantity(self) -> int | None:
-        """Return the last feed amount in raw grain count."""
-        raw = self._data.get("workRecord", [])
-        if not raw or not isinstance(raw, list):
-            return 0
-
-        for day_entry in raw:
-            for record in day_entry.get("workRecords", []):
-                _LOGGER.debug("Evaluating record type: %s", record.get("type"))
-                if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
-                    return record.get("actualGrainNum") or 0
-        return 0
 
     @property
     def feeding_plan_today_data(self) -> str:
@@ -330,43 +314,6 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
-
-    async def set_desiccant_frequency(self, value: float) -> None:
-        _LOGGER.debug(f"Setting desiccant frequency to {value} for {self.serial}")
-        try:
-            await self.api.set_desiccant_frequency(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set desiccant frequency for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting desiccantfrequency: {err}")
-
-    async def set_desiccant_reset(self) -> None:
-        _LOGGER.debug(f"Triggering desiccant reset for {self.serial}")
-        try:
-            await self.api.set_desiccant_reset(self.serial)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to trigger desiccant reset for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
-
-    async def set_light_on(self) -> None:
-        _LOGGER.debug(f"Turning on the indicator for {self.serial}")
-        try:
-            await self.api.set_light_on(self.serial)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to turn on the indicator for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error turning on the indicator: {err}")
-
-    # Method for indicator turn off
-    async def set_light_off(self) -> None:
-        _LOGGER.debug(f"Turning off the indicator for {self.serial}")
-        try:
-            await self.api.set_light_off(self.serial)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to turn off the indicator for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error turning off the indicator: {err}")
     
     @property
     def update_available(self) -> bool:
@@ -400,3 +347,41 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
 
         progress = upgrade_data.get("progress")
         return float(progress) if progress is not None else 0.0
+
+    # Method for indicator turn on
+    async def set_light_on(self) -> None:
+        _LOGGER.debug(f"Turning on the indicator for {self.serial}")
+        try:
+            await self.api.set_light_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the indicator for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the indicator: {err}")
+
+    # Method for indicator turn off
+    async def set_light_off(self) -> None:
+        _LOGGER.debug(f"Turning off the indicator for {self.serial}")
+        try:
+            await self.api.set_light_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the indicator for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the indicator: {err}")
+
+    async def set_desiccant_frequency(self, value: float) -> None:
+        _LOGGER.debug(f"Setting desiccant frequency to {value} for {self.serial}")
+        try:
+            await self.api.set_desiccant_frequency(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set desiccant frequency for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting desiccantfrequency: {err}")
+
+    async def set_desiccant_reset(self) -> None:
+        _LOGGER.debug(f"Triggering desiccant reset for {self.serial}")
+        try:
+            await self.api.set_desiccant_reset(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger desiccant reset for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
