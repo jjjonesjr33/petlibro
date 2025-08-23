@@ -9,6 +9,16 @@
 
 # PETLIBRO integration for Home Assistant
 
+### Account Integration
+#### Manage your Petlibro account directly within Home Assistant
+
+* View account information (email, username, region, subscription status)
+* Update profile details
+* Configure time zone and language preferences
+* Manage linked devices at the account level
+* Access support and diagnostic information
+* Options Flow in Home Assistant (⚙️ Configure button) for account settings
+
 ### Supported Devices
 #### This has been reworked to work with the following devices
 
