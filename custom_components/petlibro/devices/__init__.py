@@ -22,6 +22,5 @@ product_name_map : Dict[str, Type[Device]] = {
     "Polar Wet Food Feeder": PolarWetFoodFeeder,
     "Dockstream Smart Fountain": DockstreamSmartFountain,
     "Dockstream Smart RFID Fountain": DockstreamSmartRFIDFountain,
-    "Dockstream 2 Smart Cordless Fountain": Dockstream2SmartCordlessFountain,
     "Space Smart Feeder": SpaceSmartFeeder
 }
