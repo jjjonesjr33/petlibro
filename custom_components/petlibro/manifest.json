@@ -9,6 +9,6 @@
   "integration_type": "hub",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/jjjonesjr33/petlibro/issues",
-  "loggers": ["petlibro],
+  "loggers": ["petlibro"],
   "version": "1.1.27"
 }
