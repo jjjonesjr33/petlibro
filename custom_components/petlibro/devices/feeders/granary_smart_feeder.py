@@ -25,6 +25,7 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
             real_info = await self.api.device_real_info(self.serial)
             get_upgrade = await self.api.get_device_upgrade(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
+            get_work_record = await self.api.get_device_work_record(self.serial)
             get_default_matrix = await self.api.get_default_matrix(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
 
@@ -35,7 +36,8 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
                 "getUpgrade": get_upgrade or {},
                 "getAttributeSetting": attribute_settings or {},
                 "getDefaultMatrix": get_default_matrix or {},
-                "getfeedingplantoday": get_feeding_plan_today or {}
+                "getfeedingplantoday": get_feeding_plan_today or {},
+                "workRecord": get_work_record if get_work_record is not None else []
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for GranarySmartFeeder: {err}")

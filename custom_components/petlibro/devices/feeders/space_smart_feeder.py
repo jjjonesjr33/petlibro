@@ -26,6 +26,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
             attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_upgrade = await self.api.get_device_upgrade(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
+            get_work_record = await self.api.get_device_work_record(self.serial)
             get_device_events = await self.api.device_events(self.serial)
     
             # Update internal data with fetched API data
@@ -36,8 +37,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
                 "getfeedingplantoday": get_feeding_plan_today or {},
                 "getDeviceEvents": get_device_events or {},
                 "getUpgrade": get_upgrade or {},
-                "getfeedingplantoday": get_feeding_plan_today or {},
-                "getUpgrade": get_upgrade or {}
+                "workRecord": get_work_record if get_work_record is not None else []
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for SpaceSmartFeeder: {err}")
