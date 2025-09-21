@@ -935,7 +935,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="today_avg_time",
             translation_key="today_avg_time",
             icon="mdi:history",
-            state_class=SensorStateClass.TOTAL_INCREASING,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Today's Average Drinking Time"
         ),
         PetLibroSensorEntityDescription[DockstreamSmartFountain](
@@ -1182,7 +1182,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="today_avg_time",
             translation_key="today_avg_time",
             icon="mdi:history",
-            state_class=SensorStateClass.TOTAL_INCREASING,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Today's Average Drinking Time"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
@@ -1289,7 +1289,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="today_avg_time",
             translation_key="today_avg_time",
             icon="mdi:history",
-            state_class=SensorStateClass.TOTAL_INCREASING,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Today's Average Drinking Time"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartFountain](
