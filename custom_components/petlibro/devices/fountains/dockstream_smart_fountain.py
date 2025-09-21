@@ -19,14 +19,18 @@ class DockstreamSmartFountain(Device):
         
             # Fetch real info from the API
             real_info = await self.api.device_real_info(self.serial)
+            data_real_info = await self.api.device_data_real_info(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_upgrade = await self.api.get_device_upgrade(self.serial)
             get_work_record = await self.api.get_device_work_record(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
+            get_drink_water = await self.api.get_device_drink_water(self.serial)
 
             # Update internal data with fetched API data
             self.update_data({
                 "realInfo": real_info or {},
+                "dataRealInfo": data_real_info or {},
+                "getDrinkWater": get_drink_water or {},
                 "getAttributeSetting": attribute_settings or {},
                 "getUpgrade": get_upgrade or {},
                 "getfeedingplantoday": get_feeding_plan_today or {},
@@ -83,7 +87,7 @@ class DockstreamSmartFountain(Device):
     
     @property
     def remaining_filter_days(self) -> float | None:
-        """Get the remaining desiccant days."""
+        """Get the remaining filter days."""
         value = self._data.get("realInfo", {}).get("remainingReplacementDays", 0)
         try:
             return float(value) if value is not None else None
@@ -92,7 +96,7 @@ class DockstreamSmartFountain(Device):
     
     @property
     def remaining_cleaning_days(self) -> float | None:
-        """Get the remaining desiccant days."""
+        """Get the remaining cleaning days."""
         value = self._data.get("realInfo", {}).get("remainingCleaningDays", 0)
         try:
             return float(value) if value is not None else None
@@ -156,15 +160,6 @@ class DockstreamSmartFountain(Device):
             return "Intermittent Water (Scheduled)"
         else:
             return "Unknown"
-
-    async def set_water_dispensing_mode(self, value: int) -> None:
-        _LOGGER.debug(f"Setting water dispensing mode to {value} for {self.serial}")
-        try:
-            await self.api.set_water_dispensing_mode(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set water dispensing mode for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting water dispensing mode: {err}")
 
     @property
     def water_interval(self) -> float:
@@ -243,10 +238,35 @@ class DockstreamSmartFountain(Device):
             raise PetLibroAPIError(f"Error triggering filter reset: {err}")
 
     @property
-    def today_total_ml(self) -> int:
+    def today_drinking_amount(self) -> int:
         """Get the total milliliters of water used today."""
-        return self._data.get("realInfo", {}).get("todayTotalMl", 0)
+        return self._data.get("getDrinkWater", {}).get("todayTotalMl", 0)
     
+    @property
+    def today_drinking_count(self) -> int:
+        """Get the total count of times drank today."""
+        return self._data.get("getDrinkWater", {}).get("todayTotalTimes", 0)
+
+    @property
+    def today_drinking_time(self) -> int:
+        """Get the total time spent drinking today."""
+        return self._data.get("getDrinkWater", {}).get("petEatingTime", 0)
+
+    @property
+    def today_avg_time(self) -> int:
+        """Get the average time spent drinking in a session today."""
+        return self._data.get("getDrinkWater", {}).get("avgDrinkDuration", 0)
+
+    @property
+    def yesterday_drinking_amount(self) -> int:
+        """Get the total milliliters of water used yesterday."""
+        return self._data.get("getDrinkWater", {}).get("yesterdayTotalMl", 0)
+    
+    @property
+    def yesterday_drinking_count(self) -> int:
+        """Get the total count of times drank yesterday."""
+        return self._data.get("getDrinkWater", {}).get("yesterdayTotalTimes", 0)
+
     @property
     def use_water_interval(self) -> int:
         """Get the water usage interval."""

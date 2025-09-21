@@ -28,6 +28,8 @@ from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
+from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
+from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
 @dataclass(frozen=True)
@@ -183,7 +185,17 @@ DEVICE_UPDATE_MAP: dict[type[Device], list[PetLibroUpdateEntityDescription]] = {
         PetLibroUpdateEntityDescription[DockstreamSmartRFIDFountain](
             key="firmware",
         ),
-    ]
+    ],
+    Dockstream2SmartCordlessFountain: [
+        PetLibroUpdateEntityDescription[Dockstream2SmartCordlessFountain](
+            key="firmware",
+        ),
+    ],
+    Dockstream2SmartFountain: [
+        PetLibroUpdateEntityDescription[Dockstream2SmartFountain](
+            key="firmware",
+        ),
+    ],
 }
 
 async def async_setup_entry(

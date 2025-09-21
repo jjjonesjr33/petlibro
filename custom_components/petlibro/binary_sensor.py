@@ -33,6 +33,8 @@ from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
+from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
+from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
 
@@ -462,6 +464,64 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
+        ),
+    ],
+    Dockstream2SmartCordlessFountain: [
+        PetLibroBinarySensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="online",
+            translation_key="online",
+            icon="mdi:wifi",
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
+            should_report=lambda device: device.online is not None,
+            name="Wi-Fi"
+        ),
+        PetLibroBinarySensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="light_switch",
+            translation_key="light_switch",
+            icon="mdi:lightbulb",
+            should_report=lambda device: device.light_switch is not None,
+            name="Indicator"
+        ),
+        PetLibroBinarySensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="power_state",
+            translation_key="power_state",
+            icon="mdi:power-plug",
+            device_class=BinarySensorDeviceClass.PLUG,
+            should_report=lambda device: device.power_state is not None,
+            name="Power State"
+        ),
+        PetLibroBinarySensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="water_state",
+            translation_key="water_state",
+            icon="mdi:water",
+            device_class=BinarySensorDeviceClass.MOISTURE,
+            should_report=lambda device: device.water_state is not None,
+            name="Water Dispensing State"
+        ),
+    ],
+    Dockstream2SmartFountain: [
+        PetLibroBinarySensorEntityDescription[Dockstream2SmartFountain](
+            key="online",
+            translation_key="online",
+            icon="mdi:wifi",
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
+            should_report=lambda device: device.online is not None,
+            name="Wi-Fi"
+        ),
+        PetLibroBinarySensorEntityDescription[Dockstream2SmartFountain](
+            key="light_switch",
+            translation_key="light_switch",
+            icon="mdi:lightbulb",
+            should_report=lambda device: device.light_switch is not None,
+            name="Indicator"
+        ),
+        PetLibroBinarySensorEntityDescription[Dockstream2SmartFountain](
+            key="water_state",
+            translation_key="water_state",
+            icon="mdi:water",
+            device_class=BinarySensorDeviceClass.MOISTURE,
+            should_report=lambda device: device.water_state is not None,
+            name="Water Dispensing State"
         ),
     ]
 }

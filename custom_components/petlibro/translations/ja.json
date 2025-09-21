@@ -63,7 +63,7 @@
             "feeding_plan_state": {
                 "name": "今日の給餌計画"
             },
-            "today_total_ml": {
+            "today_drinking_amount": {
                 "name": "今日の水消費量（ML）"
             },
             "weight": {

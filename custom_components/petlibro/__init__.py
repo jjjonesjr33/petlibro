@@ -16,6 +16,8 @@ from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
+from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
+from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
 from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD, PLATFORMS, UPDATE_INTERVAL_SECONDS  # Assuming UPDATE_INTERVAL_SECONDS is defined in const
 from .hub import PetLibroHub
 
@@ -32,6 +34,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
+        Platform.UPDATE
     ),
     AirSmartFeeder: (
         Platform.SENSOR,
@@ -41,6 +44,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
+        Platform.UPDATE
     ),
     GranarySmartFeeder: (
         Platform.SENSOR,
@@ -50,6 +54,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
+        Platform.UPDATE
     ),
     GranarySmartCameraFeeder: (
         Platform.SENSOR,
@@ -59,6 +64,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
+        Platform.UPDATE
     ),
     OneRFIDSmartFeeder: (
         Platform.SENSOR,
@@ -68,16 +74,17 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
+        Platform.UPDATE
     ),
     PolarWetFoodFeeder: (
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
         Platform.SWITCH,
-        Platform.SELECT,
         Platform.BUTTON,
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
+        Platform.UPDATE
     ),
     SpaceSmartFeeder: (
         Platform.SENSOR,
@@ -87,6 +94,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
+        Platform.UPDATE
     ),
     DockstreamSmartFountain: (
         Platform.SENSOR,
@@ -96,6 +104,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
+        Platform.UPDATE
     ),
     DockstreamSmartRFIDFountain: (
         Platform.SENSOR,
@@ -105,7 +114,27 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE,
+        Platform.UPDATE
+    ),
+    Dockstream2SmartCordlessFountain: (
+        Platform.SENSOR,
+        Platform.BINARY_SENSOR,
+        Platform.SWITCH,
+        Platform.BUTTON,
+        Platform.NUMBER,
+        Platform.SELECT,
+        Platform.TEXT,
+        Platform.UPDATE
+    ),
+    Dockstream2SmartFountain: (
+        Platform.SENSOR,
+        Platform.BINARY_SENSOR,
+        Platform.SWITCH,
+        Platform.BUTTON,
+        Platform.NUMBER,
+        Platform.SELECT,
+        Platform.TEXT,
+        Platform.UPDATE
     ),
 }
 

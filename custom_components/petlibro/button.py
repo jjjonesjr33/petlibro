@@ -29,6 +29,8 @@ from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
+from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
+from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
 
 @dataclass(frozen=True)
 class RequiredKeysMixin(Generic[_DeviceT]):
@@ -114,18 +116,6 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="desiccant_reset",
             set_fn=lambda device: device.set_desiccant_reset(),
             name="Desiccant Replaced"
-        ),
-        PetLibroButtonEntityDescription[GranarySmartFeeder](
-            key="light_on",
-            translation_key="light_on",
-            set_fn=lambda device: device.set_light_on(),
-            name="Turn On Indicator"
-        ),
-        PetLibroButtonEntityDescription[GranarySmartFeeder](
-            key="light_off",
-            translation_key="light_off",
-            set_fn=lambda device: device.set_light_off(),
-            name="Turn Off Indicator"
         ),
     ],
     GranarySmartCameraFeeder: [
@@ -350,6 +340,58 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             name="Cleaning Reset"
         ),
         PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
+            key="filter_reset",
+            translation_key="filter_reset",
+            set_fn=lambda device: device.set_filter_reset(),
+            name="Filter Reset"
+        )
+    ],
+    Dockstream2SmartCordlessFountain: [
+        PetLibroButtonEntityDescription[Dockstream2SmartCordlessFountain](
+            key="light_on",
+            translation_key="light_on",
+            set_fn=lambda device: device.set_light_on(),
+            name="Turn On Indicator"
+        ),
+        PetLibroButtonEntityDescription[Dockstream2SmartCordlessFountain](
+            key="light_off",
+            translation_key="light_off",
+            set_fn=lambda device: device.set_light_off(),
+            name="Turn Off Indicator"
+        ),
+        PetLibroButtonEntityDescription[Dockstream2SmartCordlessFountain](
+            key="cleaning_reset",
+            translation_key="cleaning_reset",
+            set_fn=lambda device: device.set_cleaning_reset(),
+            name="Cleaning Reset"
+        ),
+        PetLibroButtonEntityDescription[Dockstream2SmartCordlessFountain](
+            key="filter_reset",
+            translation_key="filter_reset",
+            set_fn=lambda device: device.set_filter_reset(),
+            name="Filter Reset"
+        )
+    ],
+    Dockstream2SmartFountain: [
+        PetLibroButtonEntityDescription[Dockstream2SmartFountain](
+            key="light_on",
+            translation_key="light_on",
+            set_fn=lambda device: device.set_light_on(),
+            name="Turn On Indicator"
+        ),
+        PetLibroButtonEntityDescription[Dockstream2SmartFountain](
+            key="light_off",
+            translation_key="light_off",
+            set_fn=lambda device: device.set_light_off(),
+            name="Turn Off Indicator"
+        ),
+        PetLibroButtonEntityDescription[Dockstream2SmartFountain](
+            key="cleaning_reset",
+            translation_key="cleaning_reset",
+            set_fn=lambda device: device.set_cleaning_reset(),
+            name="Cleaning Reset"
+        ),
+        PetLibroButtonEntityDescription[Dockstream2SmartFountain](
             key="filter_reset",
             translation_key="filter_reset",
             set_fn=lambda device: device.set_filter_reset(),

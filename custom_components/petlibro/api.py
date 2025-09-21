@@ -299,7 +299,7 @@ class PetLibroAPI:
         # If we made the request within the last 10 seconds, return cached response
         if last_call_time and (now - last_call_time) < timedelta(seconds=10):
             _LOGGER.debug(f"Skipping drinkWater request for {device_id}, using cached response.")
-            return self._cached_responses.get(f"{device_id}_dataRealInfo", {})
+            return self._cached_responses.get(f"{device_id}_drinkWater", {})
 
         # Otherwise, make the API call and update cache
         try:
@@ -595,7 +595,7 @@ class PetLibroAPI:
         """Set the desiccant cycle."""
         _LOGGER.debug(f"Setting desiccant cycle: serial={serial}, value={value}, key={key}")
         try:
-            # Generate a dynamic request ID for the manual feeding
+            # Generate a dynamic request ID for the desiccant cycle.
             request_id = str(uuid.uuid4()).replace("-", "")
 
             response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
@@ -670,7 +670,7 @@ class PetLibroAPI:
         """Set the vacuum mode."""
         _LOGGER.debug(f"Setting vacuum mode: serial={serial}, value={value}")
         try:
-            # Generate a dynamic request ID for the manual feeding
+            # Generate a dynamic request ID for the vacuum mode.
             request_id = str(uuid.uuid4()).replace("-", "")
 
             response = await self.session.post("/device/device/vacuum", json={
@@ -686,11 +686,47 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set water dispensing mode for device {serial}: {e}")
             raise
 
+
+    # Not supported by the dockstream device firmware yet. hoping that maybe it will be in the future, so leaving code here.
+    # async def set_water_sensing_delay(self, serial: str, value: float, current_mode: int):
+    #     """Set the water sensing delay."""
+    #     _LOGGER.debug(f"Setting water sensing delay duration: serial={serial}, value={value}")
+    #     try:
+    #         # Generate a dynamic request ID for water sensing delay.
+    #         request_id = str(uuid.uuid4()).replace("-", "")
+    #         response = await self.session.post("/device/device/waterModeSetting", json={
+    #             "deviceSn": serial,
+    #             "requestId": request_id,
+    #             "useWaterType": current_mode,
+    #             "useWaterInterval": None,
+    #             "useWaterDuration": None,
+    #             "sensingWaterDuration": value
+    #         })
+    #         _LOGGER.debug(f"Water sensing delay set successfully: {response}")
+    #         return response
+    #     except Exception as e:
+    #         _LOGGER.error(f"Failed to set water sensing delay for device {serial}: {e}")
+    #         raise
+
+    async def set_water_low_threshold(self, serial: str, value: float):
+        """Set the water low threshold."""
+        _LOGGER.debug(f"Setting water low threshold: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/setting/updateLowWaterSetting", json={
+                "deviceSn": serial,
+                "lowWater": value,
+            })
+            _LOGGER.debug(f"Water low threshold set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set water low threshold for device {serial}: {e}")
+            raise
+
     async def set_water_interval(self, serial: str, value: float, current_mode: int, current_duration: float):
         """Set the water interval."""
         _LOGGER.debug(f"Setting water interval: serial={serial}, value={value}")
         try:
-            # Generate a dynamic request ID for the mode switch.
+            # Generate a dynamic request ID for water interval.
             request_id = str(uuid.uuid4()).replace("-", "")
             response = await self.session.post("/device/device/waterModeSetting", json={
                 "deviceSn": serial,
@@ -709,7 +745,7 @@ class PetLibroAPI:
         """Set the water interval."""
         _LOGGER.debug(f"Setting water dispensing duration: serial={serial}, value={value}")
         try:
-            # Generate a dynamic request ID for the mode switch.
+            # Generate a dynamic request ID for water dispensing duration.
             request_id = str(uuid.uuid4()).replace("-", "")
             response = await self.session.post("/device/device/waterModeSetting", json={
                 "deviceSn": serial,
@@ -724,45 +760,11 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set water dispensing duration for device {serial}: {e}")
             raise
 
-    async def set_water_sensing_delay(self, serial: str, value: float, current_mode: int):
-        """Set the water sensing delay."""
-        _LOGGER.debug(f"Setting water sensing delay duration: serial={serial}, value={value}")
-        try:
-            # Generate a dynamic request ID for the mode switch.
-            request_id = str(uuid.uuid4()).replace("-", "")
-            response = await self.session.post("/device/device/waterModeSetting", json={
-                "deviceSn": serial,
-                "requestId": request_id,
-                "useWaterType": current_mode,
-                "useWaterInterval": None,
-                "useWaterDuration": None,
-                "sensingWaterDuration": value
-            })
-            _LOGGER.debug(f"Water sensing delay set successfully: {response}")
-            return response
-        except Exception as e:
-            _LOGGER.error(f"Failed to set water sensing delay for device {serial}: {e}")
-            raise
-
-    async def set_water_low_threshold(self, serial: str, value: float):
-        """Set the water low threshold."""
-        _LOGGER.debug(f"Setting water low threshold: serial={serial}, value={value}")
-        try:
-            response = await self.session.post("/device/setting/updateLowWaterSetting", json={
-                "deviceSn": serial,
-                "lowWater": value,
-            })
-            _LOGGER.debug(f"Water low threshold set successfully: {response}")
-            return response
-        except Exception as e:
-            _LOGGER.error(f"Failed to set water low threshold for device {serial}: {e}")
-            raise
-
     async def set_cleaning_cycle(self, serial: str, value: float, key: str) -> JSON:
         """Set the machine cleaning cycle."""
         _LOGGER.debug(f"Setting machine cleaning cycle: serial={serial}, value={value}, key={key}")
         try:
-            # Generate a dynamic request ID for the manual feeding
+            # Generate a dynamic request ID for the cleaning cycle
             request_id = str(uuid.uuid4()).replace("-", "")
 
             response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
@@ -783,7 +785,7 @@ class PetLibroAPI:
         """Set the filter cycle."""
         _LOGGER.debug(f"Setting filter cycle: serial={serial}, value={value}, key={key}")
         try:
-            # Generate a dynamic request ID for the manual feeding
+            # Generate a dynamic request ID for the filter cycle
             request_id = str(uuid.uuid4()).replace("-", "")
 
             response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
@@ -816,75 +818,164 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set lid mode for device {serial}: {e}")
             raise
 
-    async def set_water_dispensing_mode(self, serial: str, value: int):
-        """Set the water dispensing mode."""
-        _LOGGER.debug(f"Setting water dispensing mode: serial={serial}, value={value}")
+    async def set_water_mode_off(self, serial: str):
+        """Off: stop switch ON (True = off)."""
+        _LOGGER.debug(f"set_water_mode_off: serial={serial}")
         try:
-            # Turn water dispensing off entirely.
-            if value == 999:
-                response = await self.session.post("/device/device/waterModeSetting", json={
-                    "deviceSn": serial,
-                    "waterStopSwitch": True,
-                },)
-                _LOGGER.debug(f"Setting water dispensing mode to OFF successfully: {response}")
-                return response
-
-            # Sensor-activated with distance refinement: update radar first, then set mode=2
-            if value in (997, 998):
-                
-                # Turn water dispensing back on, in case it is currently off.
-                response = await self.session.post("/device/device/waterModeSetting", json={
-                    "deviceSn": serial,
-                    "waterStopSwitch": False,
-                },)
-                _LOGGER.debug(f"Setting water dispensing mode to ON successfully: {response}")
-
-                radar_response = await self.session.post("/device/setting/updateRadarSetting", json={
-                    "deviceSn": serial,
-                    "radarSensingLevel": "NearTrigger" if value == 997 else "FarTrigger",
-                },)
-                _LOGGER.debug(f"Radar setting updated successfully: {radar_response}")
-
-                request_id = str(uuid.uuid4()).replace("-", "")
-                mode_response = await self.session.post("/device/device/waterModeSetting", json={
-                    "deviceSn": serial,
-                    "requestId": request_id,
-                    "useWaterType": 2,           # normalize 997/998 to 2
-                    "useWaterInterval": None,
-                    "useWaterDuration": None,
-                    "sensingWaterDuration": 45
-                },)
-                _LOGGER.debug(f"Mode set successfully after radar: {mode_response}")
-                return mode_response  # keep return type consistent (final mode call)
-
-            # Normal modes: only 0 (constant) and 1 (scheduled)
-            if value in (0, 1):
-
-                # Turn water dispensing back on, in case it is currently off.
-                response = await self.session.post("/device/device/waterModeSetting", json={
-                    "deviceSn": serial,
-                    "waterStopSwitch": False,
-                },)
-                _LOGGER.debug(f"Setting water dispensing mode to ON successfully: {response}")
-
-                request_id = str(uuid.uuid4()).replace("-", "")
-                response = await self.session.post("/device/device/waterModeSetting",json={
-                    "deviceSn": serial,
-                    "requestId": request_id,
-                    "useWaterType": value,
-                    "useWaterInterval": None,
-                    "useWaterDuration": None,
-                },)
-                _LOGGER.debug(f"Water dispensing mode set successfully: {response}")
-                return response
-
-            # Explicitly reject plain '2' and any unknown values
-            if value == 2:
-                raise ValueError("useWaterType=2 must be set via 997 (Near) or 998 (Far) so radar is configured first.")
-            raise ValueError(f"Unknown water dispensing value: {value}")
-
+            resp = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "waterStopSwitch": True,
+            })
+            _LOGGER.debug(f"OFF set successfully: {resp}")
+            return resp
         except Exception as e:
-            _LOGGER.error(f"Failed to set water dispensing mode for device {serial}: {e}")
+            _LOGGER.error(f"Failed to set OFF for {serial}: {e}")
+            raise
+
+    async def set_water_mode_on(self, serial: str):
+        """ON: stop switch OFF (False = on)."""
+        _LOGGER.debug(f"set_water_mode_on: serial={serial}")
+        try:
+            resp = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "waterStopSwitch": False,
+            })
+            _LOGGER.debug(f"ON set successfully: {resp}")
+            return resp
+        except Exception as e:
+            _LOGGER.error(f"Failed to set ON for {serial}: {e}")
+            raise
+
+    async def set_water_mode_radar_near(self, serial: str, interval: int, duration: int | None = None, *, currently_off: bool | None = None):
+        """Sensed (Near): set radar to NearTrigger, then useWaterType=2."""
+        _LOGGER.debug(f"set_water_mode_radar_near: serial={serial}")
+        try:
+            if currently_off:
+                await self.set_water_mode_on(serial)
+
+            radar_resp = await self.session.post("/device/setting/updateRadarSetting", json={
+                "deviceSn": serial,
+                "radarSensingLevel": "NearTrigger",
+            })
+            _LOGGER.debug(f"Radar Near updated: {radar_resp}")
+
+            request_id = str(uuid.uuid4()).replace("-", "")
+            mode_resp = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "requestId": request_id,
+                "useWaterType": 2,             # sensed
+                "useWaterInterval": interval,
+                "useWaterDuration": duration,
+            })
+            _LOGGER.debug(f"Sensed mode (Near) set: {mode_resp}")
+            return mode_resp
+        except Exception as e:
+            _LOGGER.error(f"Failed to set Sensed Near for {serial}: {e}")
+            raise
+
+    async def set_water_mode_radar_far(self, serial: str, interval: int, duration: int | None = None, *, currently_off: bool | None = None):
+        """Sensed (Far): set radar to FarTrigger, then useWaterType=2."""
+        _LOGGER.debug(f"set_water_mode_radar_far: serial={serial}")
+        try:
+            if currently_off:
+                await self.set_water_mode_on(serial)
+
+            radar_resp = await self.session.post("/device/setting/updateRadarSetting", json={
+                "deviceSn": serial,
+                "radarSensingLevel": "FarTrigger",
+            })
+            _LOGGER.debug(f"Radar Near updated: {radar_resp}")
+
+            request_id = str(uuid.uuid4()).replace("-", "")
+            mode_resp = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "requestId": request_id,
+                "useWaterType": 2,             # sensed
+                "useWaterInterval": interval,
+                "useWaterDuration": duration,
+            })
+            _LOGGER.debug(f"Sensed mode (Far) set: {mode_resp}")
+            return mode_resp
+        except Exception as e:
+            _LOGGER.error(f"Failed to set Sensed Far for {serial}: {e}")
+            raise
+
+    async def set_new_water_mode_intermittent(self, serial: str, interval: int, duration: int  | None = None, *, currently_off: bool | None = None):
+        """Intermittent (Scheduled): useWaterType=1; """
+        _LOGGER.debug(f"set_water_mode_intermittent: serial={serial}")
+        try:
+            if currently_off:
+                await self.set_water_mode_on(serial)
+
+            request_id = str(uuid.uuid4()).replace("-", "")
+            resp = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "requestId": request_id,
+                "useWaterType": 1,             # intermittent
+                "useWaterInterval": interval,
+                "useWaterDuration": duration,
+            })
+            _LOGGER.debug(f"Intermittent set successfully: {resp}")
+            return resp
+        except Exception as e:
+            _LOGGER.error(f"Failed to set Intermittent for {serial}: {e}")
+            raise
+
+    async def set_new_water_mode_constant(self, serial: str, interval: int, duration: int | None = None, *, currently_off: bool | None = None):
+        """Constant: useWaterType=0."""
+        _LOGGER.debug(f"set_water_mode_constant: serial={serial}")
+        try:
+            if currently_off:
+                await self.set_water_mode_on(serial)
+
+            request_id = str(uuid.uuid4()).replace("-", "")
+            resp = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "requestId": request_id,
+                "useWaterType": 0,             # constant
+                "useWaterInterval": interval,
+                "useWaterDuration": duration,
+            })
+            _LOGGER.debug(f"Constant set successfully: {resp}")
+            return resp
+        except Exception as e:
+            _LOGGER.error(f"Failed to set Constant for {serial}: {e}")
+            raise
+
+    async def set_water_mode_intermittent(self, serial: str, interval: int, duration: int  | None = None):
+        """Intermittent (Scheduled): useWaterType=1; """
+        _LOGGER.debug(f"set_water_mode_intermittent: serial={serial}")
+        try:
+            request_id = str(uuid.uuid4()).replace("-", "")
+            resp = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "requestId": request_id,
+                "useWaterType": 1,             # intermittent
+                "useWaterInterval": interval,
+                "useWaterDuration": duration,
+            })
+            _LOGGER.debug(f"Intermittent set successfully: {resp}")
+            return resp
+        except Exception as e:
+            _LOGGER.error(f"Failed to set Intermittent for {serial}: {e}")
+            raise
+
+    async def set_water_mode_constant(self, serial: str, interval: int, duration: int | None = None):
+        """Constant: useWaterType=0."""
+        _LOGGER.debug(f"set_water_mode_constant: serial={serial}")
+        try:
+            request_id = str(uuid.uuid4()).replace("-", "")
+            resp = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "requestId": request_id,
+                "useWaterType": 0,             # constant
+                "useWaterInterval": interval,
+                "useWaterDuration": duration,
+            })
+            _LOGGER.debug(f"Constant set successfully: {resp}")
+            return resp
+        except Exception as e:
+            _LOGGER.error(f"Failed to set Constant for {serial}: {e}")
             raise
 
     async def set_display_icon(self, serial: str, value: float):

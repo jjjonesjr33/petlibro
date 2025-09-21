@@ -63,7 +63,7 @@
             "feeding_plan_state": {
                 "name": "Dagens Foderplan"
             },
-            "today_total_ml": {
+            "today_drinking_amount": {
                 "name": "Dagens Vandindtag (ml)"
             },
             "weight": {
