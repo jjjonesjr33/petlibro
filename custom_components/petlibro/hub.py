@@ -12,7 +12,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from aiohttp import ClientResponseError, ClientConnectorError
 from .api import PetLibroAPI  # Use a relative import if inside the same package
-from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD, APIKey  # Import CONF_EMAIL and CONF_PASSWORD
+from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD  # Import CONF_EMAIL and CONF_PASSWORD
 from .api import PetLibroAPIError
 from .devices import Device, product_name_map
 from .member import Member
@@ -31,11 +31,6 @@ class PetLibroHub:
         self.last_refresh_times = {}  # Track the last refresh time for the member & each device
         self.loaded_device_sn = set()  # Track device serial numbers that have already been loaded
         self._last_online_status = {}  # Store online status per device
-        self.unit_sensor_unique_ids: dict[str | APIKey, dict[str, list[str]]] = {
-            APIKey.FEED_UNIT: {"weight": [], "volume": []},
-            APIKey.WEIGHT_UNIT: {"weight": []},
-            APIKey.WATER_UNIT: {"volume": []},
-        }
 
         # Fetch email, password, and region from entry.data
         email = data.get(CONF_EMAIL)
@@ -97,7 +92,7 @@ class PetLibroHub:
                 # Create a new device and add it without calling refresh immediately
                 if device_name in product_name_map:
                     _LOGGER.debug(f"Loading new device: {device_name} (Serial: {device_sn})")
-                    device = product_name_map[device_name](device_data, self.member, self.api)
+                    device = product_name_map[device_name](device_data, self.api)
                     self.devices.append(device)  # Add to device list
                     _LOGGER.debug(f"Successfully loaded device: {device_name} (Serial: {device_sn})")
                 else:

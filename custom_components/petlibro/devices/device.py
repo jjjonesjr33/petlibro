@@ -5,18 +5,16 @@ from typing import cast
 
 from ..api import PetLibroAPI
 from .event import Event, EVENT_UPDATE
-from ..member import Member
 
 
 _LOGGER = getLogger(__name__)
 
 
 class Device(Event):
-    def __init__(self, data: dict, member: Member, api: PetLibroAPI):
+    def __init__(self, data: dict, api: PetLibroAPI):
         super().__init__()
         self._data: dict = {}
         self.api = api
-        self.member = member
 
         self.update_data(data)
 

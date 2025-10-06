@@ -30,7 +30,6 @@
             "account_update_success": "Account updated",
             "account_update_nomember": "Member data not loaded, please check logs",
             "account_update_nochanges": "No settings were changed",
-            "account_update_nochanges_update_sensors": "No settings were changed\nSensor entities updated",
             "error_check_logs": "Error, please check logs"
         },
         "error": {
@@ -55,13 +54,10 @@
                         "data": {
                             "feedUnitType": "Feeder/Feeding",
                             "waterUnitType": "Fountain/Drinking",
-                            "weightUnitType": "Weight",
-                            "update_all_units": "Update measurement unit of all Petlibro unit sensor entities"
-                        },
-                        "data_description": {
-                            "update_all_units": "By default, changing a unit here only updates sensor entities of that type."
+                            "weightUnitType": "Weight"
                         }
                     }
+
                 }
             }
         }
@@ -88,9 +84,7 @@
                 "grams": "g (gram)",
                 "milliliters": "ml (milliliter)",
                 "kilograms": "kg (kilogram)",
-                "pounds": "lb (pound)",
-                "water_ounces": "fl oz (fluid ounce)",
-                "water_milliliters": "ml (milliliter)"
+                "pounds": "lb (pound)"
             }
         }
     },
@@ -117,11 +111,8 @@
             "electric_quantity": {
                 "name": "Battery / AC %"
             },
-            "today_feeding_quantity_weight": {
-                "name": "Today's Feeding Quantity (Weight)"
-            },
-            "today_feeding_quantity_volume": {
-                "name": "Today's Feeding Quantity (Volume)"
+            "today_feeding_quantity": {
+                "name": "Today's Feeding Quantity"
             },
             "today_feeding_times": {
                 "name": "Today's Feeding Times"
@@ -135,11 +126,8 @@
             "last_feed_time": {
                 "name": "Last Feed Time"
             },
-            "last_feed_quantity_weight": {
-                "name": "Last Feed Quantity (Weight)"
-            },
-            "last_feed_quantity_volume": {
-                "name": "Last Feed Quantity (Volume)"
+            "last_feed_quantity": {
+                "name": "Last Feed Quantity"
             },
             "feeding_plan_state": {
                 "name": "Today's Feeding Plan"
@@ -367,9 +355,6 @@
             },
             "filter_cycle": {
                 "name": "Filter Cycle"
-            },
-            "manual_feed_quantity": {
-                "name": "Manual Feed Quantity"
             }
         },
         "select": {

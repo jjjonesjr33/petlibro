@@ -25,63 +25,6 @@
             }
         }
     },
-    "options": {
-        "abort": {
-            "account_update_success": "Konto aktualisiert",
-            "account_update_nomember": "Mitgliedsdaten nicht geladen, bitte Protokolle prüfen",
-            "account_update_nochanges": "Es wurden keine Einstellungen geändert",
-            "account_update_nochanges_update_sensors": "Es wurden keine Einstellungen geändert\nSensor-Entitäten aktualisiert",
-            "error_check_logs": "Fehler, bitte Protokolle prüfen"
-        },
-        "error": {
-            "unknown": "Unerwarteter Fehler"
-        },
-        "step": {
-            "init": {
-                "menu_options": {
-                    "account_settings": "Kontoeinstellungen"
-                }
-            },
-            "account_settings": {
-                "title": "Kontoeinstellungen",
-                "description": "Für Konto: {email}",
-                "data": {
-                    "nickname": "Spitzname",
-                    "gender": "Geschlecht"
-                },
-                "sections": {
-                    "measurement_unit": {
-                        "name": "Maßeinheiten",
-                        "data": {
-                            "feedUnitType": "Futterautomat/Fütterung",
-                            "waterUnitType": "Brunnen/Trinken",
-                            "weightUnitType": "Gewicht",
-                            "update_all_units": "Maßeinheit aller Petlibro-Einheitssensor-Entitäten aktualisieren"
-                        },
-                        "data_description": {
-                            "update_all_units": "Standardmäßig aktualisiert eine Änderung der Einheit hier nur Sensor-Entitäten dieses Typs."
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "selector": {
-        "member_gender": {
-            "options": {
-                "male": "Männlich",
-                "female": "Weiblich",
-                "none": "Keine Angabe"
-            }
-        },
-        "pet_sex": {
-            "options": {
-                "male": "Männlich",
-                "female": "Weiblich",
-                "none": "Keine Auswahl"
-            }
-        }
-    },
     "entity": {
         "sensor": {
             "device_sn": {
@@ -105,17 +48,8 @@
             "electric_quantity": {
                 "name": "Batterie %"
             },
-            "today_feeding_quantity_weight": {
-                "name": "Heutige Futtermenge (Gewicht)"
-            },
-            "today_feeding_quantity_volume": {
-                "name": "Heutige Futtermenge (Volumen)"
-            },
-            "last_feed_quantity_weight": {
-                "name": "Letzte Futtermenge (Gewicht)"
-            },
-            "last_feed_quantity_volume": {
-                "name": "Letzte Futtermenge (Volumen)"
+            "today_feeding_quantity": {
+                "name": "Futtermenge heute"
             },
             "today_feeding_times": {
                 "name": "Fütterzeiten heute"
@@ -274,9 +208,6 @@
             },
             "lid_close_time": {
                 "name": "Deckelschließzeit"
-            },
-            "manual_feed_quantity": {
-                "name": "Manuelle Futtermenge"
             }
         },
         "select": {

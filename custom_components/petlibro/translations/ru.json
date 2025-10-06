@@ -25,63 +25,6 @@
             }
         }
     },
-    "options": {
-        "abort": {
-            "account_update_success": "Аккаунт обновлен",
-            "account_update_nomember": "Данные участника не загружены, проверьте логи",
-            "account_update_nochanges": "Настройки не были изменены",
-            "account_update_nochanges_update_sensors": "Настройки не были изменены\nСущности датчиков обновлены",
-            "error_check_logs": "Ошибка, пожалуйста, проверьте логи"
-        },
-        "error": {
-            "unknown": "Неожиданная ошибка"
-        },
-        "step": {
-            "init": {
-                "menu_options": {
-                    "account_settings": "Настройки аккаунта"
-                }
-            },
-            "account_settings": {
-                "title": "Настройки аккаунта",
-                "description": "Для аккаунта: {email}",
-                "data": {
-                    "nickname": "Никнейм",
-                    "gender": "Пол"
-                },
-                "sections": {
-                    "measurement_unit": {
-                        "name": "Единицы измерения",
-                        "data": {
-                            "feedUnitType": "Кормушка/Кормление",
-                            "waterUnitType": "Фонтан/Питьё",
-                            "weightUnitType": "Вес",
-                            "update_all_units": "Обновить единицу измерения для всех сущностей датчиков Petlibro"
-                        },
-                        "data_description": {
-                            "update_all_units": "По умолчанию изменение единицы здесь обновляет только сущности датчиков этого типа."
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "selector": {
-        "member_gender": {
-            "options": {
-                "male": "Мужской",
-                "female": "Женский",
-                "none": "Не указывать"
-            }
-        },
-        "pet_sex": {
-            "options": {
-                "male": "Самец",
-                "female": "Самка",
-                "none": "Не выбрано"
-            }
-        }
-    },
     "entity": {
         "sensor": {
             "device_sn": {
@@ -105,17 +48,8 @@
             "electric_quantity": {
                 "name": "Батарея / AC %"
             },
-            "today_feeding_quantity_weight": {
-                "name": "Сегодняшнее количество корма (Вес)"
-            },
-            "today_feeding_quantity_volume": {
-                "name": "Сегодняшнее количество корма (Объем)"
-            },
-            "last_feed_quantity_weight": {
-                "name": "Последнее количество корма (Вес)"
-            },
-            "last_feed_quantity_volume": {
-                "name": "Последнее количество корма (Объем)"
+            "today_feeding_quantity": {
+                "name": "Сегодняшнее количество кормления"
             },
             "today_feeding_times": {
                 "name": "Сегодняшнее время кормления"
@@ -280,9 +214,6 @@
             },
             "lid_close_time": {
                 "name": "Крышка близко время"
-            },
-            "manual_feed_quantity": {
-                "name": "Ручное количество корма"
             }
         },
         "select": {

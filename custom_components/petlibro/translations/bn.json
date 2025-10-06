@@ -25,63 +25,6 @@
             }
         }
     },
-    "options": {
-        "abort": {
-            "account_update_success": "অ্যাকাউন্ট আপডেট হয়েছে",
-            "account_update_nomember": "সদস্য তথ্য লোড করা হয়নি, অনুগ্রহ করে লগ পরীক্ষা করুন",
-            "account_update_nochanges": "কোনও সেটিংস পরিবর্তন করা হয়নি",
-            "account_update_nochanges_update_sensors": "কোনও সেটিংস পরিবর্তন করা হয়নি\nসেন্সর এন্টিটিগুলি আপডেট হয়েছে",
-            "error_check_logs": "ত্রুটি, অনুগ্রহ করে লগ পরীক্ষা করুন"
-        },
-        "error": {
-            "unknown": "অপ্রত্যাশিত ত্রুটি"
-        },
-        "step": {
-            "init": {
-                "menu_options": {
-                    "account_settings": "অ্যাকাউন্ট সেটিংস"
-                }
-            },
-            "account_settings": {
-                "title": "অ্যাকাউন্ট সেটিংস",
-                "description": "অ্যাকাউন্টের জন্য: {email}",
-                "data": {
-                    "nickname": "ডাকনাম",
-                    "gender": "লিঙ্গ"
-                },
-                "sections": {
-                    "measurement_unit": {
-                        "name": "পরিমাপের একক",
-                        "data": {
-                            "feedUnitType": "খাবার সরবরাহ/খাওয়ানো",
-                            "waterUnitType": "ফোয়ারা/পান করা",
-                            "weightUnitType": "ওজন",
-                            "update_all_units": "সমস্ত Petlibro ইউনিট সেন্সর এন্টিটির পরিমাপ একক আপডেট করুন"
-                        },
-                        "data_description": {
-                            "update_all_units": "ডিফল্টভাবে, এখানে ইউনিট পরিবর্তন করলে শুধুমাত্র সেই ধরনের সেন্সর এন্টিটি আপডেট হয়।"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "selector": {
-        "member_gender": {
-            "options": {
-                "male": "পুরুষ",
-                "female": "মহিলা",
-                "none": "বলতে চাই না"
-            }
-        },
-        "pet_sex": {
-            "options": {
-                "male": "পুরুষ",
-                "female": "মহিলা",
-                "none": "কোনওটি নির্বাচিত হয়নি"
-            }
-        }
-    },
     "entity": {
         "sensor": {
             "device_sn": {
@@ -105,17 +48,8 @@
             "electric_quantity": {
                 "name": "ব্যাটারি / এসি %"
             },
-            "today_feeding_quantity_weight": {
-                "name": "আজকের খাবারের পরিমাণ (ওজন)"
-            },
-            "today_feeding_quantity_volume": {
-                "name": "আজকের খাবারের পরিমাণ (পরিমাণ)"
-            },
-            "last_feed_quantity_weight": {
-                "name": "শেষ খাওয়ানোর পরিমাণ (ওজন)"
-            },
-            "last_feed_quantity_volume": {
-                "name": "শেষ খাওয়ানোর পরিমাণ (পরিমাণ)"
+            "today_feeding_quantity": {
+                "name": "আজকের খাওয়ানোর পরিমাণ"
             },
             "today_feeding_times": {
                 "name": "আজকের খাওয়ানোর সময়"
@@ -280,9 +214,6 @@
             },
             "lid_close_time": {
                 "name": "Lid াকনা কাছাকাছি সময়"
-            },
-            "manual_feed_quantity": {
-                "name": "ম্যানুয়াল খাবারের পরিমাণ"
             }
         },
         "select": {

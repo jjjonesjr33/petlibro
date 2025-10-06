@@ -25,63 +25,6 @@
             }
         }
     },
-    "options": {
-        "abort": {
-            "account_update_success": "アカウントを更新しました",
-            "account_update_nomember": "メンバーデータが読み込まれていません。ログを確認してください",
-            "account_update_nochanges": "設定は変更されませんでした",
-            "account_update_nochanges_update_sensors": "設定は変更されませんでした\nセンサーエンティティが更新されました",
-            "error_check_logs": "エラー、ログを確認してください"
-        },
-        "error": {
-            "unknown": "予期しないエラー"
-        },
-        "step": {
-            "init": {
-                "menu_options": {
-                    "account_settings": "アカウント設定"
-                }
-            },
-            "account_settings": {
-                "title": "アカウント設定",
-                "description": "アカウント: {email}",
-                "data": {
-                    "nickname": "ニックネーム",
-                    "gender": "性別"
-                },
-                "sections": {
-                    "measurement_unit": {
-                        "name": "測定単位",
-                        "data": {
-                            "feedUnitType": "給餌機/給餌",
-                            "waterUnitType": "給水器/飲水",
-                            "weightUnitType": "重量",
-                            "update_all_units": "すべてのPetlibroユニットセンサーエンティティの測定単位を更新"
-                        },
-                        "data_description": {
-                            "update_all_units": "デフォルトでは、ここで単位を変更すると、その種類のセンサーエンティティのみが更新されます。"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "selector": {
-        "member_gender": {
-            "options": {
-                "male": "男性",
-                "female": "女性",
-                "none": "答えたくない"
-            }
-        },
-        "pet_sex": {
-            "options": {
-                "male": "オス",
-                "female": "メス",
-                "none": "未選択"
-            }
-        }
-    },
     "entity": {
         "sensor": {
             "device_sn": {
@@ -105,17 +48,8 @@
             "electric_quantity": {
                 "name": "バッテリー / AC％"
             },
-            "today_feeding_quantity_weight": {
-                "name": "今日の給餌量（重量）"
-            },
-            "today_feeding_quantity_volume": {
-                "name": "今日の給餌量（容量）"
-            },
-            "last_feed_quantity_weight": {
-                "name": "最後の給餌量（重量）"
-            },
-            "last_feed_quantity_volume": {
-                "name": "最後の給餌量（容量）"
+            "today_feeding_quantity": {
+                "name": "今日の給餌量"
             },
             "today_feeding_times": {
                 "name": "今日の給餌時間"
@@ -280,9 +214,6 @@
             },
             "lid_close_time": {
                 "name": "ふたの近い時間"
-            },
-            "manual_feed_quantity": {
-                "name": "手動給餌量"
             }
         },
         "select": {

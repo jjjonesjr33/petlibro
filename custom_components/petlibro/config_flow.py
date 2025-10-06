@@ -10,23 +10,21 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
-from homeassistant.const import CONF_API_TOKEN, CONF_EMAIL, CONF_PASSWORD, CONF_REGION, Platform
+from homeassistant.const import CONF_API_TOKEN, CONF_EMAIL, CONF_PASSWORD, CONF_REGION
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import section
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import selector
-from homeassistant.helpers.entity_registry import async_get as get_entity_registry
 
 from .api import PetLibroAPI
 from .const import (
     DEFAULT_FEED,
     DEFAULT_WATER,
     DEFAULT_WEIGHT,
-    ROUNDING_RULES,
     DOMAIN,
-    APIKey as API,
+    CommonAPIKeys as API,
     Gender,
-    Unit,
+    UnitTypes,
 )
 from .exceptions import PetLibroCannotConnect, PetLibroInvalidAuth
 from .hub import PetLibroHub
@@ -203,54 +201,25 @@ class PetlibroOptionsFlow(OptionsFlow):
             return self.async_abort(reason="account_update_nomember")
 
         user_input = user_input or {}
-        if user_input:            
-            update_setting_temp = user_input.pop("measurement_unit", {})
-            update_info_temp = user_input.copy()
-            user_input.update(**update_setting_temp)
-            update_all_units = update_setting_temp.pop("update_all_units", False)
-            
+        if user_input:
             update_setting = self.collect_updates(
                 fields=(API.FEED_UNIT, API.WATER_UNIT, API.WEIGHT_UNIT),
-                user_input=update_setting_temp,
-                enum_cls=Unit,
+                user_input=user_input.pop("measurement_unit", {}),
+                enum_cls=UnitTypes,
             )
 
             update_info = self.collect_updates(
                 fields=(API.NICKNAME, API.GENDER),
-                user_input=update_info_temp,
+                user_input=user_input,
                 special={
                     API.NICKNAME: lambda v: v or "",
                     API.GENDER: lambda v: self.validate_enum(API.GENDER, v, Gender),
                 },
             )
-                            
-            if update_setting or update_all_units:
-                registry = get_entity_registry(self.hass)
-                for unit_type in self.hub.unit_sensor_unique_ids:
-                    unit = (input if isinstance(input := update_setting.get(unit_type), Unit)
-                        else Unit(input) if input else getattr(self.member, unit_type, None))
-                    if (unit_type not in update_setting or not unit or not unit.device_class) and not update_all_units:
-                        continue
-                    _LOGGER.debug("Updating %s sensor entities", unit_type)
-                    if update_all_units and unit_type == API.FEED_UNIT:
-                        target_units = {"weight": unit if unit.device_class == "weight" else Unit.GRAMS,
-                            "volume": unit if unit.device_class == "volume" else Unit.MILLILITERS}
-                    else:
-                        target_units = {unit.device_class: unit}
-                    for device_class, target_unit in target_units.items():
-                        display_precision = ROUNDING_RULES.get(target_unit, 0)
-                        options = { "unit_of_measurement": target_unit.symbol,
-                                    "display_precision": display_precision,
-                                    "suggested_display_precision": display_precision }
-                        for unique_id in self.hub.unit_sensor_unique_ids.get(unit_type, {}).get(device_class, []):
-                            entity_id = registry.async_get_entity_id(Platform.SENSOR, DOMAIN, unique_id)
-                            _LOGGER.debug("Setting %s to %s with display precision %s", entity_id, unit.symbol, display_precision)
-                            registry.async_update_entity_options(entity_id, Platform.SENSOR, options)
 
             if not (update_info or update_setting):
                 _LOGGER.debug("No account settings were changed.")
-                reason = "account_update_nochanges" + ("_update_sensors" if update_all_units else "")
-                return self.async_abort(reason=reason)
+                return self.async_abort(reason="account_update_nochanges")
 
             no_error = await self.api.member_update_info(update_info, update_setting)
             await self.hub.async_refresh(force_member=True)
@@ -283,12 +252,12 @@ class PetlibroOptionsFlow(OptionsFlow):
                     vol.Required(
                         str(API.GENDER),
                         default=user_input.get(
-                            API.GENDER, getattr(self.member, API.GENDER, Gender.NONE).lower
+                            API.GENDER, getattr(self.member, API.GENDER, str(Gender.NONE))
                         ),
                     ): selector(
                         {
                             "select": {
-                                "options": [g.lower for g in Gender],
+                                "options": [g.name.lower() for g in Gender],
                                 "mode": "dropdown",
                                 "translation_key": "member_gender",
                             }
@@ -311,32 +280,33 @@ class PetlibroOptionsFlow(OptionsFlow):
                 vol.Required(
                     str(API.FEED_UNIT),
                     default=user_input.get(
-                        API.FEED_UNIT, getattr(self.member, API.FEED_UNIT, DEFAULT_FEED).lower
+                        API.FEED_UNIT, getattr(self.member, API.FEED_UNIT, DEFAULT_FEED.name)
                     ),
-                ): self._unit_selector((Unit.CUPS, Unit.OUNCES, Unit.GRAMS, Unit.MILLILITERS)),
+                ): self._unit_selector(
+                    (UnitTypes.CUPS, UnitTypes.OUNCES, UnitTypes.GRAMS, UnitTypes.MILLILITERS)
+                ),
                 vol.Required(
                     str(API.WATER_UNIT),
                     default=user_input.get(
-                        API.WATER_UNIT, getattr(self.member, API.WATER_UNIT, DEFAULT_WATER).lower
+                        API.WATER_UNIT, getattr(self.member, API.WATER_UNIT, DEFAULT_WATER.name)
                     ),
-                ): self._unit_selector((Unit.WATER_OUNCES, Unit.WATER_MILLILITERS)),
+                ): self._unit_selector((UnitTypes.OUNCES, UnitTypes.MILLILITERS)),
                 vol.Required(
                     str(API.WEIGHT_UNIT),
                     default=user_input.get(
                         API.WEIGHT_UNIT,
-                        getattr(self.member, API.WEIGHT_UNIT, DEFAULT_WEIGHT).lower,
+                        getattr(self.member, API.WEIGHT_UNIT, DEFAULT_WEIGHT.name),
                     ),
-                ): self._unit_selector((Unit.POUNDS, Unit.KILOGRAMS)),
-                vol.Optional("update_all_units", default=user_input.get("update_all_units", False)): bool,
+                ): self._unit_selector((UnitTypes.POUNDS, UnitTypes.KILOGRAMS)),
             }
         )
 
-    def _unit_selector(self, options: tuple[Unit, ...]) -> Any:
+    def _unit_selector(self, options: tuple[Enum, ...]) -> Any:
         """Return a dropdown selector for measurement unit options."""
         return selector(
             {
                 "select": {
-                    "options": [o.lower for o in options],
+                    "options": [o.name.lower() for o in options],
                     "mode": "dropdown",
                     "translation_key": "unit_type",
                 }
@@ -354,7 +324,7 @@ class PetlibroOptionsFlow(OptionsFlow):
 
         form_value_str = str(form_value).upper()
         if form_value_str in enum_cls.__members__:
-            return enum_cls[form_value_str]
+            return enum_cls[form_value_str].value
 
         _LOGGER.error("Invalid value: %s for API key: %s", form_value, api_key)
         return None
@@ -388,7 +358,6 @@ class PetlibroOptionsFlow(OptionsFlow):
             else:
                 api_value = form_value
 
-            if api_value != current_value:
-                updates[api_key] = api_value
-                
+            updates[api_key] = api_value
+
         return updates

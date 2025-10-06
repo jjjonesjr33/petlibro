@@ -25,63 +25,6 @@
             }
         }
     },
-    "options": {
-        "abort": {
-            "account_update_success": "账户已更新",
-            "account_update_nomember": "未加载成员数据，请检查日志",
-            "account_update_nochanges": "未更改任何设置",
-            "account_update_nochanges_update_sensors": "未更改任何设置\n传感器实体已更新",
-            "error_check_logs": "错误，请检查日志"
-        },
-        "error": {
-            "unknown": "意外错误"
-        },
-        "step": {
-            "init": {
-                "menu_options": {
-                    "account_settings": "账户设置"
-                }
-            },
-            "account_settings": {
-                "title": "账户设置",
-                "description": "账户：{email}",
-                "data": {
-                    "nickname": "昵称",
-                    "gender": "性别"
-                },
-                "sections": {
-                    "measurement_unit": {
-                        "name": "计量单位",
-                        "data": {
-                            "feedUnitType": "喂食器/喂食",
-                            "waterUnitType": "饮水机/饮用",
-                            "weightUnitType": "重量",
-                            "update_all_units": "更新所有 Petlibro 单位传感器实体的计量单位"
-                        },
-                        "data_description": {
-                            "update_all_units": "默认情况下，在此更改单位只会更新该类型的传感器实体。"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "selector": {
-        "member_gender": {
-            "options": {
-                "male": "男",
-                "female": "女",
-                "none": "不愿透露"
-            }
-        },
-        "pet_sex": {
-            "options": {
-                "male": "公",
-                "female": "母",
-                "none": "未选择"
-            }
-        }
-    },
     "entity": {
         "sensor": {
             "device_sn": {
@@ -105,17 +48,8 @@
             "electric_quantity": {
                 "name": "电池 / AC％"
             },
-            "today_feeding_quantity_weight": {
-                "name": "今日喂食量（重量）"
-            },
-            "today_feeding_quantity_volume": {
-                "name": "今日喂食量（体积）"
-            },
-            "last_feed_quantity_weight": {
-                "name": "上次喂食量（重量）"
-            },
-            "last_feed_quantity_volume": {
-                "name": "上次喂食量（体积）"
+            "today_feeding_quantity": {
+                "name": "今天的喂养数量"
             },
             "today_feeding_times": {
                 "name": "今天的喂养时间"
@@ -280,9 +214,6 @@
             },
             "lid_close_time": {
                 "name": "盖关闭时间"
-            },
-            "manual_feed_quantity": {
-                "name": "手动喂食量"
             }
         },
         "select": {

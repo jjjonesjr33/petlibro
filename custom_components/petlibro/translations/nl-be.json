@@ -25,63 +25,6 @@
             }
         }
     },
-    "options": {
-        "abort": {
-            "account_update_success": "Account bijgewerkt",
-            "account_update_nomember": "Lidgegevens niet geladen, controleer de logboeken",
-            "account_update_nochanges": "Er zijn geen instellingen gewijzigd",
-            "account_update_nochanges_update_sensors": "Er zijn geen instellingen gewijzigd\nSensor-entiteiten bijgewerkt",
-            "error_check_logs": "Fout, controleer de logboeken"
-        },
-        "error": {
-            "unknown": "Onverwachte fout"
-        },
-        "step": {
-            "init": {
-                "menu_options": {
-                    "account_settings": "Accountinstellingen"
-                }
-            },
-            "account_settings": {
-                "title": "Accountinstellingen",
-                "description": "Voor account: {email}",
-                "data": {
-                    "nickname": "Bijnaam",
-                    "gender": "Geslacht"
-                },
-                "sections": {
-                    "measurement_unit": {
-                        "name": "Meeteenheden",
-                        "data": {
-                            "feedUnitType": "Voederautomaat/Voeren",
-                            "waterUnitType": "Fontein/Drinken",
-                            "weightUnitType": "Gewicht",
-                            "update_all_units": "Werk de meeteenheid van alle Petlibro-eenheidssensor-entiteiten bij"
-                        },
-                        "data_description": {
-                            "update_all_units": "Standaard werkt een wijziging van een eenheid hier alleen sensoren van dat type bij."
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "selector": {
-        "member_gender": {
-            "options": {
-                "male": "Man",
-                "female": "Vrouw",
-                "none": "Geen voorkeur"
-            }
-        },
-        "pet_sex": {
-            "options": {
-                "male": "Mannetje",
-                "female": "Vrouwtje",
-                "none": "Geen geselecteerd"
-            }
-        }
-    },
     "entity": {
         "sensor": {
             "device_sn": {
@@ -105,17 +48,8 @@
             "electric_quantity": {
                 "name": "Batterij %"
             },
-            "today_feeding_quantity_weight": {
-                "name": "Vandaag gevoerde hoeveelheid (Gewicht)"
-            },
-            "today_feeding_quantity_volume": {
-                "name": "Vandaag gevoerde hoeveelheid (Volume)"
-            },
-            "last_feed_quantity_weight": {
-                "name": "Laatste gevoerde hoeveelheid (Gewicht)"
-            },
-            "last_feed_quantity_volume": {
-                "name": "Laatste gevoerde hoeveelheid (Volume)"
+            "today_feeding_quantity": {
+                "name": "Totale Voedingshoeveelheid van vandaag"
             },
             "today_feeding_times": {
                 "name": "Totale voedermomenten van vandaag"
@@ -283,9 +217,6 @@
             },
             "lid_close_time": {
                 "name": "Sluittijd deksel"
-            },
-            "manual_feed_quantity": {
-                "name": "Handmatige voederhoeveelheid"
             }
         },
         "select": {

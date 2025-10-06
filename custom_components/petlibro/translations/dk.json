@@ -25,63 +25,6 @@
             }
         }
     },
-    "options": {
-        "abort": {
-            "account_update_success": "Konto opdateret",
-            "account_update_nomember": "Medlemsdata ikke indlæst, tjek venligst loggene",
-            "account_update_nochanges": "Ingen indstillinger blev ændret",
-            "account_update_nochanges_update_sensors": "Ingen indstillinger blev ændret\nSensor-entiteter opdateret",
-            "error_check_logs": "Fejl, tjek venligst loggene"
-        },
-        "error": {
-            "unknown": "Uventet fejl"
-        },
-        "step": {
-            "init": {
-                "menu_options": {
-                    "account_settings": "Kontoindstillinger"
-                }
-            },
-            "account_settings": {
-                "title": "Kontoindstillinger",
-                "description": "For konto: {email}",
-                "data": {
-                    "nickname": "Kaldenavn",
-                    "gender": "Køn"
-                },
-                "sections": {
-                    "measurement_unit": {
-                        "name": "Måleenheder",
-                        "data": {
-                            "feedUnitType": "Foderautomat/Fodring",
-                            "waterUnitType": "Fontæne/Drikke",
-                            "weightUnitType": "Vægt",
-                            "update_all_units": "Opdater måleenheden for alle Petlibro-enhedssensor-entiteter"
-                        },
-                        "data_description": {
-                            "update_all_units": "Som standard opdaterer en ændring af enheden her kun sensor-entiteter af den type."
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "selector": {
-        "member_gender": {
-            "options": {
-                "male": "Mand",
-                "female": "Kvinde",
-                "none": "Ønsker ikke at oplyse"
-            }
-        },
-        "pet_sex": {
-            "options": {
-                "male": "Han",
-                "female": "Hun",
-                "none": "Ingen valgt"
-            }
-        }
-    },
     "entity": {
         "sensor": {
             "device_sn": {
@@ -105,17 +48,8 @@
             "electric_quantity": {
                 "name": "Batteri %"
             },
-            "today_feeding_quantity_weight": {
-                "name": "Dagens Fodermængde (Vægt)"
-            },
-            "today_feeding_quantity_volume": {
-                "name": "Dagens Fodermængde (Volumen)"
-            },
-            "last_feed_quantity_weight": {
-                "name": "Sidste fodermængde (Vægt)"
-            },
-            "last_feed_quantity_volume": {
-                "name": "Sidste fodermængde (Volumen)"
+            "today_feeding_quantity": {
+                "name": "Dagens Fodermængde"
             },
             "today_feeding_times": {
                 "name": "Dagens Fodertælling"
@@ -283,9 +217,6 @@
             },
             "lid_close_time": {
                 "name": "Lågets Lukketid"
-            },
-            "manual_feed_quantity": {
-                "name": "Manuel fodermængde"
             }
         },
         "select": {

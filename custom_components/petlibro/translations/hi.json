@@ -25,63 +25,6 @@
             }
         }
     },
-    "options": {
-        "abort": {
-            "account_update_success": "खाता अपडेट किया गया",
-            "account_update_nomember": "सदस्य डेटा लोड नहीं हुआ, कृपया लॉग जांचें",
-            "account_update_nochanges": "कोई सेटिंग्स नहीं बदली गईं",
-            "account_update_nochanges_update_sensors": "कोई सेटिंग्स नहीं बदली गईं\nसेंसर एंटिटीज़ अपडेट की गईं",
-            "error_check_logs": "त्रुटि, कृपया लॉग जांचें"
-        },
-        "error": {
-            "unknown": "अप्रत्याशित त्रुटि"
-        },
-        "step": {
-            "init": {
-                "menu_options": {
-                    "account_settings": "खाता सेटिंग्स"
-                }
-            },
-            "account_settings": {
-                "title": "खाता सेटिंग्स",
-                "description": "खाते के लिए: {email}",
-                "data": {
-                    "nickname": "उपनाम",
-                    "gender": "लिंग"
-                },
-                "sections": {
-                    "measurement_unit": {
-                        "name": "माप की इकाइयाँ",
-                        "data": {
-                            "feedUnitType": "फीडर/खिलाना",
-                            "waterUnitType": "फव्वारा/पेय",
-                            "weightUnitType": "वज़न",
-                            "update_all_units": "सभी Petlibro यूनिट सेंसर एंटिटी की माप इकाई अपडेट करें"
-                        },
-                        "data_description": {
-                            "update_all_units": "डिफ़ॉल्ट रूप से, यहां एक इकाई बदलने से केवल उसी प्रकार की सेंसर एंटिटी अपडेट होती है।"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "selector": {
-        "member_gender": {
-            "options": {
-                "male": "पुरुष",
-                "female": "महिला",
-                "none": "नहीं बताना चाहता"
-            }
-        },
-        "pet_sex": {
-            "options": {
-                "male": "नर",
-                "female": "मादा",
-                "none": "कोई चयन नहीं"
-            }
-        }
-    },
     "entity": {
         "sensor": {
             "device_sn": {
@@ -105,17 +48,8 @@
             "electric_quantity": {
                 "name": "बैटरी / एसी %"
             },
-            "today_feeding_quantity_weight": {
-                "name": "आज की खिलाने की मात्रा (वज़न)"
-            },
-            "today_feeding_quantity_volume": {
-                "name": "आज की खिलाने की मात्रा (आयतन)"
-            },
-            "last_feed_quantity_weight": {
-                "name": "अंतिम खिलाने की मात्रा (वज़न)"
-            },
-            "last_feed_quantity_volume": {
-                "name": "अंतिम खिलाने की मात्रा (आयतन)"
+            "today_feeding_quantity": {
+                "name": "आज की फीडिंग की मात्रा"
             },
             "today_feeding_times": {
                 "name": "आज का खिला समय"
@@ -280,9 +214,6 @@
             },
             "lid_close_time": {
                 "name": "ढक्कन करीबी समय"
-            },
-            "manual_feed_quantity": {
-                "name": "मैनुअल खिलाने की मात्रा"
             }
         },
         "select": {

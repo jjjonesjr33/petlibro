@@ -11,7 +11,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpda
 
 from .devices import Device
 from .devices.event import EVENT_UPDATE
-from .const import DOMAIN, APIKey
+from .const import DOMAIN
 from .hub import PetLibroHub
 
 _DeviceT = TypeVar("_DeviceT", bound=Device)
@@ -31,7 +31,6 @@ class PetLibroEntity(
         super().__init__(hub.coordinator)
         self.device = device
         self.hub = hub
-        self.member = hub.member
         self.entity_description = description
         self._attr_unique_id = f"{self.device.serial}-{description.key}"
 
