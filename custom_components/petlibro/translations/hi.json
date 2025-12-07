@@ -102,12 +102,6 @@
     },
     "entity": {
         "sensor": {
-            "device_sn": {
-                "name": "युक्ति एसएन"
-            },
-            "mac_address": {
-                "name": "मैक पता"
-            },
             "wifi_ssid": {
                 "name": "वाई-फाई ssid"
             },

@@ -102,12 +102,6 @@
     },
     "entity": {
         "sensor": {
-            "device_sn": {
-                "name": "设备SN"
-            },
-            "mac_address": {
-                "name": "MAC地址"
-            },
             "wifi_ssid": {
                 "name": "Wi-Fi SSID"
             },

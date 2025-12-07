@@ -102,12 +102,6 @@
     },
     "entity": {
         "sensor": {
-            "device_sn": {
-                "name": "Appareil Sn"
-            },
-            "mac_address": {
-                "name": "Adresse MAC"
-            },
             "wifi_ssid": {
                 "name": "Wi-Fi SSID"
             },

@@ -292,18 +292,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     ],
     AirSmartFeeder: [
         PetLibroSensorEntityDescription[AirSmartFeeder](
-            key="device_sn",
-            translation_key="device_sn",
-            icon="mdi:identifier",
-            name="Device SN"
-        ),
-        PetLibroSensorEntityDescription[AirSmartFeeder](
-            key="mac",
-            translation_key="mac_address",
-            icon="mdi:network",
-            name="MAC Address"
-        ),
-        PetLibroSensorEntityDescription[AirSmartFeeder](
             key="wifi_ssid",
             translation_key="wifi_ssid",
             icon="mdi:wifi",
@@ -421,18 +409,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
         ),
     ],
     GranarySmartFeeder: [
-        PetLibroSensorEntityDescription[GranarySmartFeeder](
-            key="device_sn",
-            translation_key="device_sn",
-            icon="mdi:identifier",
-            name="Device SN"
-        ),
-        PetLibroSensorEntityDescription[GranarySmartFeeder](
-            key="mac",
-            translation_key="mac_address",
-            icon="mdi:network",
-            name="MAC Address"
-        ),
         PetLibroSensorEntityDescription[GranarySmartFeeder](
             key="wifi_ssid",
             translation_key="wifi_ssid",
@@ -560,18 +536,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
         ),
     ],
     GranarySmartCameraFeeder: [
-        PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
-            key="device_sn",
-            translation_key="device_sn",
-            icon="mdi:identifier",
-            name="Device SN"
-        ),
-        PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
-            key="mac_address",
-            translation_key="mac_address",
-            icon="mdi:network",
-            name="MAC Address"
-        ),
         PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
             key="wifi_ssid",
             translation_key="wifi_ssid",
@@ -735,18 +699,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     ],
     OneRFIDSmartFeeder: [
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="device_sn",
-            translation_key="device_sn",
-            icon="mdi:identifier",
-            name="Device SN"
-        ),
-        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
-            key="mac",
-            translation_key="mac_address",
-            icon="mdi:network",
-            name="MAC Address"
-        ),
-        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="wifi_ssid",
             translation_key="wifi_ssid",
             icon="mdi:wifi",
@@ -887,18 +839,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     ],
     PolarWetFoodFeeder: [
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
-            key="device_sn",
-            translation_key="device_sn",
-            icon="mdi:identifier",
-            name="Device SN"
-        ),
-        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
-            key="mac",
-            translation_key="mac_address",
-            icon="mdi:network",
-            name="MAC Address"
-        ),
-        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
             key="wifi_rssi",
             translation_key="wifi_rssi",
             icon="mdi:wifi",
@@ -969,18 +909,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
         ),
     ],
     SpaceSmartFeeder: [
-        PetLibroSensorEntityDescription[SpaceSmartFeeder](
-            key="device_sn",
-            translation_key="device_sn",
-            icon="mdi:identifier",
-            name="Device SN"
-        ),
-        PetLibroSensorEntityDescription[SpaceSmartFeeder](
-            key="mac",
-            translation_key="mac_address",
-            icon="mdi:network",
-            name="MAC Address"
-        ),
         PetLibroSensorEntityDescription[SpaceSmartFeeder](
             key="wifi_ssid",
             translation_key="wifi_ssid",
@@ -1106,18 +1034,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     ],
     DockstreamSmartFountain: [
         PetLibroSensorEntityDescription[DockstreamSmartFountain](
-            key="device_sn",
-            translation_key="device_sn",
-            icon="mdi:identifier",
-            name="Device SN"
-        ),
-        PetLibroSensorEntityDescription[DockstreamSmartFountain](
-            key="mac",
-            translation_key="mac_address",
-            icon="mdi:network",
-            name="MAC Address"
-        ),
-        PetLibroSensorEntityDescription[DockstreamSmartFountain](
             key="wifi_ssid",
             translation_key="wifi_ssid",
             icon="mdi:wifi",
@@ -1228,18 +1144,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     ],
     DockstreamSmartRFIDFountain: [
         PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
-            key="device_sn",
-            translation_key="device_sn",
-            icon="mdi:identifier",
-            name="Device SN"
-        ),
-        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
-            key="mac",
-            translation_key="mac_address",
-            icon="mdi:network",
-            name="MAC Address"
-        ),
-        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
             key="wifi_ssid",
             translation_key="wifi_ssid",
             icon="mdi:wifi",
@@ -1317,18 +1221,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
         ),
     ],
     Dockstream2SmartCordlessFountain: [
-        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
-            key="device_sn",
-            translation_key="device_sn",
-            icon="mdi:identifier",
-            name="Device SN"
-        ),
-        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
-            key="mac",
-            translation_key="mac_address",
-            icon="mdi:network",
-            name="MAC Address"
-        ),
         PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
             key="wifi_ssid",
             translation_key="wifi_ssid",
@@ -1446,18 +1338,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
         ),
     ],
     Dockstream2SmartFountain: [
-        PetLibroSensorEntityDescription[Dockstream2SmartFountain](
-            key="device_sn",
-            translation_key="device_sn",
-            icon="mdi:identifier",
-            name="Device SN"
-        ),
-        PetLibroSensorEntityDescription[Dockstream2SmartFountain](
-            key="mac",
-            translation_key="mac_address",
-            icon="mdi:network",
-            name="MAC Address"
-        ),
         PetLibroSensorEntityDescription[Dockstream2SmartFountain](
             key="wifi_ssid",
             translation_key="wifi_ssid",

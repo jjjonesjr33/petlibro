@@ -102,12 +102,6 @@
     },
     "entity": {
         "sensor": {
-            "device_sn": {
-                "name": "ডিভাইস এসএন"
-            },
-            "mac_address": {
-                "name": "ম্যাক ঠিকানা"
-            },
             "wifi_ssid": {
                 "name": "Wi-Fi ssid"
             },

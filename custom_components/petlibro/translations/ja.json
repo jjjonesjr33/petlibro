@@ -102,12 +102,6 @@
     },
     "entity": {
         "sensor": {
-            "device_sn": {
-                "name": "デバイスSN"
-            },
-            "mac_address": {
-                "name": "Macアドレス"
-            },
             "wifi_ssid": {
                 "name": "wi-fi ssid"
             },
