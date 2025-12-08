@@ -1,48 +1,59 @@
+"""Petlibro Dockstream Smart Fountain."""
+
+from logging import getLogger
+from typing import cast
+
 import aiohttp
 
-from ...api import make_api_call
-from aiohttp import ClientSession, ClientError
 from ...exceptions import PetLibroAPIError
 from ..device import Device
-from typing import cast
-from logging import getLogger
 
 _LOGGER = getLogger(__name__)
+
 
 class DockstreamSmartFountain(Device):
     """Represents the Dockstream Smart Fountain device."""
 
-    async def refresh(self):
+    async def refresh(self) -> None:
         """Refresh the device data from the API."""
         try:
-            await super().refresh()  # Call the refresh method from the parent class (Device)
-        
+            await (
+                super().refresh()
+            )  # Call the refresh method from the parent class (Device)
+
             # Fetch real info from the API
             real_info = await self.api.device_real_info(self.serial)
             data_real_info = await self.api.device_data_real_info(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_upgrade = await self.api.get_device_upgrade(self.serial)
             get_work_record = await self.api.get_device_work_record(self.serial)
-            get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
+            get_feeding_plan_today = await self.api.device_feeding_plan_today_new(
+                self.serial
+            )
             get_drink_water = await self.api.get_device_drink_water(self.serial)
 
             # Update internal data with fetched API data
-            self.update_data({
-                "realInfo": real_info or {},
-                "dataRealInfo": data_real_info or {},
-                "getDrinkWater": get_drink_water or {},
-                "getAttributeSetting": attribute_settings or {},
-                "getUpgrade": get_upgrade or {},
-                "getfeedingplantoday": get_feeding_plan_today or {},
-                "workRecord": get_work_record if get_work_record is not None else []
-            })
-        except PetLibroAPIError as err:
-            _LOGGER.error(f"Error refreshing data for DockstreamSmartFountain: {err}")
+            self.update_data(
+                {
+                    "realInfo": real_info or {},
+                    "dataRealInfo": data_real_info or {},
+                    "getDrinkWater": get_drink_water or {},
+                    "getAttributeSetting": attribute_settings or {},
+                    "getUpgrade": get_upgrade or {},
+                    "getfeedingplantoday": get_feeding_plan_today or {},
+                    "workRecord": get_work_record
+                    if get_work_record is not None
+                    else [],
+                }
+            )
+        except PetLibroAPIError:
+            _LOGGER.exception("Error refreshing data for DockstreamSmartFountain")
 
     @property
     def available(self) -> bool:
-        _LOGGER.debug(f"Device {self.device.name} availability: {self.device.online}")
-        return self.device.online if hasattr(self.device, 'online') else True
+        """Return `True` if the device is available."""
+        _LOGGER.debug("Device %s availability: %s", self.name, self.online)
+        return self.online if hasattr(self, "online") else True
 
     @property
     def device_sn(self) -> str:
@@ -58,36 +69,38 @@ class DockstreamSmartFountain(Device):
     def online(self) -> bool:
         """Return the online status of the fountain."""
         return bool(self._data.get("realInfo", {}).get("online", False))
-    
+
     @property
     def battery_display_type(self) -> float:
         """Get the battery percentage state."""
         try:
-            value = str(self._data.get("realInfo", {}).get("batteryDisplayType", "percentage"))
+            value = str(
+                self._data.get("realInfo", {}).get("batteryDisplayType", "percentage")
+            )
             # Attempt to convert the value to a float
-            return cast(float, float(value))
+            return cast("float", float(value))
         except (TypeError, ValueError):
             # Handle the case where the value is None or not a valid float
             return 0.0
-    
+
     @property
     def wifi_rssi(self) -> int:
         """Get the Wi-Fi signal strength."""
         wifi_rssi = self._data.get("realInfo", {}).get("wifiRssi")
         return wifi_rssi if isinstance(wifi_rssi, int) else -100
-    
+
     @property
     def weight(self) -> float:
         """Get the current weight of the water (in grams)."""
         weight = self._data.get("realInfo", {}).get("weight")
         return weight if isinstance(weight, (int, float)) else 0
-    
+
     @property
     def weight_percent(self) -> int | float:
         """Get the current weight percentage of water."""
         weight_percent = self._data.get("realInfo", {}).get("weightPercent")
         return weight_percent if isinstance(weight_percent, (int, float)) else 0
-    
+
     @property
     def remaining_filter_days(self) -> float | None:
         """Get the remaining filter days."""
@@ -96,7 +109,7 @@ class DockstreamSmartFountain(Device):
             return float(value) if value is not None else None
         except (TypeError, ValueError):
             return None
-    
+
     @property
     def remaining_cleaning_days(self) -> float | None:
         """Get the remaining cleaning days."""
@@ -105,48 +118,48 @@ class DockstreamSmartFountain(Device):
             return float(value) if value is not None else None
         except (TypeError, ValueError):
             return None
-    
+
     @property
     def vacuum_state(self) -> bool:
         """Check if the vacuum state is active."""
         return self._data.get("realInfo", {}).get("vacuumState", False)
-    
+
     @property
     def pump_air_state(self) -> bool:
         """Check if the air pump is active."""
         return self._data.get("realInfo", {}).get("pumpAirState", False)
-    
+
     @property
     def barn_door_error(self) -> bool:
         """Check if there's a barn door error."""
         return self._data.get("realInfo", {}).get("barnDoorError", False)
-    
+
     @property
     def running_state(self) -> str:
         """Get the current running state of the device."""
         return self._data.get("realInfo", {}).get("runningState", "unknown")
-    
+
     @property
     def light_switch(self) -> bool:
         """Check if the light is enabled."""
         return bool(self._data.get("realInfo", {}).get("lightSwitch", False))
-    
+
     @property
     def sound_switch(self) -> bool:
         """Check if the sound is enabled."""
         return self._data.get("realInfo", {}).get("soundSwitch", False)
-    
-    async def set_light_switch(self, value: bool):
+
+    async def set_light_switch(self, value: bool) -> None:
         """Enable or disable the light."""
         await self.api.set_light_switch(self.serial, value)
         await self.refresh()
-    
-    async def set_sound_switch(self, value: bool):
+
+    async def set_sound_switch(self, value: bool) -> None:
         """Enable or disable the sound."""
         await self.api.set_sound_switch(self.serial, value)
         await self.refresh()
 
-    async def set_manual_cleaning(self):
+    async def set_manual_cleaning(self) -> None:
         """Trigger manual cleaning action."""
         await self.api.set_manual_cleaning(self.serial)
         await self.refresh()
@@ -155,101 +168,138 @@ class DockstreamSmartFountain(Device):
     def water_dispensing_mode(self) -> str:
         """Return the user-friendly water dispensing mode (mapped directly from the API value)."""
         api_value = self._data.get("realInfo", {}).get("useWaterType", 0)
-        
+
         # Direct mapping inside the property
         if api_value == 0:
             return "Flowing Water (Constant)"
-        elif api_value == 1:
+        if api_value == 1:
             return "Intermittent Water (Scheduled)"
-        else:
-            return "Unknown"
+        return "Unknown"
 
     @property
     def water_interval(self) -> float:
+        """Return the water interval."""
         water_interval = self._data.get("realInfo", {}).get("useWaterInterval")
         return water_interval if isinstance(water_interval, (int, float)) else 0
 
     async def set_water_interval(self, value: float) -> None:
-        _LOGGER.debug(f"Setting water interval to {value} for {self.serial}")
+        """Set the water interval."""
+        _LOGGER.debug("Setting water interval to %s for %s", value, self.serial)
         try:
             current_mode = self._data.get("realInfo", {}).get("useWaterType", 0)
             current_duration = self._data.get("realInfo", {}).get("useWaterDuration", 0)
-            await self.api.set_water_interval(self.serial, value, current_mode, current_duration)
+            await self.api.set_water_interval(
+                self.serial, value, current_mode, current_duration
+            )
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set water interval using {current_mode} & {current_duration} for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting water interval using {current_mode} & {current_duration}: {err}")
+            _LOGGER.exception(
+                "Failed to set water interval using %s & %s for %s",
+                current_mode,
+                current_duration,
+                self.serial,
+            )
+            msg = f"Error setting water interval using {current_mode} & {current_duration}: {err}"
+            raise PetLibroAPIError(msg) from err
 
     @property
     def water_dispensing_duration(self) -> float:
+        """Return the water dispensing duration."""
         duration = self._data.get("realInfo", {}).get("useWaterDuration")
         return duration if isinstance(duration, (int, float)) else 0
 
     async def set_water_dispensing_duration(self, value: float) -> None:
-        _LOGGER.debug(f"Setting water dispensing duration to {value} for {self.serial}")
+        """Set the water dispensing duration."""
+        _LOGGER.debug(
+            "Setting water dispensing duration to %s for %s", value, self.serial
+        )
         try:
             current_mode = self._data.get("realInfo", {}).get("useWaterType", 0)
             current_interval = self._data.get("realInfo", {}).get("useWaterInterval", 0)
-            await self.api.set_water_dispensing_duration(self.serial, value, current_mode, current_interval)
+            await self.api.set_water_dispensing_duration(
+                self.serial, value, current_mode, current_interval
+            )
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set water dispensing duration using {current_mode} & {current_interval} for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting water dispensing duration using {current_mode} & {current_interval}: {err}")
+            _LOGGER.exception(
+                "Failed to set water dispensing duration using %s & %s for %s",
+                current_mode,
+                current_interval,
+                self.serial,
+            )
+            msg = f"Error setting water dispensing duration using {current_mode} & {current_interval}: {err}"
+            raise PetLibroAPIError(msg) from err
 
     @property
     def cleaning_cycle(self) -> float:
+        """Return the cleaning cycle."""
         cleaning_cycle = self._data.get("realInfo", {}).get("machineCleaningFrequency")
         return cleaning_cycle if isinstance(cleaning_cycle, (int, float)) else 0
 
     async def set_cleaning_cycle(self, value: float) -> None:
-        _LOGGER.debug(f"Setting cleaning cycle to {value} for {self.serial}")
+        """Set the cleaning cycle."""
+        _LOGGER.debug("Setting cleaning cycle to %s for %s", value, self.serial)
         try:
             key = "MACHINE_CLEANING"
             await self.api.set_filter_cycle(self.serial, value, key)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set cleaning cycle using {key} for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting cleaning cycle using {key}: {err}")
+            _LOGGER.exception(
+                "Failed to set cleaning cycle using %s for %s", key, self.serial
+            )
+            msg = f"Error setting cleaning cycle using {key}: {err}"
+            raise PetLibroAPIError(msg) from err
 
     @property
     def filter_cycle(self) -> float:
+        """Return the filter cycle."""
         filter_cycle = self._data.get("realInfo", {}).get("filterReplacementFrequency")
         return filter_cycle if isinstance(filter_cycle, (int, float)) else 0
 
     async def set_filter_cycle(self, value: float) -> None:
-        _LOGGER.debug(f"Setting filter cycle to {value} for {self.serial}")
+        """Set the filter cycle."""
+        _LOGGER.debug("Setting filter cycle to %s for %s", value, self.serial)
         try:
             key = "FILTER_ELEMENT"
             await self.api.set_filter_cycle(self.serial, value, key)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set filter cycle using {key} for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting filter cycle using {key}: {err}")
+            _LOGGER.exception(
+                "Failed to set filter cycle using %s for %s", key, self.serial
+            )
+            msg = f"Error setting filter cycle using {key}: {err}"
+            raise PetLibroAPIError(msg) from err
 
     async def set_cleaning_reset(self) -> None:
-        _LOGGER.debug(f"Triggering machine cleaning reset for {self.serial}")
+        """Set the cleaning reset."""
+        _LOGGER.debug("Triggering machine cleaning reset for %s", self.serial)
         try:
             await self.api.set_cleaning_reset(self.serial)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to trigger machine cleaning reset for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error triggering machine cleaning reset: {err}")
+            _LOGGER.exception(
+                "Failed to trigger machine cleaning reset for %s", self.serial
+            )
+            msg = f"Error triggering machine cleaning reset: {err}"
+            raise PetLibroAPIError(msg) from err
 
     async def set_filter_reset(self) -> None:
-        _LOGGER.debug(f"Triggering filter reset for {self.serial}")
+        """Set the filter reset."""
+        _LOGGER.debug("Triggering filter reset for %s", self.serial)
         try:
             await self.api.set_filter_reset(self.serial)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to trigger filter reset for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error triggering filter reset: {err}")
+            _LOGGER.exception("Failed to trigger filter reset for %s", self.serial)
+            msg = f"Error triggering filter reset: {err}"
+            raise PetLibroAPIError(msg) from err
 
     @property
     def today_drinking_amount(self) -> float:
         """Get the total milliliters of water used today."""
         amount = self._data.get("getDrinkWater", {}).get("todayTotalMl")
         return amount if isinstance(amount, (int, float)) else 0
-    
+
     @property
     def today_drinking_count(self) -> int:
         """Get the total count of times drank today."""
@@ -273,7 +323,7 @@ class DockstreamSmartFountain(Device):
         """Get the total milliliters of water used yesterday."""
         amount = self._data.get("getDrinkWater", {}).get("yesterdayTotalMl")
         return amount if isinstance(amount, (int, float)) else 0
-    
+
     @property
     def yesterday_drinking_count(self) -> int:
         """Get the total count of times drank yesterday."""
@@ -285,19 +335,19 @@ class DockstreamSmartFountain(Device):
         """Get the water usage interval."""
         water_interval = self._data.get("realInfo", {}).get("useWaterInterval")
         return water_interval if isinstance(water_interval, int) else 0
-    
+
     @property
     def use_water_duration(self) -> int:
         """Get the water usage duration."""
         water_duration = self._data.get("realInfo", {}).get("useWaterDuration", 0)
         return water_duration if isinstance(water_duration, int) else 0
-    
+
     @property
     def filter_replacement_frequency(self) -> int:
         """Get the filter replacement frequency."""
         frequency = self._data.get("realInfo", {}).get("filterReplacementFrequency")
         return frequency if isinstance(frequency, int) else 0
-    
+
     @property
     def machine_cleaning_frequency(self) -> int:
         """Get the machine cleaning frequency."""
@@ -306,47 +356,51 @@ class DockstreamSmartFountain(Device):
 
     # Method for indicator turn on
     async def set_light_on(self) -> None:
-        _LOGGER.debug(f"Turning on the indicator for {self.serial}")
+        """Turn the indicator light on."""
+        _LOGGER.debug("Turning on the indicator for %s", self.serial)
         try:
             await self.api.set_light_on(self.serial)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to turn on the indicator for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error turning on the indicator: {err}")
+            _LOGGER.exception("Failed to turn on the indicator for %s", self.serial)
+            msg = f"Error turning on the indicator: {err}"
+            raise PetLibroAPIError(msg) from err
 
     # Method for indicator turn off
     async def set_light_off(self) -> None:
-        _LOGGER.debug(f"Turning off the indicator for {self.serial}")
+        """Turn the indicator light off."""
+        _LOGGER.debug("Turning off the indicator for %s", self.serial)
         try:
             await self.api.set_light_off(self.serial)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to turn off the indicator for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error turning off the indicator: {err}")
+            _LOGGER.exception("Failed to turn off the indicator for %s", self.serial)
+            msg = f"Error turning off the indicator: {err}"
+            raise PetLibroAPIError(msg) from err
 
     @property
     def update_available(self) -> bool:
         """Return True if an update is available, False otherwise."""
         return bool(self._data.get("getUpgrade", {}).get("jobItemId"))
-    
+
     @property
     def update_release_notes(self) -> str | None:
         """Return release notes if available, else None."""
         upgrade_data = self._data.get("getUpgrade")
         return upgrade_data.get("upgradeDesc") if upgrade_data else None
-    
+
     @property
     def update_version(self) -> str | None:
         """Return target version if available, else None."""
         upgrade_data = self._data.get("getUpgrade")
         return upgrade_data.get("targetVersion") if upgrade_data else None
-    
+
     @property
     def update_name(self) -> str | None:
         """Return update job name if available, else None."""
         upgrade_data = self._data.get("getUpgrade")
         return upgrade_data.get("jobName") if upgrade_data else None
-    
+
     @property
     def update_progress(self) -> float:
         """Return update progress as a float, or 0 if not updating."""

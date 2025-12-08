@@ -1,37 +1,43 @@
 """Support for PETLIBRO switches."""
+
 from __future__ import annotations
-from .api import make_api_call
-import aiohttp
-from aiohttp import ClientSession, ClientError
-from collections.abc import Callable, Coroutine
-from dataclasses import dataclass
-from functools import cached_property
-from typing import Any, Generic
+
 import logging
-from .const import DOMAIN
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any, Generic
+
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
-from .hub import PetLibroHub  # Adjust the import path as necessary
 
-_LOGGER = logging.getLogger(__name__)
-
-from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
-from .devices import Device
-from .devices.device import Device
-from .devices.feeders.feeder import Feeder
+from .const import DOMAIN
 from .devices.feeders.air_smart_feeder import AirSmartFeeder
-from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
+from .devices.feeders.feeder import Feeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
+from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
-from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
-from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
-from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
+from .devices.fountains.dockstream_2_smart_cordless_fountain import (
+    Dockstream2SmartCordlessFountain,
+)
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
+from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
+from .devices.fountains.dockstream_smart_rfid_fountain import (
+    DockstreamSmartRFIDFountain,
+)
+from .entity import PetLibroEntity, PetLibroEntityDescription, _DeviceT
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Coroutine
+
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+    from .devices import Device
+
+_LOGGER = logging.getLogger(__name__)
+
 
 @dataclass(frozen=True)
 class RequiredKeysMixin(Generic[_DeviceT]):
@@ -39,42 +45,41 @@ class RequiredKeysMixin(Generic[_DeviceT]):
 
     set_fn: Callable[[_DeviceT, bool], Coroutine[Any, Any, None]]
 
+
 @dataclass(frozen=True)
-class PetLibroSwitchEntityDescription(SwitchEntityDescription, PetLibroEntityDescription[_DeviceT], RequiredKeysMixin[_DeviceT]):
+class PetLibroSwitchEntityDescription(
+    SwitchEntityDescription,
+    PetLibroEntityDescription[_DeviceT],
+    RequiredKeysMixin[_DeviceT],
+):
     """A class that describes device switch entities."""
 
     entity_category: EntityCategory = EntityCategory.CONFIG
 
+
 DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
-    Feeder: [
-    ],
-    AirSmartFeeder: [
-    ],
-    GranarySmartFeeder: [
-    ],
-    GranarySmartCameraFeeder: [
-    ],
-    OneRFIDSmartFeeder: [
-    ],
+    Feeder: [],
+    AirSmartFeeder: [],
+    GranarySmartFeeder: [],
+    GranarySmartCameraFeeder: [],
+    OneRFIDSmartFeeder: [],
     PolarWetFoodFeeder: [
         PetLibroSwitchEntityDescription[PolarWetFoodFeeder](
             key="manual_feed_now",
             translation_key="manual_feed_now",
-            set_fn=lambda device, value: device.set_manual_feed_now(value, device.plate_position),
-            name="Manually Open/Close Lid"
+            set_fn=lambda device, value: device.set_manual_feed_now(
+                value, device.plate_position
+            ),
+            name="Manually Open/Close Lid",
         ),
     ],
-    SpaceSmartFeeder: [
-    ],
-    DockstreamSmartFountain: [
-    ],
-    DockstreamSmartRFIDFountain: [
-    ],
-    Dockstream2SmartCordlessFountain: [
-    ],
-    Dockstream2SmartFountain: [
-    ],
+    SpaceSmartFeeder: [],
+    DockstreamSmartFountain: [],
+    DockstreamSmartRFIDFountain: [],
+    Dockstream2SmartCordlessFountain: [],
+    Dockstream2SmartFountain: [],
 }
+
 
 class PetLibroSwitchEntity(PetLibroEntity[_DeviceT], SwitchEntity):
     """PETLIBRO switch entity."""
@@ -89,7 +94,7 @@ class PetLibroSwitchEntity(PetLibroEntity[_DeviceT], SwitchEntity):
     @property
     def available(self) -> bool:
         """Check if the device is available."""
-        return getattr(self.device, 'online', False)
+        return getattr(self.device, "online", False)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the switch on."""
@@ -98,6 +103,7 @@ class PetLibroSwitchEntity(PetLibroEntity[_DeviceT], SwitchEntity):
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the switch off."""
         await self.entity_description.set_fn(self.device, False)
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -138,8 +144,11 @@ async def async_setup_entry(
         # Log the number of entities and their details
         _LOGGER.debug("Adding %d PetLibro switches", len(entities))
         for entity in entities:
-            _LOGGER.debug("Adding switch entity: %s for device %s", entity.entity_description.name, entity.device.name)
+            _LOGGER.debug(
+                "Adding switch entity: %s for device %s",
+                entity.entity_description.name,
+                entity.device.name,
+            )
 
         # Add switch entities to Home Assistant
         async_add_entities(entities)
-

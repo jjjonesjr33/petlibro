@@ -1,1 +1,3 @@
-from .. import Device
+"""Petlibro fountains."""
+
+from .. import Device as Device

@@ -2,38 +2,35 @@
 
 import logging
 
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.const import Platform
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_registry import (
-    async_get as get_entity_registry,
     RegistryEntryDisabler,
-    RegistryEntryHider
+    RegistryEntryHider,
 )
+from homeassistant.helpers.entity_registry import async_get as get_entity_registry
 
-from ..const import (
-    SENTINEL as UNDEFINED,
-    DOMAIN,
-    GITHUB,
-    MANUAL_FEED_PORTIONS,
-    ROUNDING_RULES,
-    Unit,
-    APIKey as API,
-)
+from ..const import DOMAIN, GITHUB, MANUAL_FEED_PORTIONS, ROUNDING_RULES, Unit
+from ..const import SENTINEL as UNDEFINED
+from ..const import APIKey as API
 from ..hub import PetLibroHub
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class Unit_Entities:
-    """Manage the entities which use Petlibro measurement units.
+    """
+    Manage the entities which use Petlibro measurement units.
 
     An example of a unit entity is the sensor 'today_feeding_quantity_weight', which syncronises with
     Petlibro Feeder units to display feed quantities in the user's configured feed weight.
     """
 
-    def __init__(self, *, hass: HomeAssistant, config_entry: ConfigEntry, hub: PetLibroHub):
+    def __init__(
+        self, *, hass: HomeAssistant, config_entry: ConfigEntry, hub: PetLibroHub
+    ) -> None:
         """Initialise the Unit_Entities class."""
         self.hass = hass
         self.entry = config_entry
@@ -44,9 +41,13 @@ class Unit_Entities:
         self._sync_task = None
 
     async def sync_manual_feed_entity_visibility(
-        self, /, feed_unit: Unit | None = UNDEFINED, include_portions: bool = True,
+        self,
+        /,
+        feed_unit: Unit | None = UNDEFINED,
+        include_portions: bool = True,
     ) -> bool:
-        """Enable/disable and hide/unhide manual feed entities based on compatibility.
+        """
+        Enable/disable and hide/unhide manual feed entities based on compatibility.
 
         Behavior:
         - If `feed_unit` is UNDEFINED, defaults to the member's current feed unit type.
@@ -55,43 +56,55 @@ class Unit_Entities:
         - NUMBER entities are disabled when using cups without portions.
         - Returns True if the integration needs to be reloaded.
         """
-
         numbers = self.hub.manual_feed_unique_ids.get(Platform.NUMBER)
         selects = self.hub.manual_feed_unique_ids.get(Platform.SELECT)
-        
+
         reload_needed = False
 
         if len(numbers) != len(selects):
             _LOGGER.error(
-                "Not all Number entities have an equivalent Select entity, or vice versa. "
+                "Not all Number entities have an equivalent Select entity, or vice versa."
                 "Please open an issue at %s/issues if the problem persists.\n"
-                "Number entities: %s\nSelect entities: %s", GITHUB, numbers, selects
+                "Number entities: %s\nSelect entities: %s",
+                GITHUB,
+                numbers,
+                selects,
             )
         elif not (numbers and selects):
             # No entities to update
             return False
 
         feed_unit = self.member.feedUnitType if feed_unit is UNDEFINED else feed_unit
-        set_as_portion = self.entry.options.get(MANUAL_FEED_PORTIONS) if include_portions else False
+        set_as_portion = (
+            self.entry.options.get(MANUAL_FEED_PORTIONS) if include_portions else False
+        )
 
         def incompatible(platform: Platform) -> bool:
             match platform:
-                case Platform.SELECT: return feed_unit != Unit.CUPS or set_as_portion
-                case Platform.NUMBER: return feed_unit == Unit.CUPS and not set_as_portion
-                case _: raise ValueError(f"Unsupported platform: {platform}")
+                case Platform.SELECT:
+                    return feed_unit != Unit.CUPS or set_as_portion
+                case Platform.NUMBER:
+                    return feed_unit == Unit.CUPS and not set_as_portion
+                case _:
+                    msg = f"Unsupported platform: {platform}"
+                    raise ValueError(msg)
 
         for platform, unique_ids in self.hub.manual_feed_unique_ids.items():
             entity_ids = []
             not_found = []
 
             for unique_id in unique_ids:
-                if entity_id := self.entity_registry.async_get_entity_id(platform, DOMAIN, unique_id):
+                if entity_id := self.entity_registry.async_get_entity_id(
+                    platform, DOMAIN, unique_id
+                ):
                     entity_ids.append(entity_id)
                 else:
                     not_found.append(unique_id)
 
             if not_found:
-                _LOGGER.warning("Manual feed entities not found for %s: %s", platform, not_found)
+                _LOGGER.warning(
+                    "Manual feed entities not found for %s: %s", platform, not_found
+                )
 
             if not entity_ids:
                 continue
@@ -100,17 +113,26 @@ class Unit_Entities:
             disable = RegistryEntryDisabler.INTEGRATION if incompat else None
             hide = RegistryEntryHider.INTEGRATION if incompat else None
 
-            action = "Hiding/disabling incompatible" if incompat else "Unhiding/enabling compatible"
+            action = (
+                "Hiding/disabling incompatible"
+                if incompat
+                else "Unhiding/enabling compatible"
+            )
             _LOGGER.debug("%s entities for %s: %s", action, platform, entity_ids)
-
 
             for entity_id in entity_ids:
                 if self.entity_registry.async_get(entity_id).disabled_by != disable:
                     reload_needed = True
                     _LOGGER.debug("Integration reload needed for entity: %s", entity_id)
                 else:
-                    _LOGGER.debug("Entity '%s' already %s, no reload needed", entity_id, "disabled" if disable else "enabled")
-                self.entity_registry.async_update_entity(entity_id, disabled_by=disable, hidden_by=hide)
+                    _LOGGER.debug(
+                        "Entity '%s' already %s, no reload needed",
+                        entity_id,
+                        "disabled" if disable else "enabled",
+                    )
+                self.entity_registry.async_update_entity(
+                    entity_id, disabled_by=disable, hidden_by=hide
+                )
 
         return reload_needed
 
@@ -127,9 +149,13 @@ class Unit_Entities:
             await self.hub.async_refresh(force_member=True)
 
     async def update_sensor_entity_units(
-        self, /, new_units: dict[API|str, Unit] = UNDEFINED, update_all_units: bool = False
+        self,
+        /,
+        new_units: dict[API | str, Unit] = UNDEFINED,
+        update_all_units: bool = False,
     ) -> bool:
-        """Update all sensor entity units which use Petlibro's feed, weight or water units based on account settings.
+        """
+        Update all sensor entity units which use Petlibro's feed, weight or water units based on account settings.
 
         Behavior:
         - If `new_units` is UNDEFINED, defaults to all three of the member's current unit types.
@@ -137,7 +163,6 @@ class Unit_Entities:
           to the member's current unit type for any not provided in `new_units`.
         - Returns True if the integration needs to be reloaded.
         """
-
         if new_units is UNDEFINED:
             update_all_units = True
             new_units = {}
@@ -150,8 +175,10 @@ class Unit_Entities:
         for unit_type, unit_classes in self.hub.unit_sensor_unique_ids.items():
             selected = new_units.get(unit_type)
             unit = (
-                selected if isinstance(selected, Unit)
-                else Unit(selected) if selected
+                selected
+                if isinstance(selected, Unit)
+                else Unit(selected)
+                if selected
                 else getattr(self.member, unit_type, None)
             )
             if not update_all_units and (unit_type not in new_units or not unit):
@@ -160,10 +187,18 @@ class Unit_Entities:
             _LOGGER.debug("Updating %s entities", unit_type)
 
             target_units = (
-                {"weight": unit if unit and unit.device_class == "weight" else Unit.GRAMS,
-                "volume": unit if unit and unit.device_class == "volume" else Unit.MILLILITERS}
+                {
+                    "weight": unit
+                    if unit and unit.device_class == "weight"
+                    else Unit.GRAMS,
+                    "volume": unit
+                    if unit and unit.device_class == "volume"
+                    else Unit.MILLILITERS,
+                }
                 if update_all_units and unit_type == API.FEED_UNIT
-                else {unit.device_class: unit} if unit and unit.device_class else {}
+                else {unit.device_class: unit}
+                if unit and unit.device_class
+                else {}
             )
 
             for device_class, unique_ids in unit_classes.items():
@@ -176,23 +211,32 @@ class Unit_Entities:
                     "suggested_display_precision": precision,
                 }
                 for unique_id in unique_ids:
-                    entity_id = self.entity_registry.async_get_entity_id(Platform.SENSOR, DOMAIN, unique_id)
+                    entity_id = self.entity_registry.async_get_entity_id(
+                        Platform.SENSOR, DOMAIN, unique_id
+                    )
                     if not entity_id:
                         continue
                     _LOGGER.debug(
                         "Setting %s to %s with display precision %s",
-                        entity_id, target_unit.symbol, precision,
+                        entity_id,
+                        target_unit.symbol,
+                        precision,
                     )
-                    self.entity_registry.async_update_entity_options(entity_id, Platform.SENSOR, options)
+                    self.entity_registry.async_update_entity_options(
+                        entity_id, Platform.SENSOR, options
+                    )
 
             if unit_type is API.FEED_UNIT and (
-                (Unit.CUPS in (unit, self.member.feedUnitType) and not self.entry.options.get(MANUAL_FEED_PORTIONS))
+                (
+                    Unit.CUPS in (unit, self.member.feedUnitType)
+                    and not self.entry.options.get(MANUAL_FEED_PORTIONS)
+                )
                 or update_all_units
             ):
                 try:
                     reload_needed = await self.sync_manual_feed_entity_visibility(unit)
-                except HomeAssistantError as e:
-                    _LOGGER.error("Error syncing manual feed entity visibility: %s", e)
+                except HomeAssistantError:
+                    _LOGGER.exception("Error syncing manual feed entity visibility")
 
         _LOGGER.debug("Unit entity update complete (reload=%s)", reload_needed)
         return reload_needed

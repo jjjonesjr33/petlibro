@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
-from enum import Enum
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import voluptuous as vol
-
-from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+)
 from homeassistant.const import CONF_API_TOKEN, CONF_EMAIL, CONF_PASSWORD, CONF_REGION
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import section
@@ -19,19 +21,24 @@ from homeassistant.helpers.translation import async_get_translations
 
 from .api import PetLibroAPI
 from .const import (
-    SENTINEL,
     DEFAULT_FEED,
     DEFAULT_WATER,
     DEFAULT_WEIGHT,
-    MANUAL_FEED_PORTIONS,
     DOMAIN,
-    APIKey as API,
+    MANUAL_FEED_PORTIONS,
+    SENTINEL,
     Gender,
     Unit,
 )
+from .const import APIKey as API
 from .exceptions import PetLibroCannotConnect, PetLibroInvalidAuth
-from .hub import PetLibroHub
-from .member import Member
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Mapping
+    from enum import Enum
+
+    from .hub import PetLibroHub
+    from .member import Member
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,6 +50,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
     }
 )
 
+
 class PetlibroConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Petlibro."""
 
@@ -53,7 +61,9 @@ class PetlibroConfigFlow(ConfigFlow, domain=DOMAIN):
     region: str
     password: str  # Store the password temporarily for API login
 
-    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Handle the initial step."""
         errors: dict[str, str] = {}
 
@@ -75,31 +85,36 @@ class PetlibroConfigFlow(ConfigFlow, domain=DOMAIN):
                         CONF_REGION: self.region,
                         CONF_EMAIL: self.email,
                         CONF_PASSWORD: self.password,  # Save password in entry
-                        CONF_API_TOKEN: self.token
-                    }
+                        CONF_API_TOKEN: self.token,
+                    },
                 )
             errors["base"] = error
 
         return self.async_show_form(
-            step_id="user",
-            data_schema=STEP_USER_DATA_SCHEMA,
-            errors=errors
+            step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
         )
 
-    async def async_step_reauth(self, entry_data: Mapping[str, Any]) -> ConfigFlowResult:
+    async def async_step_reauth(
+        self, entry_data: Mapping[str, Any]
+    ) -> ConfigFlowResult:
         """Handle a reauthorization flow request."""
         self.email = entry_data[CONF_EMAIL]
         self.region = entry_data[CONF_REGION]
         return await self.async_step_reauth_confirm()
 
-    async def async_step_reauth_confirm(self, user_input: dict[str, str] | None = None) -> ConfigFlowResult:
+    async def async_step_reauth_confirm(
+        self, user_input: dict[str, str] | None = None
+    ) -> ConfigFlowResult:
         """Handle user's reauth credentials."""
         errors = {}
 
         if user_input:
             entry_id = self.context["entry_id"]
             if entry := self.hass.config_entries.async_get_entry(entry_id):
-                user_input = user_input | {CONF_EMAIL: self.email, CONF_REGION: self.region}
+                user_input = user_input | {
+                    CONF_EMAIL: self.email,
+                    CONF_REGION: self.region,
+                }
                 self.password = user_input[CONF_PASSWORD]
 
                 # Validate input and login to the API again
@@ -111,7 +126,7 @@ class PetlibroConfigFlow(ConfigFlow, domain=DOMAIN):
                             CONF_EMAIL: self.email,
                             CONF_REGION: self.region,
                             CONF_PASSWORD: self.password,  # Ensure password is updated
-                            CONF_API_TOKEN: self.token
+                            CONF_API_TOKEN: self.token,
                         },
                     )
                     await self.hass.config_entries.async_reload(entry.entry_id)
@@ -127,7 +142,8 @@ class PetlibroConfigFlow(ConfigFlow, domain=DOMAIN):
         )
 
     async def _validate_input(self) -> str:
-        """Validate the user input allows us to connect.
+        """
+        Validate the user input allows us to connect.
 
         Validate email, password, and region, then attempt API login.
         """
@@ -137,17 +153,17 @@ class PetlibroConfigFlow(ConfigFlow, domain=DOMAIN):
                 self.hass.config.time_zone,
                 self.region,
                 self.email,
-                self.password
+                self.password,
             )
 
             self.token = await api.login(self.email, self.password)
-            _LOGGER.debug(f"Login successful, token: {self.token}")
+            _LOGGER.debug("Login successful, token: %s", self.token)
         except PetLibroCannotConnect:
             return "cannot_connect"
         except PetLibroInvalidAuth:
             return "invalid_auth"
-        except Exception as e:
-            _LOGGER.exception("Unexpected exception during validation: %s", e)
+        except Exception:
+            _LOGGER.exception("Unexpected exception during validation")
             return "unknown"
 
         return ""
@@ -162,7 +178,7 @@ class PetlibroConfigFlow(ConfigFlow, domain=DOMAIN):
 class PetlibroOptionsFlow(OptionsFlow):
     """Handle an options flow for Petlibro."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialise Petlibro Options Flow."""
         self._data: dict[str, Any] = {}  # For storing temporary data.
         self.entry: ConfigEntry | None = None
@@ -178,10 +194,10 @@ class PetlibroOptionsFlow(OptionsFlow):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Handle the initial options menu."""
-
         _LOGGER.debug("Starting Petlibro options flow.")
         self.translations = await async_get_translations(
-            self.hass, self.hass.config.language, "common")
+            self.hass, self.hass.config.language, "common"
+        )
         self.entry = self.config_entry
         self.hub = self.hass.data[DOMAIN][self.handler]
         self.api = self.hub.api
@@ -191,39 +207,57 @@ class PetlibroOptionsFlow(OptionsFlow):
         _LOGGER.debug(
             "Started Petlibro options flow for account %s", self.entry.data[CONF_EMAIL]
         )
-        return self.async_show_menu(menu_options=["integration_settings", "account_settings"])
+        return self.async_show_menu(
+            menu_options=["integration_settings", "account_settings"]
+        )
 
     async def async_step_integration_settings(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Handle integration-level settings for the Petlibro integration."""
-        
         user_input = user_input or {}
-        
+
         if user_input:
             manual_feed_portions = user_input.get(MANUAL_FEED_PORTIONS)
-            current_value = self.entry.options.get(MANUAL_FEED_PORTIONS, False)            
-            
+            current_value = self.entry.options.get(MANUAL_FEED_PORTIONS, False)
+
             # --- Nothing changed
             if manual_feed_portions == current_value:
                 _LOGGER.debug("No integration settings changed.")
-                return self.async_abort(reason=self.get_common_translation("no_settings_changed", "No settings were changed"))
+                return self.async_abort(
+                    reason=self.get_common_translation(
+                        "no_settings_changed", "No settings were changed"
+                    )
+                )
 
             # --- Update option
             self.hub.update_options({MANUAL_FEED_PORTIONS: manual_feed_portions})
-            _LOGGER.debug("Updated %s to %s", MANUAL_FEED_PORTIONS, manual_feed_portions)
-            
-            abort_messages = [self.get_common_translation("settings_updated", "Settings updated")]
+            _LOGGER.debug(
+                "Updated %s to %s", MANUAL_FEED_PORTIONS, manual_feed_portions
+            )
+
+            abort_messages = [
+                self.get_common_translation("settings_updated", "Settings updated")
+            ]
 
             # --- Update entities and warn user if feed unit is cups
             if self.member.feedUnitType == Unit.CUPS:
-                reload_needed = await self.hub.unit_entities.sync_manual_feed_entity_visibility(Unit.CUPS)
+                reload_needed = (
+                    await self.hub.unit_entities.sync_manual_feed_entity_visibility(
+                        Unit.CUPS
+                    )
+                )
 
                 if reload_needed:
                     abort_messages.append(
-                        self.get_common_translation("reloading_integration", "The integration will reload shortly")
+                        self.get_common_translation(
+                            "reloading_integration",
+                            "The integration will reload shortly",
+                        )
                     )
-                    _LOGGER.debug("'manual_feed_portions' value changed while feed unit is 'cups', reloading integration.")
+                    _LOGGER.debug(
+                        "'manual_feed_portions' value changed while feed unit is 'cups', reloading integration."
+                    )
                 else:
                     _LOGGER.debug("No Manual Feed entities found — nothing to reload.")
             await self.hub.async_refresh()
@@ -231,17 +265,18 @@ class PetlibroOptionsFlow(OptionsFlow):
             # --- Done
             return self.async_abort(
                 reason="integration_settings_abort",
-                description_placeholders={"integration_settings_abort": "\n".join(abort_messages)},
+                description_placeholders={
+                    "integration_settings_abort": "\n".join(abort_messages)
+                },
             )
 
         _LOGGER.debug("Showing integration settings form.")
         return self._show_integration_settings_form(user_input)
-        
+
     async def async_step_account_settings(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Handle account settings."""
-
         if not self.member:
             return self.async_abort(reason="no_member_data")
 
@@ -252,7 +287,7 @@ class PetlibroOptionsFlow(OptionsFlow):
             account_info_raw = user_input.copy()
             user_input.update(**measurement_units_raw)
             update_all_units = measurement_units_raw.pop("update_all_units", False)
-            
+
             unit_updates = self.collect_updates(
                 fields=(API.FEED_UNIT, API.WATER_UNIT, API.WEIGHT_UNIT),
                 user_input=measurement_units_raw,
@@ -271,37 +306,61 @@ class PetlibroOptionsFlow(OptionsFlow):
             # --- Update entity options if units changed or update_all_units
             reload_needed = False
             if unit_updates or update_all_units:
-                reload_needed = await self.hub.unit_entities.update_sensor_entity_units(unit_updates, update_all_units)
+                reload_needed = await self.hub.unit_entities.update_sensor_entity_units(
+                    unit_updates, update_all_units
+                )
 
             # --- Apply account-level changes through API
             abort_messages = []
             if not (info_updates or unit_updates):
                 _LOGGER.debug("No account settings were changed.")
-                abort_messages.append(self.get_common_translation("no_settings_changed", "No settings were changed"))
+                abort_messages.append(
+                    self.get_common_translation(
+                        "no_settings_changed", "No settings were changed"
+                    )
+                )
             else:
-                success = await self.api.member_update_info(update_info = info_updates, update_setting = unit_updates)
+                success = await self.api.member_update_info(
+                    update_info=info_updates, update_setting=unit_updates
+                )
                 if success:
-                    abort_messages.append(self.get_common_translation("account_updated", "Account update successful"))
+                    abort_messages.append(
+                        self.get_common_translation(
+                            "account_updated", "Account update successful"
+                        )
+                    )
                 else:
                     _LOGGER.error("Error updating account info via API.")
                     return self.async_abort(reason="error_check_logs")
 
             # --- Build the abort message
             if update_all_units:
-                abort_messages.append(self.get_common_translation("sensors_updated", "Sensor entities were updated"))
+                abort_messages.append(
+                    self.get_common_translation(
+                        "sensors_updated", "Sensor entities were updated"
+                    )
+                )
 
             if reload_needed:
-                _LOGGER.debug("Reloading integration due to feed unit change to/from cups.")
-                abort_messages.append(self.get_common_translation("reloading_integration", "The integration will reload shortly"))
-            
+                _LOGGER.debug(
+                    "Reloading integration due to feed unit change to/from cups."
+                )
+                abort_messages.append(
+                    self.get_common_translation(
+                        "reloading_integration", "The integration will reload shortly"
+                    )
+                )
+
             # --- Refresh hub data
             if info_updates or unit_updates or reload_needed:
                 await self.hub.async_refresh(force_member=True)
-                
+
             # --- Done
             return self.async_abort(
                 reason="account_settings_abort",
-                description_placeholders={"account_settings_abort": "\n".join(abort_messages)},
+                description_placeholders={
+                    "account_settings_abort": "\n".join(abort_messages)
+                },
             )
 
         _LOGGER.debug("Showing account settings form.")
@@ -310,10 +369,11 @@ class PetlibroOptionsFlow(OptionsFlow):
     # ------------------------------
     # Form Builders
     # ------------------------------
-    
-    def _show_integration_settings_form(self, user_input: dict[str, Any]) -> ConfigFlowResult:
-        """Build and show the integration settings form."""
 
+    def _show_integration_settings_form(
+        self, user_input: dict[str, Any]
+    ) -> ConfigFlowResult:
+        """Build and show the integration settings form."""
         return self.async_show_form(
             data_schema=vol.Schema(
                 {
@@ -328,9 +388,10 @@ class PetlibroOptionsFlow(OptionsFlow):
             },
         )
 
-    def _show_account_settings_form(self, user_input: dict[str, Any]) -> ConfigFlowResult:
+    def _show_account_settings_form(
+        self, user_input: dict[str, Any]
+    ) -> ConfigFlowResult:
         """Build and show the account settings form."""
-
         return self.async_show_form(
             data_schema=vol.Schema(
                 {
@@ -345,7 +406,8 @@ class PetlibroOptionsFlow(OptionsFlow):
                     vol.Required(
                         str(API.GENDER),
                         default=user_input.get(
-                            API.GENDER, getattr(self.member, API.GENDER, Gender.NONE).lower
+                            API.GENDER,
+                            getattr(self.member, API.GENDER, Gender.NONE).lower,
                         ),
                     ): selector(
                         {
@@ -373,13 +435,17 @@ class PetlibroOptionsFlow(OptionsFlow):
                 vol.Required(
                     str(API.FEED_UNIT),
                     default=user_input.get(
-                        API.FEED_UNIT, getattr(self.member, API.FEED_UNIT, DEFAULT_FEED).lower
+                        API.FEED_UNIT,
+                        getattr(self.member, API.FEED_UNIT, DEFAULT_FEED).lower,
                     ),
-                ): self._unit_selector((Unit.CUPS, Unit.OUNCES, Unit.GRAMS, Unit.MILLILITERS)),
+                ): self._unit_selector(
+                    (Unit.CUPS, Unit.OUNCES, Unit.GRAMS, Unit.MILLILITERS)
+                ),
                 vol.Required(
                     str(API.WATER_UNIT),
                     default=user_input.get(
-                        API.WATER_UNIT, getattr(self.member, API.WATER_UNIT, DEFAULT_WATER).lower
+                        API.WATER_UNIT,
+                        getattr(self.member, API.WATER_UNIT, DEFAULT_WATER).lower,
                     ),
                 ): self._unit_selector((Unit.WATER_OUNCES, Unit.WATER_MILLILITERS)),
                 vol.Required(
@@ -389,7 +455,10 @@ class PetlibroOptionsFlow(OptionsFlow):
                         getattr(self.member, API.WEIGHT_UNIT, DEFAULT_WEIGHT).lower,
                     ),
                 ): self._unit_selector((Unit.POUNDS, Unit.KILOGRAMS)),
-                vol.Optional("update_all_units", default=user_input.get("update_all_units", False)): bool,
+                vol.Optional(
+                    "update_all_units",
+                    default=user_input.get("update_all_units", False),
+                ): bool,
             }
         )
 
@@ -452,12 +521,14 @@ class PetlibroOptionsFlow(OptionsFlow):
 
             if api_value != current_value:
                 updates[api_key] = api_value
-                
+
         return updates
-    
+
     def get_common_translation(self, translation_key: str, fallback: str = "") -> str:
         """Get a translated string under the 'common' key from the user's chosen language."""
         translation_path = f"component.{DOMAIN}.common.{translation_key}"
         if translation_path not in self.translations:
-            _LOGGER.warning("Translation key %s not found in translation file.", translation_key)
+            _LOGGER.warning(
+                "Translation key %s not found in translation file.", translation_key
+            )
         return self.translations.get(translation_path, fallback)

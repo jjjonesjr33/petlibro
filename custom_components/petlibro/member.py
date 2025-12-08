@@ -3,22 +3,24 @@
 from __future__ import annotations
 
 from logging import getLogger
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.sensor import SensorEntity
 
-from .api import PetLibroAPI
 from .const import (
     DEFAULT_FEED,
     DEFAULT_WATER,
     DEFAULT_WEIGHT,
-    WATER_MAPPING,
     DOMAIN,
-    APIKey as API,
+    WATER_MAPPING,
     Gender,
     Unit,
 )
+from .const import APIKey as API
 from .devices.event import EVENT_UPDATE, Event
+
+if TYPE_CHECKING:
+    from .api import PetLibroAPI
 
 _LOGGER = getLogger(__name__)
 
@@ -54,7 +56,6 @@ class Member(Event):
         """Entity ID."""
         return f"PL-{self._data.get(API.ID, API.EMAIL)}-data"
 
-
     @property
     def email(self) -> str:
         """Account email."""
@@ -74,7 +75,7 @@ class Member(Event):
         try:
             return Gender(self._data.get(API.GENDER, 0))
         except ValueError:
-            _LOGGER.error("Unknown gender value: %s", self._data.get("gender"))
+            _LOGGER.error("Unknown gender value: %s", self._data.get("gender"))  # noqa: TRY400
             return Gender.NONE
 
     @property
@@ -99,7 +100,7 @@ class Member(Event):
         try:
             return Unit(raw_value)
         except ValueError:
-            _LOGGER.error("Unknown unit type for %s: %s", key, raw_value)
+            _LOGGER.error("Unknown unit type for %s: %s", key, raw_value)  # noqa: TRY400
             return default
 
     def to_dict(self) -> dict[str, Any]:
@@ -110,11 +111,13 @@ class Member(Event):
             "gender": self.gender.name.capitalize(),
             "weight_unit": self.weightUnitType.name.capitalize(),
             "feed_unit": self.feedUnitType.name.capitalize(),
-            "water_unit": self.waterUnitType.name.removeprefix('WATER_').capitalize(),
+            "water_unit": self.waterUnitType.name.removeprefix("WATER_").capitalize(),
         }
+
 
 class MemberEntity(SensorEntity):
     """Entity storing member data for front-end use."""
+
     def __init__(self, member: Member) -> None:
         """Initialise the member entity."""
         self.data: dict[str, Any] = {}

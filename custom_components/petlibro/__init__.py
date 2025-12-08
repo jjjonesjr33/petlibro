@@ -1,24 +1,29 @@
+"""Petlibro custom component."""
+
 import logging
 
-from datetime import timedelta  # For managing the update interval
-from homeassistant.core import HomeAssistant
-from homeassistant.const import Platform
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, Platform
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed  # For coordinator and update handling
+
+from .const import DOMAIN, PLATFORMS
 from .devices import Device
-from .devices.feeders.feeder import Feeder
 from .devices.feeders.air_smart_feeder import AirSmartFeeder
-from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
+from .devices.feeders.feeder import Feeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
+from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
-from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
-from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
-from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
+from .devices.fountains.dockstream_2_smart_cordless_fountain import (
+    Dockstream2SmartCordlessFountain,
+)
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
-from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD, PLATFORMS, UPDATE_INTERVAL_SECONDS  # Assuming UPDATE_INTERVAL_SECONDS is defined in const
+from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
+from .devices.fountains.dockstream_smart_rfid_fountain import (
+    DockstreamSmartRFIDFountain,
+)
 from .hub import PetLibroHub
 
 _LOGGER = logging.getLogger(__name__)
@@ -34,7 +39,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE
+        Platform.UPDATE,
     ),
     AirSmartFeeder: (
         Platform.SENSOR,
@@ -44,7 +49,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE
+        Platform.UPDATE,
     ),
     GranarySmartFeeder: (
         Platform.SENSOR,
@@ -54,7 +59,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE
+        Platform.UPDATE,
     ),
     GranarySmartCameraFeeder: (
         Platform.SENSOR,
@@ -64,7 +69,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE
+        Platform.UPDATE,
     ),
     OneRFIDSmartFeeder: (
         Platform.SENSOR,
@@ -74,7 +79,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE
+        Platform.UPDATE,
     ),
     PolarWetFoodFeeder: (
         Platform.SENSOR,
@@ -84,7 +89,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE
+        Platform.UPDATE,
     ),
     SpaceSmartFeeder: (
         Platform.SENSOR,
@@ -94,7 +99,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE
+        Platform.UPDATE,
     ),
     DockstreamSmartFountain: (
         Platform.SENSOR,
@@ -104,7 +109,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE
+        Platform.UPDATE,
     ),
     DockstreamSmartRFIDFountain: (
         Platform.SENSOR,
@@ -114,7 +119,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE
+        Platform.UPDATE,
     ),
     Dockstream2SmartCordlessFountain: (
         Platform.SENSOR,
@@ -124,7 +129,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE
+        Platform.UPDATE,
     ),
     Dockstream2SmartFountain: (
         Platform.SENSOR,
@@ -134,7 +139,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE
+        Platform.UPDATE,
     ),
 }
 
@@ -157,7 +162,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Ensure email and password exist
     if not email or not password:
-        _LOGGER.error("Email or password is missing in the configuration entry. Cannot proceed.")
+        _LOGGER.error(
+            "Email or password is missing in the configuration entry. Cannot proceed."
+        )
         return False
 
     # Initialize PetLibroHub
@@ -172,7 +179,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         # Load devices only once here
         await hub.load_devices()
-        
+
         # Initialize Helpers
         await hub._initialize_helpers()
 
@@ -182,12 +189,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         # Forward entry setups for each platform
         await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-        _LOGGER.info(f"Successfully set up PetLibro integration for {email}")
-        return True
+        _LOGGER.info("Successfully set up PetLibro integration for %s", email)
 
-    except Exception as err:
-        _LOGGER.error(f"Failed to set up PetLibro integration: {err}", exc_info=True)
+    except Exception:
+        _LOGGER.exception("Failed to set up PetLibro integration")
         return False
+
+    else:
+        return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -196,25 +205,31 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hub = hass.data[DOMAIN].pop(entry.entry_id, None)
 
     if hub is None:
-        _LOGGER.warning(f"PetLibro hub for entry {entry.entry_id} not found.")
+        _LOGGER.warning("PetLibro hub for entry %s not found.", entry.entry_id)
         return False
 
     # Unload platforms associated with the entry
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
     if unload_ok:
-        _LOGGER.info(f"Successfully unloaded PetLibro entry for {entry.data.get(CONF_EMAIL)}")
+        _LOGGER.info(
+            "Successfully unloaded PetLibro entry for %s", entry.data.get(CONF_EMAIL)
+        )
         await hub.async_unload()  # If you have any cleanup to do in the hub
     else:
-        _LOGGER.error(f"Failed to unload PetLibro entry for {entry.data.get(CONF_EMAIL)}")
+        _LOGGER.error(
+            "Failed to unload PetLibro entry for %s", entry.data.get(CONF_EMAIL)
+        )
 
     return unload_ok
 
 
-async def async_remove_config_entry_device(hass: HomeAssistant, entry: ConfigEntry, device_entry: DeviceEntry) -> bool:
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, entry: ConfigEntry, device_entry: DeviceEntry
+) -> bool:
     """Remove a config entry from a device."""
     hub = hass.data[DOMAIN].get(entry.entry_id)
-    
+
     if not hub:
         _LOGGER.warning("No hub found for this entry during device removal.")
         return False

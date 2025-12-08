@@ -1,0 +1,44 @@
+[tool.ruff]
+# Based on https://github.com/home-assistant/core/blob/dev/pyproject.toml
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed
+    "ARG002",  # Unused method argument: `kwargs`
+    "ARG004",  # Unused static method argument
+    "ARG005",  # Unused lambda argument
+    "COM812",  # incompatible with formatter
+    "D203",    # no-blank-line-before-class (incompatible with formatter)
+    "D212",    # multi-line-summary-first-line (incompatible with formatter)
+    "DTZ007",  # Naive datetime constructed using `datetime.datetime.strptime()` without %z
+    "E501",    # Line too long
+    "ERA001",  # Commented-out code
+    "FBT001",  # Boolean-typed positional argument in function definition
+    "FBT002",  # Boolean default positional argument in function definition
+    "FBT003",  # Boolean positional value in function call
+    "ISC001",  # incompatible with formatter
+    "N802",    # Function name should be lowercase
+    "N801",    # Class name should use CapWords convention
+    "N814",    # Camelcase imported as constant
+    "N818",    # Exception name should be named with an Error suffix
+    "PLR0911", # Too many return statements
+    "PLR0912", # Too many branches
+    "PLR0913", # Too many arguments in function definition
+    "PLR2004", # Magic value used in comparison
+    "SLF001",  # Private member access
+    "TID252",  # Prefer absolute imports over relative imports from parent modules
+    "TRY003",  # Avoid specifying long messages outside the exception class
+    "TRY301",  # Abstract `raise` to an inner function
+    "UP046",   # Generic class uses `Generic` subclass instead of type parameters
+]
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
+
+[tool.ruff.lint.mccabe]
+max-complexity = 25

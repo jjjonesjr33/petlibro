@@ -1,8 +1,10 @@
+"""Petlibro exceptions."""
+
 from homeassistant.exceptions import HomeAssistantError
 
 
 class PetLibroAPIError(HomeAssistantError):
-    "Basic API error"
+    """Basic API error."""
 
 
 class PetLibroCannotConnect(PetLibroAPIError):

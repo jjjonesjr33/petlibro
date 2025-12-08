@@ -1,50 +1,60 @@
 """Support for PETLIBRO binary sensors."""
+
 from __future__ import annotations
-from .api import make_api_call
-import aiohttp
-from aiohttp import ClientSession, ClientError
-from dataclasses import dataclass
-from collections.abc import Callable
-from functools import cached_property
-from typing import Optional
+
 import logging
-from .const import DOMAIN
+from dataclasses import dataclass
+from functools import cached_property
+from typing import TYPE_CHECKING
+
 from homeassistant.components.binary_sensor import (
+    BinarySensorDeviceClass,
     BinarySensorEntity,
     BinarySensorEntityDescription,
-    BinarySensorDeviceClass,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
-from .hub import PetLibroHub  # Adjust the import path as necessary
 
-
-_LOGGER = logging.getLogger(__name__)
-
-from .devices import Device
-from .devices.device import Device
-from .devices.feeders.feeder import Feeder
+from .const import DOMAIN
 from .devices.feeders.air_smart_feeder import AirSmartFeeder
-from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
+from .devices.feeders.feeder import Feeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
+from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
-from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
-from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
-from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
+from .devices.fountains.dockstream_2_smart_cordless_fountain import (
+    Dockstream2SmartCordlessFountain,
+)
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
-from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
+from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
+from .devices.fountains.dockstream_smart_rfid_fountain import (
+    DockstreamSmartRFIDFountain,
+)
+from .entity import PetLibroEntity, PetLibroEntityDescription, _DeviceT
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+    from .devices import Device
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class PetLibroBinarySensorEntityDescription(BinarySensorEntityDescription, PetLibroEntityDescription[_DeviceT]):
+class PetLibroBinarySensorEntityDescription(
+    BinarySensorEntityDescription, PetLibroEntityDescription[_DeviceT]
+):
     """A class that describes device binary sensor entities."""
 
-    device_class_fn: Callable[[_DeviceT], BinarySensorDeviceClass | None] = lambda _: None
+    device_class_fn: Callable[[_DeviceT], BinarySensorDeviceClass | None] = (
+        lambda _: None
+    )
     should_report: Callable[[_DeviceT], bool] = lambda _: True
-    device_class: Optional[BinarySensorDeviceClass] = None
+    device_class: BinarySensorDeviceClass | None = None
+
 
 class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
     """PETLIBRO sensor entity."""
@@ -67,19 +77,21 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
         state = getattr(self.device, self.entity_description.key, None)
 
         # Check if this is the first time the sensor is being refreshed by checking if _last_state exists
-        last_state = getattr(self, '_last_state', None)
-        initial_log_done = getattr(self, '_initial_log_done', False)  # Track if we've logged the initial state
+        last_state = getattr(self, "_last_state", None)
+        initial_log_done = getattr(
+            self, "_initial_log_done", False
+        )  # Track if we've logged the initial state
 
         # If this is the initial boot, don't log anything but track the state
         if not initial_log_done:
             # Mark the initial log as done without logging
-            self._initial_log_done = True  
+            self._initial_log_done = True
         elif last_state != state:
             # Log state changes: log online with INFO and offline with WARNING
             if state:
-                _LOGGER.info(f"Device {self.device.name} is online.")
+                _LOGGER.info("Device %s is online.", self.device.name)
             else:
-                _LOGGER.warning(f"Device {self.device.name} is offline.")
+                _LOGGER.warning("Device %s is offline.", self.device.name)
 
         # Store the last state for future comparisons
         self._last_state = state
@@ -87,9 +99,11 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
         # Return the state, ensuring it's a boolean
         return bool(state)
 
-DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDescription]] = {
-    Feeder: [
-    ],
+
+DEVICE_BINARY_SENSOR_MAP: dict[
+    type[Device], list[PetLibroBinarySensorEntityDescription]
+] = {
+    Feeder: [],
     AirSmartFeeder: [
         PetLibroBinarySensorEntityDescription[AirSmartFeeder](
             key="food_dispenser_state",
@@ -97,7 +111,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_dispenser_state is not None,
-            name="Food Dispenser"
+            name="Food Dispenser",
         ),
         PetLibroBinarySensorEntityDescription[AirSmartFeeder](
             key="food_low",
@@ -105,7 +119,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-mix-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_low is not None,
-            name="Food Status"
+            name="Food Status",
         ),
         PetLibroBinarySensorEntityDescription[AirSmartFeeder](
             key="online",
@@ -113,14 +127,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:wifi",
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
-            name="Wi-Fi"
+            name="Wi-Fi",
         ),
         PetLibroBinarySensorEntityDescription[AirSmartFeeder](
             key="whether_in_sleep_mode",
             translation_key="whether_in_sleep_mode",
             icon="mdi:sleep",
             should_report=lambda device: device.whether_in_sleep_mode is not None,
-            name="Sleep Mode"
+            name="Sleep Mode",
         ),
         PetLibroBinarySensorEntityDescription[AirSmartFeeder](
             key="enable_low_battery_notice",
@@ -128,14 +142,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:battery-alert",
             device_class=BinarySensorDeviceClass.BATTERY,
             should_report=lambda device: device.enable_low_battery_notice is not None,
-            name="Battery Status"
+            name="Battery Status",
         ),
         PetLibroBinarySensorEntityDescription[AirSmartFeeder](
             key="light_switch",
             translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
-            name="Indicator"
+            name="Indicator",
         ),
     ],
     GranarySmartFeeder: [
@@ -145,7 +159,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_dispenser_state is not None,
-            name="Food Dispenser"
+            name="Food Dispenser",
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
             key="food_low",
@@ -153,7 +167,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-mix-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_low is not None,
-            name="Food Status"
+            name="Food Status",
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
             key="online",
@@ -161,14 +175,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:wifi",
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
-            name="Wi-Fi"
+            name="Wi-Fi",
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
             key="whether_in_sleep_mode",
             translation_key="whether_in_sleep_mode",
             icon="mdi:sleep",
             should_report=lambda device: device.whether_in_sleep_mode is not None,
-            name="Sleep Mode"
+            name="Sleep Mode",
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
             key="enable_low_battery_notice",
@@ -176,14 +190,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:battery-alert",
             device_class=BinarySensorDeviceClass.BATTERY,
             should_report=lambda device: device.enable_low_battery_notice is not None,
-            name="Battery Status"
+            name="Battery Status",
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
             key="light_switch",
             translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
-            name="Indicator"
+            name="Indicator",
         ),
     ],
     GranarySmartCameraFeeder: [
@@ -193,7 +207,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_dispenser_state is not None,
-            name="Food Dispenser"
+            name="Food Dispenser",
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
             key="food_low",
@@ -201,7 +215,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-mix-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_low is not None,
-            name="Food Status"
+            name="Food Status",
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
             key="online",
@@ -209,14 +223,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:wifi",
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
-            name="Wi-Fi"
+            name="Wi-Fi",
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
             key="whether_in_sleep_mode",
             translation_key="whether_in_sleep_mode",
             icon="mdi:sleep",
             should_report=lambda device: device.whether_in_sleep_mode is not None,
-            name="Sleep Mode"
+            name="Sleep Mode",
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
             key="enable_low_battery_notice",
@@ -224,14 +238,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:battery-alert",
             device_class=BinarySensorDeviceClass.BATTERY,
             should_report=lambda device: device.enable_low_battery_notice is not None,
-            name="Battery Status"
+            name="Battery Status",
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
             key="light_switch",
             translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
-            name="Indicator"
+            name="Indicator",
         ),
     ],
     OneRFIDSmartFeeder: [
@@ -241,7 +255,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:door",
             device_class=BinarySensorDeviceClass.DOOR,
             should_report=lambda device: device.door_state is not None,
-            name="Lid"
+            name="Lid",
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="food_dispenser_state",
@@ -249,7 +263,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_dispenser_state is not None,
-            name="Food Dispenser"
+            name="Food Dispenser",
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="door_blocked",
@@ -257,7 +271,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:door",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.door_blocked is not None,
-            name="Lid Status"
+            name="Lid Status",
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="food_low",
@@ -265,7 +279,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-mix-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_low is not None,
-            name="Food Status"
+            name="Food Status",
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="online",
@@ -273,14 +287,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:wifi",
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
-            name="Wi-Fi"
+            name="Wi-Fi",
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="whether_in_sleep_mode",
             translation_key="whether_in_sleep_mode",
             icon="mdi:sleep",
             should_report=lambda device: device.whether_in_sleep_mode is not None,
-            name="Sleep Mode"
+            name="Sleep Mode",
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="enable_low_battery_notice",
@@ -288,14 +302,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:battery-alert",
             device_class=BinarySensorDeviceClass.BATTERY,
             should_report=lambda device: device.enable_low_battery_notice is not None,
-            name="Battery Status"
+            name="Battery Status",
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="sound_switch",
             translation_key="sound_switch",
             icon="mdi:volume-high",
             should_report=lambda device: device.sound_switch is not None,
-            name="Sound Status"
+            name="Sound Status",
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="child_lock_switch",
@@ -303,14 +317,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:lock",
             device_class=BinarySensorDeviceClass.LOCK,
             should_report=lambda device: device.child_lock_switch is not None,
-            name="Buttons Lock"
+            name="Buttons Lock",
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="display_switch",
             translation_key="display_switch",
             icon="mdi:monitor-star",
             should_report=lambda device: device.display_switch is not None,
-            name="Display Status"
+            name="Display Status",
         ),
     ],
     PolarWetFoodFeeder: [
@@ -320,7 +334,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-mix-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_low is not None,
-            name="Food Status"
+            name="Food Status",
         ),
         PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
             key="online",
@@ -328,7 +342,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:wifi",
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
-            name="Wi-Fi"
+            name="Wi-Fi",
         ),
         PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
             key="enable_low_battery_notice",
@@ -336,7 +350,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:battery-alert",
             device_class=BinarySensorDeviceClass.BATTERY,
             should_report=lambda device: device.enable_low_battery_notice is not None,
-            name="Battery Status"
+            name="Battery Status",
         ),
         PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
             key="door_blocked",
@@ -344,21 +358,21 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:door-closed-lock",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.door_blocked is not None,
-            name="Lid Status"
+            name="Lid Status",
         ),
         PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
             key="whether_in_sleep_mode",
             translation_key="whether_in_sleep_mode",
             icon="mdi:sleep",
             should_report=lambda device: device.whether_in_sleep_mode is not None,
-            name="Sleep Mode"
+            name="Sleep Mode",
         ),
         PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
             key="light_switch",
             translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
-            name="Indicator"
+            name="Indicator",
         ),
     ],
     SpaceSmartFeeder: [
@@ -368,7 +382,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_dispenser_state is not None,
-            name="Food Dispenser"
+            name="Food Dispenser",
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
             key="food_outlet_state",
@@ -376,7 +390,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:door",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_outlet_state is not None,
-            name="Food Outlet"
+            name="Food Outlet",
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
             key="vacuum_state",
@@ -384,7 +398,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:air-filter",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.vacuum_state is not None,
-            name="Vacuum State"
+            name="Vacuum State",
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
             key="food_low",
@@ -392,7 +406,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:bowl-mix-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
             should_report=lambda device: device.food_low is not None,
-            name="Food Status"
+            name="Food Status",
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
             key="online",
@@ -400,14 +414,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:wifi",
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
-            name="Wi-Fi"
+            name="Wi-Fi",
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
             key="whether_in_sleep_mode",
             translation_key="whether_in_sleep_mode",
             icon="mdi:sleep",
             should_report=lambda device: device.whether_in_sleep_mode is not None,
-            name="Sleep Mode"
+            name="Sleep Mode",
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
             key="enable_low_battery_notice",
@@ -415,21 +429,21 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:battery-alert",
             device_class=BinarySensorDeviceClass.BATTERY,
             should_report=lambda device: device.enable_low_battery_notice is not None,
-            name="Battery Status"
+            name="Battery Status",
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
             key="sound_switch",
             translation_key="sound_switch",
             icon="mdi:volume-high",
             should_report=lambda device: device.sound_switch is not None,
-            name="Sound Status"
+            name="Sound Status",
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
             key="light_switch",
             translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
-            name="Indicator"
+            name="Indicator",
         ),
     ],
     DockstreamSmartFountain: [
@@ -439,14 +453,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:wifi",
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
-            name="Wi-Fi"
+            name="Wi-Fi",
         ),
         PetLibroBinarySensorEntityDescription[DockstreamSmartFountain](
             key="light_switch",
             translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
-            name="Indicator"
+            name="Indicator",
         ),
     ],
     DockstreamSmartRFIDFountain: [
@@ -456,14 +470,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:wifi",
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
-            name="Wi-Fi"
+            name="Wi-Fi",
         ),
         PetLibroBinarySensorEntityDescription[DockstreamSmartRFIDFountain](
             key="light_switch",
             translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
-            name="Indicator"
+            name="Indicator",
         ),
     ],
     Dockstream2SmartCordlessFountain: [
@@ -473,14 +487,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:wifi",
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
-            name="Wi-Fi"
+            name="Wi-Fi",
         ),
         PetLibroBinarySensorEntityDescription[Dockstream2SmartCordlessFountain](
             key="light_switch",
             translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
-            name="Indicator"
+            name="Indicator",
         ),
         PetLibroBinarySensorEntityDescription[Dockstream2SmartCordlessFountain](
             key="power_state",
@@ -488,7 +502,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:power-plug",
             device_class=BinarySensorDeviceClass.PLUG,
             should_report=lambda device: device.power_state is not None,
-            name="Power State"
+            name="Power State",
         ),
         PetLibroBinarySensorEntityDescription[Dockstream2SmartCordlessFountain](
             key="water_state",
@@ -496,7 +510,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:water",
             device_class=BinarySensorDeviceClass.MOISTURE,
             should_report=lambda device: device.water_state is not None,
-            name="Water Dispensing State"
+            name="Water Dispensing State",
         ),
     ],
     Dockstream2SmartFountain: [
@@ -506,14 +520,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:wifi",
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             should_report=lambda device: device.online is not None,
-            name="Wi-Fi"
+            name="Wi-Fi",
         ),
         PetLibroBinarySensorEntityDescription[Dockstream2SmartFountain](
             key="light_switch",
             translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
-            name="Indicator"
+            name="Indicator",
         ),
         PetLibroBinarySensorEntityDescription[Dockstream2SmartFountain](
             key="water_state",
@@ -521,10 +535,11 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:water",
             device_class=BinarySensorDeviceClass.MOISTURE,
             should_report=lambda device: device.water_state is not None,
-            name="Water Dispensing State"
+            name="Water Dispensing State",
         ),
-    ]
+    ],
 }
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -565,8 +580,11 @@ async def async_setup_entry(
         # Log the number of entities and their details
         _LOGGER.debug("Adding %d PetLibro binary sensors", len(entities))
         for entity in entities:
-            _LOGGER.debug("Adding binary sensor entity: %s for device %s", entity.entity_description.name, entity.device.name)
+            _LOGGER.debug(
+                "Adding binary sensor entity: %s for device %s",
+                entity.entity_description.name,
+                entity.device.name,
+            )
 
         # Add binary sensor entities to Home Assistant
         async_add_entities(entities)
-
