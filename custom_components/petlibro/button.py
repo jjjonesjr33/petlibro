@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from logging import getLogger
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Generic
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.const import EntityCategory
@@ -40,7 +40,7 @@ _LOGGER = getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class RequiredKeysMixin[DeviceT]:
+class RequiredKeysMixin(Generic[_DeviceT]):
     """A class that describes devices button entity required keys."""
 
     set_fn: Callable[[_DeviceT], Coroutine[Any, Any, None]]
