@@ -5,12 +5,12 @@ from logging import getLogger
 import aiohttp
 
 from ...exceptions import PetLibroAPIError
-from ..device import Device
+from .fountain import Fountain
 
 _LOGGER = getLogger(__name__)
 
 
-class Dockstream2SmartFountain(Device):
+class Dockstream2SmartFountain(Fountain):
     """Represents the Dockstream 2 Smart Fountain device."""
 
     async def refresh(self) -> None:

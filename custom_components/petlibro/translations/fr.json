@@ -37,12 +37,12 @@
             "unknown": "Erreur inattendue"
         },
         "step": {
-			"init": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "Paramètres d’intégration",
                     "account_settings": "Paramètres du compte"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "Paramètres d’intégration",
                 "data": {
@@ -197,9 +197,6 @@
             },
             "next_feeding_end_time": {
                 "name": "Tire d'alimentation"
-            },
-            "feeding_plan": {
-                "name": "Plan d'alimentation"
             },
             "temperature": {
                 "name": "Température"

@@ -10,12 +10,12 @@ import aiohttp
 from homeassistant.util import dt as dt_util
 
 from ...exceptions import PetLibroAPIError
-from ..device import Device
+from .dry_food_feeder import DryFoodFeeder
 
 _LOGGER = getLogger(__name__)
 
 
-class SpaceSmartFeeder(Device):  # Inherit directly from Device
+class SpaceSmartFeeder(DryFoodFeeder):
     """Petlibro Space Smart Feeder."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:

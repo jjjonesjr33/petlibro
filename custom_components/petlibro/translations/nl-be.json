@@ -37,12 +37,12 @@
             "unknown": "Onverwachte fout"
         },
         "step": {
-			"init": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "Integratie-instellingen",
                     "account_settings": "Accountinstellingen"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "Integratie-instellingen",
                 "data": {
@@ -197,9 +197,6 @@
             },
             "next_feeding_end_time": {
                 "name": "Voeding eindigt"
-            },
-            "feeding_plan": {
-                "name": "Voedingsplan"
             },
             "temperature": {
                 "name": "Temperatuur"

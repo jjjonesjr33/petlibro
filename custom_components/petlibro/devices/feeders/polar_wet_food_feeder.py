@@ -8,12 +8,12 @@ from typing import cast
 import aiohttp
 
 from ...exceptions import PetLibroAPIError
-from ..device import Device
+from .wet_food_feeder import WetFoodFeeder
 
 _LOGGER = getLogger(__name__)
 
 
-class PolarWetFoodFeeder(Device):
+class PolarWetFoodFeeder(WetFoodFeeder):
     """Petlibro Polar Smart Wet Food Feeder."""
 
     async def refresh(self) -> None:

@@ -6,12 +6,12 @@ from typing import cast
 import aiohttp
 
 from ...exceptions import PetLibroAPIError
-from ..device import Device
+from .fountain import Fountain
 
 _LOGGER = getLogger(__name__)
 
 
-class DockstreamSmartRFIDFountain(Device):
+class DockstreamSmartRFIDFountain(Fountain):
     """Represents the Dockstream Smart RFID Fountain device."""
 
     async def refresh(self) -> None:

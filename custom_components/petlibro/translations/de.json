@@ -37,12 +37,12 @@
             "unknown": "Unerwarteter Fehler"
         },
         "step": {
-			"init": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "Integrationseinstellungen",
                     "account_settings": "Kontoeinstellungen"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "Integrationseinstellungen",
                 "data": {
@@ -197,9 +197,6 @@
             },
             "next_feeding_end_time": {
                 "name": "Ende nächste Fütterung"
-            },
-            "feeding_plan": {
-                "name": "Essensplan"
             },
             "temperature": {
                 "name": "Temperatur"

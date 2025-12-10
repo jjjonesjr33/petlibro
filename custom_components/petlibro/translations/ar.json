@@ -37,12 +37,12 @@
             "unknown": "خطأ غير متوقع"
         },
         "step": {
-			"init": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "إعدادات التكامل",
                     "account_settings": "إعدادات الحساب"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "إعدادات التكامل",
                 "data": {
@@ -197,9 +197,6 @@
             },
             "next_feeding_end_time": {
                 "name": "نهايات التغذية"
-            },
-            "feeding_plan": {
-                "name": "خطة التغذية"
             },
             "temperature": {
                 "name": "درجة حرارة"

@@ -25,7 +25,7 @@
             }
         }
     },
-	"options": {
+    "options": {
         "abort": {
             "no_member_data": "Member data not loaded, please check logs",
             "account_settings_abort": "{account_settings_abort}",
@@ -35,13 +35,13 @@
         "error": {
             "unknown": "Unexpected error"
         },
-		"step": {
-			"init": {
+        "step": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "Integration settings",
                     "account_settings": "Account settings"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "Integration Settings",
                 "data": {
@@ -151,7 +151,7 @@
             },
             "last_feed_quantity_volume": {
                 "name": "Last Feed Quantity (Volume)"
-            }, 
+            },
             "next_feed_time": {
                 "name": "Next Feed Time"
             },
@@ -212,14 +212,14 @@
             "next_feeding_end_time": {
                 "name": "Feeding Ends"
             },
-            "feeding_plan": {
-                "name": "Feeding Plan"
-            },
             "temperature": {
                 "name": "Temperature"
             },
             "plate_position": {
                 "name": "Plate Position"
+            },
+            "pump_air_state": {
+                "name": "Pump air state"
             },
             "display_selection": {
                 "name": "Display Value"

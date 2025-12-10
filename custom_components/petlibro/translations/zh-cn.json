@@ -37,12 +37,12 @@
             "unknown": "意外错误"
         },
         "step": {
-			"init": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "集成设置",
                     "account_settings": "账户设置"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "集成设置",
                 "data": {
@@ -197,9 +197,6 @@
             },
             "next_feeding_end_time": {
                 "name": "进食末端"
-            },
-            "feeding_plan": {
-                "name": "喂养计划"
             },
             "temperature": {
                 "name": "温度"

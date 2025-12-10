@@ -37,12 +37,12 @@
             "unknown": "अप्रत्याशित त्रुटि"
         },
         "step": {
-			"init": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "इंटीग्रेशन सेटिंग्स",
                     "account_settings": "खाता सेटिंग्स"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "इंटीग्रेशन सेटिंग्स",
                 "data": {
@@ -197,9 +197,6 @@
             },
             "next_feeding_end_time": {
                 "name": "खिला समाप्त होता है"
-            },
-            "feeding_plan": {
-                "name": "भरी योजना"
             },
             "temperature": {
                 "name": "तापमान"

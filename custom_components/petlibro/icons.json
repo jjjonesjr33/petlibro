@@ -1,0 +1,138 @@
+{
+  "entity": {
+    "sensor": {
+      "battery_charge_state": {
+        "default": "mdi:battery"
+      },
+      "battery_state": {
+        "default": "mdi:battery"
+      },
+      "child_lock_switch": {
+        "default": "mdi:lock"
+      },
+      "display_selection": {
+        "default": "mdi:monitor-shimmer"
+      },
+      "electric_quantity": {
+        "default": "mdi:battery"
+      },
+      "enable_video_record": {
+        "default": "mdi:video"
+      },
+      "feeding_plan_state": {
+        "default": "mdi:calendar-check"
+      },
+      "last_feed_quantity_volume": {
+        "default": "mdi:history"
+      },
+      "last_feed_quantity_weight": {
+        "default": "mdi:history"
+      },
+      "last_feed_time": {
+        "default": "mdi:history"
+      },
+      "next_feed_quantity_volume": {
+        "default": "mdi:calendar-arrow-right"
+      },
+      "next_feed_quantity_weight": {
+        "default": "mdi:calendar-arrow-right"
+      },
+      "next_feed_time": {
+        "default": "mdi:calendar-arrow-right"
+      },
+      "next_feeding_day": {
+        "default": "mdi:calendar-clock"
+      },
+      "next_feeding_end_time": {
+        "default": "mdi:clock-end"
+      },
+      "next_feeding_time": {
+        "default": "mdi:clock-outline"
+      },
+      "night_vision": {
+        "default": "mdi:weather-night"
+      },
+      "plate_position": {
+        "default": "mdi:rotate-3d-variant"
+      },
+      "pump_air_state": {
+        "default": "mdi:air-filter"
+      },
+      "remaining_cleaning_days": {
+        "default": "mdi:package"
+      },
+      "remaining_desiccant": {
+        "default": "mdi:package"
+      },
+      "remaining_filter_days": {
+        "default": "mdi:package"
+      },
+      "remaining_water": {
+        "default": "mdi:water"
+      },
+      "resolution": {
+        "default": "mdi:camera"
+      },
+      "temperature": {
+        "default": "mdi:thermometer"
+      },
+      "today_avg_time": {
+        "default": "mdi:history"
+      },
+      "today_drinking_amount": {
+        "default": "mdi:water"
+      },
+      "today_drinking_count": {
+        "default": "mdi:history"
+      },
+      "today_drinking_time": {
+        "default": "mdi:history"
+      },
+      "today_eating_time": {
+        "default": "mdi:history"
+      },
+      "today_eating_times": {
+        "default": "mdi:history"
+      },
+      "today_feeding_quantity_volume": {
+        "default": "mdi:scale"
+      },
+      "today_feeding_quantity_weight": {
+        "default": "mdi:scale"
+      },
+      "today_feeding_times": {
+        "default": "mdi:history"
+      },
+      "use_water_duration": {
+        "default": "mdi:water"
+      },
+      "use_water_interval": {
+        "default": "mdi:water"
+      },
+      "vacuum_mode": {
+        "default": "mdi:air-filter"
+      },
+      "video_record_mode": {
+        "default": "mdi:motion-sensor"
+      },
+      "video_record_switch": {
+        "default": "mdi:video-outline"
+      },
+      "weight_percent": {
+        "default": "mdi:water-percent"
+      },
+      "wifi_rssi": {
+        "default": "mdi:wifi"
+      },
+      "wifi_ssid": {
+        "default": "mdi:wifi"
+      },
+      "yesterday_drinking_amount": {
+        "default": "mdi:water"
+      },
+      "yesterday_drinking_count": {
+        "default": "mdi:history"
+      }
+    }
+  }
+}

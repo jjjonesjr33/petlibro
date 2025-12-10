@@ -37,12 +37,12 @@
             "unknown": "অপ্রত্যাশিত ত্রুটি"
         },
         "step": {
-			"init": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "ইন্টিগ্রেশন সেটিংস",
                     "account_settings": "অ্যাকাউন্ট সেটিংস"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "ইন্টিগ্রেশন সেটিংস",
                 "data": {
@@ -197,9 +197,6 @@
             },
             "next_feeding_end_time": {
                 "name": "খাওয়ানো শেষ"
-            },
-            "feeding_plan": {
-                "name": "খাওয়ানো পরিকল্পনা"
             },
             "temperature": {
                 "name": "তাপমাত্রা"

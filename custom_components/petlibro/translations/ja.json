@@ -37,12 +37,12 @@
             "unknown": "予期しないエラー"
         },
         "step": {
-			"init": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "統合設定",
                     "account_settings": "アカウント設定"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "統合設定",
                 "data": {
@@ -197,9 +197,6 @@
             },
             "next_feeding_end_time": {
                 "name": "給餌の終わり"
-            },
-            "feeding_plan": {
-                "name": "給餌計画"
             },
             "temperature": {
                 "name": "温度"

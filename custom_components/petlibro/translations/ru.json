@@ -37,12 +37,12 @@
             "unknown": "Неожиданная ошибка"
         },
         "step": {
-			"init": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "Настройки интеграции",
                     "account_settings": "Настройки аккаунта"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "Настройки интеграции",
                 "data": {
@@ -197,9 +197,6 @@
             },
             "next_feeding_end_time": {
                 "name": "Кормление заканчивается"
-            },
-            "feeding_plan": {
-                "name": "План кормления"
             },
             "temperature": {
                 "name": "Температура"

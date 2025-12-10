@@ -37,12 +37,12 @@
             "unknown": "Uventet fejl"
         },
         "step": {
-			"init": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "Integrationsindstillinger",
                     "account_settings": "Kontoindstillinger"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "Integrationsindstillinger",
                 "data": {
@@ -197,9 +197,6 @@
             },
             "next_feeding_end_time": {
                 "name": "Fodring Ender"
-            },
-            "feeding_plan": {
-                "name": "Fodringsplan"
             },
             "temperature": {
                 "name": "Temperatur"

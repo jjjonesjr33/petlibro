@@ -37,12 +37,12 @@
             "unknown": "Error inesperado"
         },
         "step": {
-			"init": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "Configuración de la integración",
                     "account_settings": "Configuración de la cuenta"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "Configuración de la integración",
                 "data": {
@@ -197,9 +197,6 @@
             },
             "next_feeding_end_time": {
                 "name": "Fines de alimentación"
-            },
-            "feeding_plan": {
-                "name": "Plan de alimentación"
             },
             "temperature": {
                 "name": "Temperatura"
