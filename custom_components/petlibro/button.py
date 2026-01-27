@@ -31,6 +31,7 @@ from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
+from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
 
 @dataclass(frozen=True)
 class RequiredKeysMixin(Generic[_DeviceT]):
@@ -397,6 +398,50 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_filter_reset(),
             name="Filter Reset"
         )
+    ],
+    LumaSmartLitterBox: [
+        PetLibroButtonEntityDescription[LumaSmartLitterBox](
+            key="trigger_clean",
+            translation_key="trigger_clean",
+            set_fn=lambda device: device.trigger_manual_clean(),
+            name="Start Clean Cycle",
+        ),
+        PetLibroButtonEntityDescription[LumaSmartLitterBox](
+            key="trigger_empty_waste",
+            translation_key="trigger_empty_waste",
+            set_fn=lambda device: device.trigger_empty_waste(),
+            name="Empty Waste Bin",
+        ),
+        PetLibroButtonEntityDescription[LumaSmartLitterBox](
+            key="trigger_level_litter",
+            translation_key="trigger_level_litter",
+            set_fn=lambda device: device.trigger_level_litter(),
+            name="Level Litter",
+        ),
+        PetLibroButtonEntityDescription[LumaSmartLitterBox](
+            key="trigger_stop_action",
+            translation_key="trigger_stop_action",
+            set_fn=lambda device: device.trigger_stop_action(),
+            name="Stop Current Action",
+        ),
+        PetLibroButtonEntityDescription[LumaSmartLitterBox](
+            key="trigger_open_door",
+            translation_key="trigger_open_door",
+            set_fn=lambda device: device.trigger_open_door(),
+            name="Open Door",
+        ),
+        PetLibroButtonEntityDescription[LumaSmartLitterBox](
+            key="trigger_close_door",
+            translation_key="trigger_close_door",
+            set_fn=lambda device: device.trigger_close_door(),
+            name="Close Door",
+        ),
+        PetLibroButtonEntityDescription[LumaSmartLitterBox](
+            key="trigger_vacuum",
+            translation_key="trigger_vacuum",
+            set_fn=lambda device: device.trigger_vacuum(),
+            name="Run Air Purifier",
+        ),
     ],
 }
 
