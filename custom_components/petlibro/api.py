@@ -1136,7 +1136,7 @@ class PetLibroAPI:
                 return response
             
             # Check if response code indicates success
-            if response.status == 200:
+            if response.code == 200 or response.code == 0:
                 _LOGGER.debug(f"Desiccant reset set successfully, returned code: {response.status}")
                 return response
 
