@@ -501,7 +501,8 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
     async def set_desiccant_cycle(self, value: float) -> None:
         _LOGGER.debug(f"Setting desiccant frequency to {value} for {self.serial}")
         try:
-            await self.api.set_desiccant_cycle(self.serial, value)
+            key = "DESICCANT"
+            await self.api.set_desiccant_cycle(self.serial, value, key)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set desiccant cycle for {self.serial}: {err}")
