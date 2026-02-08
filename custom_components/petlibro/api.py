@@ -1126,7 +1126,7 @@ class PetLibroAPI:
             })
 
             # Granary smart feeder quirk: response can be None on success
-            if response is None:
+            if response is None or response == {}:
                 _LOGGER.debug("Desiccant reset set successfully, got no extra data")
                 return
 
