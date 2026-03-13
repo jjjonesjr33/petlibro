@@ -691,6 +691,103 @@ class PetLibroAPI:
             raise
 
 
+    async def exec_device_command(self, serial: str, action: str):
+        """Execute a device command via execCmdService.
+
+        Discovered actions for the Luma Smart Litter Box:
+          CLEAN / STOP_CLEAN / SUSPEND_CLEAN / RESTART_CLEAN
+          EMPTY / STOP_EMPTY / RESTART_EMPTY
+          LEVELING / RESTART_LEVELING
+          VACUUM (air purifier)
+          OPEN_DOOR / CLOSE_DOOR
+          STOP / CANCEL
+        """
+        _LOGGER.debug(f"Executing device command: serial={serial}, action={action}")
+        try:
+            request_id = str(uuid.uuid4()).replace("-", "")
+            response = await self.session.post("/device/device/execCmdService", json={
+                "deviceSn": serial,
+                "action": action,
+                "requestId": request_id,
+            })
+            _LOGGER.debug(f"execCmdService({action}) returned: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to exec command {action} for device {serial}: {e}")
+            raise
+
+    async def trigger_manual_clean(self, serial: str):
+        """Trigger a manual clean cycle on a litter box device."""
+        return await self.exec_device_command(serial, "CLEAN")
+
+    async def trigger_empty_waste(self, serial: str):
+        """Trigger waste bin emptying on a litter box device."""
+        return await self.exec_device_command(serial, "EMPTY")
+
+    async def trigger_level_litter(self, serial: str):
+        """Trigger litter leveling on a litter box device."""
+        return await self.exec_device_command(serial, "LEVELING")
+
+    async def trigger_stop_device_action(self, serial: str):
+        """Stop the current device action."""
+        return await self.exec_device_command(serial, "STOP")
+
+    async def trigger_open_door(self, serial: str):
+        """Open the litter box door."""
+        return await self.exec_device_command(serial, "OPEN_DOOR")
+
+    async def trigger_close_door(self, serial: str):
+        """Close the litter box door."""
+        return await self.exec_device_command(serial, "CLOSE_DOOR")
+
+    async def trigger_vacuum(self, serial: str):
+        """Trigger the air purifier (vacuum) on a litter box device."""
+        return await self.exec_device_command(serial, "VACUUM")
+
+    async def set_clean_mode(self, serial: str, clean_mode: str, auto_delay_sec: int = 60):
+        """Set the litter box clean mode (AUTO/MANUAL) and auto-delay."""
+        _LOGGER.debug(f"Setting clean mode: serial={serial}, mode={clean_mode}, delay={auto_delay_sec}")
+        try:
+            response = await self.session.post("/device/setting/updateCleanModeSetting", json={
+                "deviceSn": serial,
+                "cleanMode": clean_mode,
+                "autoDelaySec": auto_delay_sec,
+            })
+            _LOGGER.debug(f"Clean mode update returned code: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set clean mode for device {serial}: {e}")
+            raise
+
+    async def set_deodorization_setting(self, serial: str, mode: str, switch: bool):
+        """Update deodorization mode and master switch."""
+        _LOGGER.debug(f"Setting deodorization: serial={serial}, mode={mode}, switch={switch}")
+        try:
+            response = await self.session.post("/device/setting/updateDeodorizationSetting", json={
+                "deviceSn": serial,
+                "deodorizationMode": mode,
+                "deodorizationModeSwitch": switch,
+            })
+            _LOGGER.debug(f"Deodorization setting returned code: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set deodorization for device {serial}: {e}")
+            raise
+
+    async def set_volume(self, serial: str, volume: int):
+        """Set speaker volume (0-100)."""
+        _LOGGER.debug(f"Setting volume: serial={serial}, volume={volume}")
+        try:
+            response = await self.session.post("/device/setting/updateVolumeSetting", json={
+                "deviceSn": serial,
+                "volume": volume,
+            })
+            _LOGGER.debug(f"Volume setting returned code: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set volume for device {serial}: {e}")
+            raise
+
     # Not supported by the dockstream device firmware yet. hoping that maybe it will be in the future, so leaving code here.
     # async def set_water_sensing_delay(self, serial: str, value: float, current_mode: int):
     #     """Set the water sensing delay."""
