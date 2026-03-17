@@ -6,6 +6,7 @@ from collections.abc import Callable, Mapping
 from enum import Enum
 import logging
 from typing import Any
+from types import MappingProxyType
 
 import voluptuous as vol
 
@@ -23,11 +24,11 @@ from .const import (
     DEFAULT_FEED,
     DEFAULT_WATER,
     DEFAULT_WEIGHT,
-    MANUAL_FEED_PORTIONS,
     DOMAIN,
     APIKey as API,
     Gender,
     Unit,
+    IntegrationSetting,
 )
 from .exceptions import PetLibroCannotConnect, PetLibroInvalidAuth
 from .hub import PetLibroHub
@@ -201,32 +202,47 @@ class PetlibroOptionsFlow(OptionsFlow):
         user_input = user_input or {}
         
         if user_input:
-            manual_feed_portions = user_input.get(MANUAL_FEED_PORTIONS)
-            current_value = self.entry.options.get(MANUAL_FEED_PORTIONS, False)            
-            
+            # --- Extract updates
+            updates = self.collect_updates(
+                fields=IntegrationSetting,
+                user_input=user_input,
+                local_data=self.entry.options,
+            )
+
             # --- Nothing changed
-            if manual_feed_portions == current_value:
+            if not updates:
                 _LOGGER.debug("No integration settings changed.")
                 return self.async_abort(reason=self.get_common_translation("no_settings_changed", "No settings were changed"))
 
-            # --- Update option
-            self.hub.update_options({MANUAL_FEED_PORTIONS: manual_feed_portions})
-            _LOGGER.debug("Updated %s to %s", MANUAL_FEED_PORTIONS, manual_feed_portions)
+            # --- Update options
+            self.hub.update_options(updates)
+            _LOGGER.debug("Updated integration settings: %s", updates)
             
             abort_messages = [self.get_common_translation("settings_updated", "Settings updated")]
+            auto_reload = manual_reload = False
 
-            # --- Update entities and warn user if feed unit is cups
-            if self.member.feedUnitType == Unit.CUPS:
-                reload_needed = await self.hub.unit_entities.sync_manual_feed_entity_visibility(Unit.CUPS)
-
-                if reload_needed:
-                    abort_messages.append(
-                        self.get_common_translation("reloading_integration", "The integration will reload shortly")
-                    )
+            # --- Update entities and warn user if MANUAL_FEED_PORTIONS was changed and feed unit is cups
+            if IntegrationSetting.MANUAL_FEED_PORTIONS in updates and self.member.feedUnitType == Unit.CUPS:
+                if await self.hub.unit_entities.sync_manual_feed_entity_visibility(Unit.CUPS):
                     _LOGGER.debug("'manual_feed_portions' value changed while feed unit is 'cups', reloading integration.")
+                    auto_reload = True
                 else:
                     _LOGGER.debug("No Manual Feed entities found — nothing to reload.")
+
+            if IntegrationSetting.ENABLE_SHARED_PETS in updates:
+                if updates[IntegrationSetting.ENABLE_SHARED_PETS]:
+                    manual_reload = True
+                else:
+                    await self.hub.pets_helper.remove_shared_pets()
+
             await self.hub.async_refresh()
+
+            if auto_reload or manual_reload:
+                abort_messages.append(
+                    self.get_common_translation("reloading_integration", "The integration will reload shortly")
+                )
+                if not auto_reload:
+                    self.hass.config_entries.async_schedule_reload(self.handler)
 
             # --- Done
             return self.async_abort(
@@ -256,12 +272,14 @@ class PetlibroOptionsFlow(OptionsFlow):
             unit_updates = self.collect_updates(
                 fields=(API.FEED_UNIT, API.WATER_UNIT, API.WEIGHT_UNIT),
                 user_input=measurement_units_raw,
+                local_data=self.member,
                 enum_cls=Unit,
             )
 
             info_updates = self.collect_updates(
                 fields=(API.NICKNAME, API.GENDER),
                 user_input=account_info_raw,
+                local_data=self.member,
                 special={
                     API.NICKNAME: lambda v: v or "",
                     API.GENDER: lambda v: self.validate_enum(API.GENDER, v, Gender),
@@ -317,10 +335,11 @@ class PetlibroOptionsFlow(OptionsFlow):
         return self.async_show_form(
             data_schema=vol.Schema(
                 {
-                    vol.Optional(
-                        MANUAL_FEED_PORTIONS,
-                        default=self.entry.options.get(MANUAL_FEED_PORTIONS, False),
+                    vol.Required(
+                        setting.value,
+                        default=self.entry.options.get(setting, setting.default),
                     ): selector({"boolean": {}})
+                    for setting in IntegrationSetting
                 }
             ),
             description_placeholders={
@@ -425,6 +444,7 @@ class PetlibroOptionsFlow(OptionsFlow):
         self,
         fields: tuple[str, ...],
         user_input: dict[str, Any],
+        local_data: dict[str, Any],
         enum_cls: type[Enum] | None = None,
         special: dict[str, Callable[[Any], Any]] | None = None,
     ) -> dict[str, Any]:
@@ -433,10 +453,15 @@ class PetlibroOptionsFlow(OptionsFlow):
 
         for api_key in fields:
             form_value = user_input.get(api_key)
-            current_value = getattr(self.member, api_key, SENTINEL)
+
+            current_value = (
+                local_data.get(api_key, SENTINEL)
+                if isinstance(local_data, MappingProxyType)
+                else getattr(local_data, api_key, SENTINEL)
+            )
 
             if current_value is SENTINEL:
-                _LOGGER.error("Unsupported API key: %s", api_key)
+                _LOGGER.warning("Unsupported API key: %s", api_key)
                 continue
             if form_value == current_value:
                 continue

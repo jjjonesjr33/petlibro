@@ -205,7 +205,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up PETLIBRO updates using config entry."""
     # Retrieve the hub from hass.data that was set up in __init__.py
-    hub = hass.data[DOMAIN].get(entry.entry_id)
+    hub: PetLibroHub = hass.data[DOMAIN].get(entry.entry_id)
 
     if not hub:
         _LOGGER.error("Hub not found for entry: %s", entry.entry_id)
@@ -225,7 +225,7 @@ async def async_setup_entry(
     # Create update entities for each device based on the update map
     entities = [
         PetLibroUpdateEntity(device, hub, description)
-        for device in devices  # Iterate through devices from the hub
+        for device in devices.values()  # Iterate through devices from the hub
         for device_type, entity_descriptions in DEVICE_UPDATE_MAP.items()
         if isinstance(device, device_type)
         for description in entity_descriptions
@@ -241,4 +241,3 @@ async def async_setup_entry(
 
         # Add update entities to Home Assistant
         async_add_entities(entities)
-

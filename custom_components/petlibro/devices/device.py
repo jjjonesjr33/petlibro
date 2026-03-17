@@ -1,23 +1,26 @@
 # Error Mode - Used for pulling API for new devices. Enable Error Mode and Disable Debug Mode.
 
 from logging import getLogger
+import sys
 from typing import cast
 
-from ..api import PetLibroAPI
 from .event import Event, EVENT_UPDATE
-from ..member import Member
-from ..const import DEFAULT_MAX_FEED_PORTIONS
+from ..const import DOMAIN, DEFAULT_MAX_FEED_PORTIONS
 
 
 _LOGGER = getLogger(__name__)
 
 
 class Device(Event):
-    def __init__(self, data: dict, member: Member, api: PetLibroAPI):
+    def __init__(self, data: dict, hub):
         super().__init__()
+        if "PetLibroHub" not in sys.modules:
+            from ..hub import PetLibroHub
         self._data: dict = {}
-        self.api = api
-        self.member = member
+        self.hub: PetLibroHub = hub
+        self.api = self.hub.api
+        self.member = self.hub.member
+        self.saved_to_options = False
         
         self.feed_conv_factor = 1
         self.max_feed_portions = DEFAULT_MAX_FEED_PORTIONS
@@ -43,6 +46,7 @@ class Device(Event):
             data.update(await self.api.device_base_info(self.serial))
             data.update(await self.api.device_real_info(self.serial))
             data.update(await self.api.device_attribute_settings(self.serial))
+            data.update({"boundPets": await self.api.device_get_bound_pets(self.serial)})
             self.update_data(data)
         except Exception as e:
             _LOGGER.error(f"Failed to refresh device data: {e}")
@@ -61,6 +65,24 @@ class Device(Event):
     #     data.update(await self.api.device_real_info(self.serial))
     #     data.update(await self.api.device_attribute_settings(self.serial))
     #     self.update_data(data)
+
+    @property
+    def device_id(self) -> str:
+        """Home Assistant Device ID."""
+        return self._data.get("device_id") or ""
+
+    @property
+    def device_identifiers(self) -> set:
+        return {(DOMAIN, self.serial)}
+
+    @property
+    def owned(self) -> bool:
+        """Whether this account owns the device."""
+        return {
+            1: False,   # Shared with me
+            2: True,    # Owned, sharing with others
+            3: True,    # Owned, not shared
+        }.get(self._data.get("deviceShareState", 3))
 
     @property
     def serial(self) -> str:
@@ -89,6 +111,34 @@ class Device(Event):
     @property
     def hardware_version(self) -> str:
         return cast(str, self._data.get("hardwareVersion"))
+
+    @property
+    def boundPets(self) -> list[dict]:
+        return self._data.get("boundPets") or []
+
+    def set_device_id(self) -> None:
+        """Update Device object data with it's Home Assistant device ID."""
+        device = self.hub.device_register.async_get_device(
+            identifiers=self.device_identifiers
+        )
+        if device and getattr(device, "id", False):
+            self.update_data({"device_id": device.id})
+
+    def save_to_options(self) -> None:
+        """Save data to the Config Entry about the device."""
+        if self.device_id:
+            self.hub.update_options(
+                {
+                    "devices": self.hub.devices_helper.cached_devices
+                    | {
+                        self.serial: {
+                            "device_id": self.device_id,
+                            "owned": self.owned,
+                        },
+                    }
+                }
+            )
+            self.saved_to_options = True
 
 # Debug Mode - No more errors in HA logs.
 #

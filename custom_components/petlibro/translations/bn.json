@@ -46,10 +46,14 @@
             "integration_settings": {
                 "title": "ইন্টিগ্রেশন সেটিংস",
                 "data": {
-                    "manual_feed_portions": "পরিমাণ অনুযায়ী ম্যানুয়াল ফিড সেট করুন"
+                    "manual_feed_portions": "পরিমাণ অনুযায়ী ম্যানুয়াল ফিড সেট করুন",
+                    "pet_feed_quantity_no_rfid": "নন-RFID পোষা প্রাণীর খাওয়ার পরিমাণ অন্তর্ভুক্ত করুন",
+                    "enable_shared_pets": "শেয়ার করা ডিভাইসের পোষা প্রাণী দেখান"
                 },
                 "data_description": {
-                    "manual_feed_portions": "ডিফল্ট: আপনার নির্বাচিত পোষা খাবারের এককের দ্বারা নির্ধারণ করুন ({uom})।"
+                    "manual_feed_portions": "ডিফল্ট: আপনার নির্বাচিত পোষা খাবারের এককের দ্বারা নির্ধারণ করুন ({uom})।",
+                    "pet_feed_quantity_no_rfid": "যখন কোনো ডিভাইসে শুধুমাত্র একটি পোষা প্রাণী নির্ধারিত থাকে, তখন পোষা প্রাণীর খাওয়ার পরিমাণে নন-RFID ডিভাইসও অন্তর্ভুক্ত হবে।",
+                    "enable_shared_pets": "আপনার সাথে শেয়ার করা ডিভাইসের সাথে যুক্ত অন্য অ্যাকাউন্টের পোষা প্রাণীগুলোতে প্রবেশ করুন।"
                 }
             },
             "account_settings": {
@@ -209,6 +213,48 @@
             },
             "display_selection": {
                 "name": "প্রদর্শন মান"
+            },
+            "name": {
+                "name": "নাম"
+            },
+            "type": {
+                "name": "পোষা প্রাণীর ধরন"
+            },
+            "breed_name": {
+                "name": "বংশ"
+            },
+            "age": {
+                "name": "বয়স",
+                "state_attributes": {
+                    "years": {
+                        "name": "বছর"
+                    },
+                    "months": {
+                        "name": "মাস"
+                    },
+                    "days": {
+                        "name": "দিন"
+                    },
+                    "days_until_birthday": {
+                        "name": "জন্মদিন পর্যন্ত দিন"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "সংযুক্ত ডিভাইস"
+            },
+            "rfid": {
+                "name": "RFID কলার"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "অ্যাভাটার"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "জন্মতারিখ"
             }
         },
         "switch": {
@@ -223,6 +269,9 @@
             },
             "manual_feed_now": {
                 "name": "ম্যানুয়ালি খোলা/বন্ধ id াকনা"
+            },
+            "sterilization": {
+                "name": "নিউটার/স্পে করা"
             }
         },
         "button": {
@@ -307,6 +356,27 @@
             },
             "manual_feed_quantity": {
                 "name": "ম্যানুয়াল খাবারের পরিমাণ"
+            },
+            "weight": {
+                "name": "বর্তমান ওজন"
+            },
+            "drinking_goal": {
+                "name": "পান করার লক্ষ্য"
+            },
+            "feeding_goal": {
+                "name": "শুকনো খাবারের লক্ষ্য"
+            },
+            "weight_goal": {
+                "name": "ওজনের লক্ষ্য"
+            },
+            "training_goal": {
+                "name": "প্রশিক্ষণের লক্ষ্য"
+            },
+            "playing_goal": {
+                "name": "খেলার লক্ষ্য"
+            },
+            "walking_goal": {
+                "name": "হাঁটার লক্ষ্য"
             }
         },
         "select": {
@@ -321,6 +391,14 @@
             },
             "manual_feed_quantity_cups": {
                 "name": "ম্যানুয়াল খাবারের পরিমাণ"
+            },
+            "pet_sex": {
+                "name": "লিঙ্গ",
+                "state": {
+                    "none":"কিছুই নয়",
+                    "male": "পুরুষ",
+                    "female": "মহিলা"
+                }
             }
         },
         "text": {

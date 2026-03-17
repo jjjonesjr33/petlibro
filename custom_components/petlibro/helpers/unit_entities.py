@@ -11,17 +11,22 @@ from homeassistant.helpers.entity_registry import (
     RegistryEntryDisabler,
     RegistryEntryHider
 )
+from homeassistant.components.sensor.const import SensorDeviceClass
+from homeassistant.components.number.const import NumberDeviceClass
 
 from ..const import (
     SENTINEL as UNDEFINED,
     DOMAIN,
     GITHUB,
-    MANUAL_FEED_PORTIONS,
     ROUNDING_RULES,
+    DEFAULT_PORTIONS_IN_CUP,
+    DEFAULT_MAX_FEED_PORTIONS,
     Unit,
     APIKey as API,
+    IntegrationSetting,
 )
 from ..hub import PetLibroHub
+from ..devices import Device
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,6 +48,43 @@ class Unit_Entities:
         self.entity_registry = get_entity_registry(self.hass)
         self._sync_task = None
 
+        self.feed_number_unique_ids: dict[Platform, list[str]] = {
+            Platform.NUMBER: [], Platform.SELECT: []
+        }
+        self.unique_ids: dict[API, dict[Platform, dict[SensorDeviceClass, list[str]]]] = {
+            API.FEED_UNIT: {
+                Platform.SENSOR: {SensorDeviceClass.WEIGHT: [], SensorDeviceClass.VOLUME: []},
+                Platform.NUMBER: {NumberDeviceClass.WEIGHT: [], NumberDeviceClass.VOLUME: []},
+            },
+            API.WEIGHT_UNIT: {
+                Platform.SENSOR: {SensorDeviceClass.WEIGHT: []}, 
+                Platform.NUMBER: {NumberDeviceClass.WEIGHT: []},
+            },
+            API.WATER_UNIT: {
+                Platform.SENSOR: {SensorDeviceClass.VOLUME: []}, 
+                Platform.NUMBER: {NumberDeviceClass.VOLUME: []},
+            },
+        }
+        _LOGGER.debug("Unit Entities Helper initialised.")
+
+    def cups_select_options(self, device: Device | None = None) -> list[str]:
+        """Return formatted cup portion options for a select entity."""
+        denominator = round(DEFAULT_PORTIONS_IN_CUP / (device.feed_conv_factor if device else 1))
+        max_portions = device.max_feed_portions if device else DEFAULT_MAX_FEED_PORTIONS
+        numerator_trans = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
+        denominator_trans = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+        options = []
+        for portion in range(1, max_portions + 1):
+            whole, remainder = divmod(portion, denominator)
+            if remainder == 0:
+                label = f"{whole}"
+            else:
+                num = str(remainder).translate(numerator_trans)
+                den = str(denominator).translate(denominator_trans)
+                label = f"{num}/{den}" if whole == 0 else f"{whole} {num}/{den}"
+            options.append(label)
+        return options
+
     async def sync_manual_feed_entity_visibility(
         self, /, feed_unit: Unit | None = UNDEFINED, include_portions: bool = True,
     ) -> bool:
@@ -56,8 +98,8 @@ class Unit_Entities:
         - Returns True if the integration needs to be reloaded.
         """
 
-        numbers = self.hub.manual_feed_unique_ids.get(Platform.NUMBER)
-        selects = self.hub.manual_feed_unique_ids.get(Platform.SELECT)
+        numbers = self.feed_number_unique_ids.get(Platform.NUMBER)
+        selects = self.feed_number_unique_ids.get(Platform.SELECT)
         
         reload_needed = False
 
@@ -72,7 +114,11 @@ class Unit_Entities:
             return False
 
         feed_unit = self.member.feedUnitType if feed_unit is UNDEFINED else feed_unit
-        set_as_portion = self.entry.options.get(MANUAL_FEED_PORTIONS) if include_portions else False
+        set_as_portion = (
+            self.entry.options.get(IntegrationSetting.MANUAL_FEED_PORTIONS)
+            if include_portions
+            else False
+        )
 
         def incompatible(platform: Platform) -> bool:
             match platform:
@@ -80,7 +126,7 @@ class Unit_Entities:
                 case Platform.NUMBER: return feed_unit == Unit.CUPS and not set_as_portion
                 case _: raise ValueError(f"Unsupported platform: {platform}")
 
-        for platform, unique_ids in self.hub.manual_feed_unique_ids.items():
+        for platform, unique_ids in self.feed_number_unique_ids.items():
             entity_ids = []
             not_found = []
 
@@ -147,7 +193,7 @@ class Unit_Entities:
 
         reload_needed = False
 
-        for unit_type, unit_classes in self.hub.unit_sensor_unique_ids.items():
+        for unit_type, platforms in self.unique_ids.items():
             selected = new_units.get(unit_type)
             unit = (
                 selected if isinstance(selected, Unit)
@@ -166,27 +212,33 @@ class Unit_Entities:
                 else {unit.device_class: unit} if unit and unit.device_class else {}
             )
 
-            for device_class, unique_ids in unit_classes.items():
-                if not (target_unit := target_units.get(device_class)):
-                    continue
-                precision = ROUNDING_RULES.get(target_unit, 0)
-                options = {
-                    "unit_of_measurement": target_unit.symbol,
-                    "display_precision": precision,
-                    "suggested_display_precision": precision,
-                }
-                for unique_id in unique_ids:
-                    entity_id = self.entity_registry.async_get_entity_id(Platform.SENSOR, DOMAIN, unique_id)
-                    if not entity_id:
+            for platform, unit_classes in platforms.items():
+                for device_class, unique_ids in unit_classes.items():
+                    if not (target_unit := target_units.get(device_class)):
                         continue
-                    _LOGGER.debug(
-                        "Setting %s to %s with display precision %s",
-                        entity_id, target_unit.symbol, precision,
-                    )
-                    self.entity_registry.async_update_entity_options(entity_id, Platform.SENSOR, options)
+                    precision = ROUNDING_RULES.get(target_unit, 0)
+                    options = {
+                        "unit_of_measurement": target_unit.symbol,
+                        "display_precision": precision,
+                        "suggested_display_precision": precision,
+                    }
+                    for unique_id in unique_ids:
+                        entity_id = self.entity_registry.async_get_entity_id(platform, DOMAIN, unique_id)
+                        if not entity_id:
+                            continue
+                        _LOGGER.debug(
+                            "Setting %s to %s with display precision %s",
+                            entity_id, target_unit.symbol, precision,
+                        )
+                        self.entity_registry.async_update_entity_options(entity_id, platform, options)
 
             if unit_type is API.FEED_UNIT and (
-                (Unit.CUPS in (unit, self.member.feedUnitType) and not self.entry.options.get(MANUAL_FEED_PORTIONS))
+                (
+                    Unit.CUPS in (unit, self.member.feedUnitType)
+                    and not self.entry.options.get(
+                        IntegrationSetting.MANUAL_FEED_PORTIONS
+                    )
+                )
                 or update_all_units
             ):
                 try:

@@ -46,10 +46,14 @@
             "integration_settings": {
                 "title": "إعدادات التكامل",
                 "data": {
-                    "manual_feed_portions": "تعيين كمية التغذية اليدوية حسب الحصص"
+                    "manual_feed_portions": "تعيين كمية التغذية اليدوية حسب الحصص",
+                    "pet_feed_quantity_no_rfid": "تضمين استهلاك الحيوانات الأليفة بدون RFID",
+                    "enable_shared_pets": "إظهار الحيوانات الأليفة من الأجهزة المشتركة"
                 },
                 "data_description": {
-                    "manual_feed_portions": "الافتراضي: التعيين حسب الوحدة التي اخترتها لطعام الحيوانات الأليفة ({uom})."
+                    "manual_feed_portions": "الافتراضي: التعيين حسب الوحدة التي اخترتها لطعام الحيوانات الأليفة ({uom}).",
+                    "pet_feed_quantity_no_rfid": "سيشمل استهلاك الحيوان الأليف الأجهزة غير المزودة بـ RFID عندما يكون حيوان أليف واحد فقط مرتبطًا بها.",
+                    "enable_shared_pets": "الوصول إلى الحيوانات الأليفة من حسابات أخرى المرتبطة بالأجهزة التي يشاركونها معك."
                 }
             },
             "account_settings": {
@@ -209,6 +213,45 @@
             },
             "display_selection": {
                 "name": "قيمة العرض"
+            },
+            "type": {
+                "name": "نوع الحيوان الأليف"
+            },
+            "breed_name": {
+                "name": "السلالة"
+            },
+            "age": {
+                "name": "العمر",
+                "state_attributes": {
+                    "years": {
+                        "name": "سنوات"
+                    },
+                    "months": {
+                        "name": "أشهر"
+                    },
+                    "days": {
+                        "name": "أيام"
+                    },
+                    "days_until_birthday": {
+                        "name": "الأيام حتى عيد الميلاد"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "الأجهزة المرتبطة"
+            },
+            "rfid": {
+                "name": "طوق RFID"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "الصورة الرمزية"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "تاريخ الميلاد"
             }
         },
         "switch": {
@@ -223,6 +266,9 @@
             },
             "manual_feed_now": {
                 "name": "فتح/إغلاق يدويًا"
+            },
+            "sterilization": {
+                "name": "معقم/مخصي"
             }
         },
         "button": {
@@ -307,6 +353,27 @@
             },
             "manual_feed_quantity": {
                 "name": "كمية التغذية اليدوية"
+            },
+            "weight": {
+                "name": "الوزن الحالي"
+            },
+            "drinking_goal": {
+                "name": "هدف الشرب"
+            },
+            "feeding_goal": {
+                "name": "هدف الطعام الجاف"
+            },
+            "weight_goal": {
+                "name": "هدف الوزن"
+            },
+            "training_goal": {
+                "name": "هدف التدريب"
+            },
+            "playing_goal": {
+                "name": "هدف اللعب"
+            },
+            "walking_goal": {
+                "name": "هدف المشي"
             }
         },
         "select": {
@@ -321,6 +388,14 @@
             },
             "manual_feed_quantity_cups": {
                 "name": "كمية التغذية اليدوية"
+            },
+            "pet_sex": {
+                "name": "الجنس",
+                "state": {
+                    "none":"لا شيء",
+                    "male": "ذكر",
+                    "female": "أنثى"
+                }
             }
         },
         "text": {

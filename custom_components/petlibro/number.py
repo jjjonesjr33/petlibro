@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from collections.abc import Callable
 import logging
-from .const import DOMAIN, Unit, APIKey, MANUAL_FEED_PORTIONS
+from .const import DOMAIN, Unit, APIKey, IntegrationSetting
 from homeassistant.components.number import (
     NumberEntity,
     NumberEntityDescription,
@@ -16,11 +16,7 @@ from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
 from homeassistant.util.unit_conversion import VolumeConverter
 from .hub import PetLibroHub  # Adjust the import path as necessary
 
-
-_LOGGER = logging.getLogger(__name__)
-
 from .devices import Device
-from .devices.device import Device
 from .devices.feeders.feeder import Feeder
 from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
@@ -33,6 +29,10 @@ from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFI
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
+from .pets.entity import PL_PetNumberEntity
+
+
+_LOGGER = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class PetLibroNumberEntityDescription(NumberEntityDescription, PetLibroEntityDescription[_DeviceT]):
@@ -50,7 +50,7 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
         super().__init__(device, hub, description)
 
         if (unit_type := self.entity_description.petlibro_unit) and unit_type == APIKey.FEED_UNIT:
-            self.hub.manual_feed_unique_ids[Platform.NUMBER].append(self._attr_unique_id)
+            self.hub.unit_entities.feed_number_unique_ids[Platform.NUMBER].append(self._attr_unique_id)
 
     @property
     def native_value(self) -> float | None:
@@ -169,7 +169,10 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
     @property
     def portions_enabled(self) -> bool:
         """Return True if portions are enabled for setting manual feed."""
-        return self.hub.entry.options.get(MANUAL_FEED_PORTIONS, False)
+        return self.hub.entry.options.get(
+            IntegrationSetting.MANUAL_FEED_PORTIONS,
+            IntegrationSetting.MANUAL_FEED_PORTIONS.default,
+        )
 
     @property
     def enable_for_manual_feed(self) -> bool:
@@ -539,31 +542,42 @@ async def async_setup_entry(
 ) -> None:
     """Set up PETLIBRO number using config entry."""
     # Retrieve the hub from hass.data that was set up in __init__.py
-    hub = hass.data[DOMAIN].get(entry.entry_id)
+    hub: PetLibroHub = hass.data[DOMAIN].get(entry.entry_id)
 
     if not hub:
         _LOGGER.error("Hub not found for entry: %s", entry.entry_id)
         return
 
-    # Ensure that the devices are loaded (if load_devices is not already called elsewhere)
-    if not hub.devices:
+    # Ensure that the devices are loaded
+    if not (devices := hub.devices):
         _LOGGER.warning("No devices found in hub during number setup.")
+
+    # Ensure that the pets are loaded
+    if not (pets := hub.pets):
+        _LOGGER.warning("No pets found in hub during number setup.")
+
+    if not (devices or pets):
         return
+
+    entities = []
 
     # Log the contents of the hub data for debugging
     _LOGGER.debug("Hub data: %s", hub)
 
-    devices = hub.devices  # Devices should already be loaded in the hub
-    _LOGGER.debug("Devices in hub: %s", devices)
+    if devices:
+        # Devices should already be loaded in the hub
+        _LOGGER.debug("Devices in hub: %s", devices)
 
-    # Create number entities for each device based on the number map
-    entities = [
-        PetLibroNumberEntity(device, hub, description)
-        for device in devices  # Iterate through devices from the hub
-        for device_type, entity_descriptions in DEVICE_NUMBER_MAP.items()
-        if isinstance(device, device_type)
-        for description in entity_descriptions
-    ]
+        # Create number entities for each device based on the number map
+        entities.extend(
+            [
+                PetLibroNumberEntity(device, hub, description)
+                for device in devices.values()  # Iterate through devices from the hub
+                for device_type, entity_descriptions in DEVICE_NUMBER_MAP.items()
+                if isinstance(device, device_type)
+                for description in entity_descriptions
+            ]
+        )
 
     if not entities:
         _LOGGER.warning("No number entities added, entities list is empty!")
@@ -573,5 +587,10 @@ async def async_setup_entry(
         for entity in entities:
             _LOGGER.debug("Adding number entity: %s for device %s", entity.entity_description.name, entity.device.name)
 
+    if pets:
+        for pet in pets.values():
+            entities.extend(pet.entities(PL_PetNumberEntity, hub))
+
+    if entities:
         # Add number entities to Home Assistant
         async_add_entities(entities)

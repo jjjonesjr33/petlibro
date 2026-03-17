@@ -46,10 +46,14 @@
             "integration_settings": {
                 "title": "Integrationsindstillinger",
                 "data": {
-                    "manual_feed_portions": "Indstil manuel fodermængde efter portioner"
+                    "manual_feed_portions": "Indstil manuel fodermængde efter portioner",
+                    "pet_feed_quantity_no_rfid": "Inkluder ikke-RFID kæledyrsforbrug",
+                    "enable_shared_pets": "Vis kæledyr fra delte enheder"
                 },
                 "data_description": {
-                    "manual_feed_portions": "Standard: Indstil efter den valgte enhed til dyrefoder ({uom})."
+                    "manual_feed_portions": "Standard: Indstil efter den valgte enhed til dyrefoder ({uom}).",
+                    "pet_feed_quantity_no_rfid": "Kæledyrsforbrug vil inkludere ikke-RFID-enheder, når kun ét kæledyr er tilknyttet dem.",
+                    "enable_shared_pets": "Få adgang til kæledyr fra andre konti, der er knyttet til enheder, som de deler med dig."
                 }
             },
             "account_settings": {
@@ -209,6 +213,48 @@
             },
             "display_selection": {
                 "name": "Skærmsværdi"
+            },
+            "name": {
+                "name": "Navn"
+            },
+            "type": {
+                "name": "Kæledyrstype"
+            },
+            "breed_name": {
+                "name": "Race"
+            },
+            "age": {
+                "name": "Alder",
+                "state_attributes": {
+                    "years": {
+                        "name": "År"
+                    },
+                    "months": {
+                        "name": "Måneder"
+                    },
+                    "days": {
+                        "name": "Dage"
+                    },
+                    "days_until_birthday": {
+                        "name": "Dage til fødselsdag"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "Tilknyttede enheder"
+            },
+            "rfid": {
+                "name": "RFID-halsbånd"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "Avatar"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "Fødselsdato"
             }
         },
         "switch": {
@@ -223,6 +269,9 @@
             },
             "manual_feed_now": {
                 "name": "Manuel Åbning/Lukning af Låg"
+            },
+            "sterilization": {
+                "name": "Neutraliseret/steriliseret"
             }
         },
         "button": {
@@ -310,6 +359,27 @@
             },
             "manual_feed_quantity": {
                 "name": "Manuel fodermængde"
+            },
+            "weight": {
+                "name": "Nuværende vægt"
+            },
+            "drinking_goal": {
+                "name": "Drikkemål"
+            },
+            "feeding_goal": {
+                "name": "Tørfoder-mål"
+            },
+            "weight_goal": {
+                "name": "Vægtmål"
+            },
+            "training_goal": {
+                "name": "Træningsmål"
+            },
+            "playing_goal": {
+                "name": "Legemål"
+            },
+            "walking_goal": {
+                "name": "Gåmål"
             }
         },
         "select": {
@@ -324,6 +394,14 @@
             },
             "manual_feed_quantity_cups": {
                 "name": "Manuel fodermængde"
+            },
+            "pet_sex": {
+                "name": "Køn",
+                "state": {
+                    "none":"Ingen",
+                    "male": "Han",
+                    "female": "Hun"
+                }
             }
         },
         "text": {

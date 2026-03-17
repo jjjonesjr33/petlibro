@@ -46,10 +46,14 @@
             "integration_settings": {
                 "title": "Настройки интеграции",
                 "data": {
-                    "manual_feed_portions": "Задать ручную подачу по порциям"
+                    "manual_feed_portions": "Задать ручную подачу по порциям",
+                    "pet_feed_quantity_no_rfid": "Включить потребление питомцев без RFID",
+                    "enable_shared_pets": "Показывать питомцев с общих устройств"
                 },
                 "data_description": {
-                    "manual_feed_portions": "По умолчанию: устанавливается согласно выбранной единице измерения корма ({uom})."
+                    "manual_feed_portions": "По умолчанию: устанавливается согласно выбранной единице измерения корма ({uom}).",
+                    "pet_feed_quantity_no_rfid": "Потребление питомца будет включать устройства без RFID, если к ним привязан только один питомец.",
+                    "enable_shared_pets": "Получите доступ к питомцам из других аккаунтов, связанных с устройствами, которыми они делятся с вами."
                 }
             },
             "account_settings": {
@@ -209,6 +213,48 @@
             },
             "display_selection": {
                 "name": "Значение отображения"
+            },
+            "name": {
+                "name": "Имя"
+            },
+            "type": {
+                "name": "Тип питомца"
+            },
+            "breed_name": {
+                "name": "Порода"
+            },
+            "age": {
+                "name": "Возраст",
+                "state_attributes": {
+                    "years": {
+                        "name": "Годы"
+                    },
+                    "months": {
+                        "name": "Месяцы"
+                    },
+                    "days": {
+                        "name": "Дни"
+                    },
+                    "days_until_birthday": {
+                        "name": "Дней до дня рождения"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "Связанные устройства"
+            },
+            "rfid": {
+                "name": "RFID-ошейник"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "Аватар"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "Дата рождения"
             }
         },
         "switch": {
@@ -223,6 +269,9 @@
             },
             "manual_feed_now": {
                 "name": "Вручную открытую/закрытую крышку"
+            },
+            "sterilization": {
+                "name": "Стерилизован/кастрирован"
             }
         },
         "button": {
@@ -307,6 +356,27 @@
             },
             "manual_feed_quantity": {
                 "name": "Ручное количество корма"
+            },
+            "weight": {
+                "name": "Текущий вес"
+            },
+            "drinking_goal": {
+                "name": "Цель потребления воды"
+            },
+            "feeding_goal": {
+                "name": "Цель сухого корма"
+            },
+            "weight_goal": {
+                "name": "Цель веса"
+            },
+            "training_goal": {
+                "name": "Цель тренировки"
+            },
+            "playing_goal": {
+                "name": "Цель игры"
+            },
+            "walking_goal": {
+                "name": "Цель прогулок"
             }
         },
         "select": {
@@ -321,6 +391,14 @@
             },
             "manual_feed_quantity_cups": {
                 "name": "Ручное количество корма"
+            },
+            "pet_sex": {
+                "name": "Пол",
+                "state": {
+                    "none":"Нет",
+                    "male": "Самец",
+                    "female": "Самка"
+                }
             }
         },
         "text": {

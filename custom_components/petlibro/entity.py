@@ -11,7 +11,6 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpda
 
 from .devices import Device
 from .devices.event import EVENT_UPDATE
-from .const import DOMAIN, APIKey
 from .hub import PetLibroHub
 
 _DeviceT = TypeVar("_DeviceT", bound=Device)
@@ -36,12 +35,17 @@ class PetLibroEntity(
         self.key = description.key
         self._attr_unique_id = f"{self.device.serial}-{description.key}"
 
+        if not self.device.device_id:
+            self.device.set_device_id()
+        if not self.device.saved_to_options:
+            self.device.save_to_options()
+
     @cached_property
     def device_info(self) -> DeviceInfo | None:
         """Return the device information for a PETLIBRO."""
         assert self.device.serial
         return DeviceInfo(
-            identifiers={(DOMAIN, self.device.serial)},
+            identifiers=self.device.device_identifiers,
             connections={(CONNECTION_NETWORK_MAC, self.device.mac)},
             manufacturer="PETLIBRO",
             model=self.device.model,

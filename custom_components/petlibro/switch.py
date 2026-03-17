@@ -1,11 +1,7 @@
 """Support for PETLIBRO switches."""
 from __future__ import annotations
-from .api import make_api_call
-import aiohttp
-from aiohttp import ClientSession, ClientError
 from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
-from functools import cached_property
 from typing import Any, Generic
 import logging
 from .const import DOMAIN
@@ -16,11 +12,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
 from .hub import PetLibroHub  # Adjust the import path as necessary
 
-_LOGGER = logging.getLogger(__name__)
-
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 from .devices import Device
-from .devices.device import Device
 from .devices.feeders.feeder import Feeder
 from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
@@ -32,6 +25,10 @@ from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
+from .pets.entity import PL_PetSwitchEntity
+
+
+_LOGGER = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class RequiredKeysMixin(Generic[_DeviceT]):
@@ -106,31 +103,42 @@ async def async_setup_entry(
 ) -> None:
     """Set up PETLIBRO switches using config entry."""
     # Retrieve the hub from hass.data that was set up in __init__.py
-    hub = hass.data[DOMAIN].get(entry.entry_id)
+    hub: PetLibroHub = hass.data[DOMAIN].get(entry.entry_id)
 
     if not hub:
         _LOGGER.error("Hub not found for entry: %s", entry.entry_id)
         return
 
     # Ensure that the devices are loaded
-    if not hub.devices:
+    if not (devices := hub.devices):
         _LOGGER.warning("No devices found in hub during switch setup.")
+
+    # Ensure that the pets are loaded
+    if not (pets := hub.pets):
+        _LOGGER.warning("No pets found in hub during switch setup.")
+
+    if not (devices or pets):
         return
+
+    entities = []
 
     # Log the contents of the hub data for debugging
     _LOGGER.debug("Hub data: %s", hub)
 
-    devices = hub.devices  # Devices should already be loaded in the hub
-    _LOGGER.debug("Devices in hub: %s", devices)
+    if devices:
+        # Devices should already be loaded in the hub
+        _LOGGER.debug("Devices in hub: %s", devices)
 
-    # Create switch entities for each device based on the switch map
-    entities = [
-        PetLibroSwitchEntity(device, hub, description)
-        for device in devices  # Iterate through devices from the hub
-        for device_type, entity_descriptions in DEVICE_SWITCH_MAP.items()
-        if isinstance(device, device_type)
-        for description in entity_descriptions
-    ]
+        # Create switch entities for each device based on the switch map
+        entities.extend(
+            [
+                PetLibroSwitchEntity(device, hub, description)
+                for device in devices.values()  # Iterate through devices from the hub
+                for device_type, entity_descriptions in DEVICE_SWITCH_MAP.items()
+                if isinstance(device, device_type)
+                for description in entity_descriptions
+            ]
+        )
 
     if not entities:
         _LOGGER.debug("No switches added, entities list is empty!")
@@ -140,6 +148,10 @@ async def async_setup_entry(
         for entity in entities:
             _LOGGER.debug("Adding switch entity: %s for device %s", entity.entity_description.name, entity.device.name)
 
+    if pets:
+        for pet in pets.values():
+            entities.extend(pet.entities(PL_PetSwitchEntity, hub))
+
+    if entities:
         # Add switch entities to Home Assistant
         async_add_entities(entities)
-

@@ -12,7 +12,7 @@ from typing import Optional
 from typing import Any
 from typing import List, Awaitable
 import logging
-from .const import DOMAIN, MANUAL_FEED_PORTIONS, DEFAULT_PORTIONS_IN_CUP, Unit, APIKey
+from .const import DOMAIN, DEFAULT_PORTIONS_IN_CUP, Unit, APIKey, IntegrationSetting
 from homeassistant.components.select import (
     SelectEntity,
     SelectEntityDescription,
@@ -23,9 +23,6 @@ from homeassistant.const import Platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
 from .hub import PetLibroHub  # Adjust the import path as necessary
-
-
-_LOGGER = logging.getLogger(__name__)
 
 from .devices import Device
 from .devices.device import Device
@@ -41,6 +38,10 @@ from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFI
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
+from .pets.entity import PL_PetSelectEntity
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def _apply_and_refresh(device, action_coro):
@@ -80,27 +81,13 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
         super().__init__(device, hub, description)
 
         if (unit_type := self.entity_description.petlibro_unit) and unit_type == APIKey.FEED_UNIT:
-            self.hub.manual_feed_unique_ids[Platform.SELECT].append(self._attr_unique_id)
+            self.hub.unit_entities.feed_number_unique_ids[Platform.SELECT].append(self._attr_unique_id)
 
     @property
     def options(self) -> list[str]:
         """Return the list of available options for the select."""    
         if self.key == "manual_feed_quantity_cups":
-            denominator = round(DEFAULT_PORTIONS_IN_CUP / self.device.feed_conv_factor)
-            max_portions = self.device.max_feed_portions
-            numerator_trans = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
-            denominator_trans = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
-            options = []
-            for portion in range(1, max_portions + 1):
-                whole, remainder = divmod(portion, denominator)
-                if remainder == 0:
-                    label = f"{whole}"
-                else:
-                    num = str(remainder).translate(numerator_trans)
-                    den = str(denominator).translate(denominator_trans)
-                    label = f"{num}/{den}" if whole == 0 else f"{whole} {num}/{den}"
-                options.append(label)
-            return options
+            return self.hub.unit_entities.cups_select_options(self.device)
         
         if not self.entity_description.options:
             # If there are no options, return an empty list and log an error.
@@ -175,7 +162,10 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
     @property
     def enable_for_manual_feed(self) -> bool:
         """Return True if entity should be enabled for manual feed portion setting."""
-        return self.member.feedUnitType is Unit.CUPS and not self.hub.entry.options.get(MANUAL_FEED_PORTIONS, False)
+        return self.member.feedUnitType is Unit.CUPS and not self.hub.entry.options.get(
+            IntegrationSetting.MANUAL_FEED_PORTIONS,
+            IntegrationSetting.MANUAL_FEED_PORTIONS.default,
+        )
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -390,6 +380,7 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
     ]
 }
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,  # Use ConfigEntry
@@ -397,31 +388,42 @@ async def async_setup_entry(
 ) -> None:
     """Set up PETLIBRO select using config entry."""
     # Retrieve the hub from hass.data that was set up in __init__.py
-    hub = hass.data[DOMAIN].get(entry.entry_id)
+    hub: PetLibroHub = hass.data[DOMAIN].get(entry.entry_id)
 
     if not hub:
         _LOGGER.error("Hub not found for entry: %s", entry.entry_id)
         return
 
-    # Ensure that the devices are loaded (if load_devices is not already called elsewhere)
-    if not hub.devices:
+    # Ensure that the devices are loaded
+    if not (devices := hub.devices):
         _LOGGER.warning("No devices found in hub during select setup.")
+
+    # Ensure that the pets are loaded
+    if not (pets := hub.pets):
+        _LOGGER.warning("No pets found in hub during select setup.")
+
+    if not (devices or pets):
         return
+
+    entities = []
 
     # Log the contents of the hub data for debugging
     _LOGGER.debug("Hub data: %s", hub)
 
-    devices = hub.devices  # Devices should already be loaded in the hub
-    _LOGGER.debug("Devices in hub: %s", devices)
+    if devices:
+        # Devices should already be loaded in the hub
+        _LOGGER.debug("Devices in hub: %s", devices)
 
-    # Create select entities for each device based on the select map
-    entities = [
-        PetLibroSelectEntity(device, hub, description)
-        for device in devices  # Iterate through devices from the hub
-        for device_type, entity_descriptions in DEVICE_SELECT_MAP.items()
-        if isinstance(device, device_type)
-        for description in entity_descriptions
-    ]
+        # Create select entities for each device based on the select map
+        entities.extend(
+            [
+                PetLibroSelectEntity(device, hub, description)
+                for device in devices.values()  # Iterate through devices from the hub
+                for device_type, entity_descriptions in DEVICE_SELECT_MAP.items()
+                if isinstance(device, device_type)
+                for description in entity_descriptions
+            ]
+        )
 
     if not entities:
         _LOGGER.warning("No select entities added, entities list is empty!")
@@ -429,8 +431,16 @@ async def async_setup_entry(
         # Log the select of entities and their details
         _LOGGER.debug("Adding %d PetLibro select entities", len(entities))
         for entity in entities:
-            _LOGGER.debug("Adding select entity: %s for device %s", entity.entity_description.name, entity.device.name)
+            _LOGGER.debug(
+                "Adding select entity: %s for device %s",
+                entity.entity_description.name,
+                entity.device.name,
+            )
 
+    if pets:
+        for pet in pets.values():
+            entities.extend(pet.entities(PL_PetSelectEntity, hub))
+
+    if entities:
         # Add select entities to Home Assistant
         async_add_entities(entities)
-

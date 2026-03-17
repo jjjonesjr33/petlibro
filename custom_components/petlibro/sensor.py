@@ -7,7 +7,7 @@ from datetime import datetime
 from .const import DOMAIN, VALID_UNIT_TYPES, Unit, APIKey as API
 from homeassistant.components.sensor.const import SensorStateClass, SensorDeviceClass
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
-from homeassistant.const import UnitOfMass, UnitOfVolume, UnitOfTime, SIGNAL_STRENGTH_DECIBELS_MILLIWATT, PERCENTAGE
+from homeassistant.const import Platform, UnitOfMass, UnitOfVolume, UnitOfTime, SIGNAL_STRENGTH_DECIBELS_MILLIWATT, PERCENTAGE
 from homeassistant.core import HomeAssistant
 from homeassistant.util.unit_conversion import VolumeConverter
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -15,10 +15,7 @@ from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
 from .hub import PetLibroHub  # Adjust the import path as necessary
 from .member import MemberEntity
 
-_LOGGER = getLogger(__name__)
-
 from .devices import Device
-from .devices.device import Device
 from .devices.feeders.feeder import Feeder
 from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
@@ -31,6 +28,10 @@ from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFI
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
+from .pets.entity import PL_PetSensorEntity
+
+
+_LOGGER = getLogger(__name__)
 
 def icon_for_gauge_level(gauge_level: int | None = None, offset: int = 0) -> str:
     """Return a gauge icon valid identifier."""
@@ -67,7 +68,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         
         if unit_type := self.entity_description.petlibro_unit:
             device_class = self.entity_description.device_class
-            self.hub.unit_sensor_unique_ids[unit_type][device_class].append(self._attr_unique_id)
+            self.hub.unit_entities.unique_ids[unit_type][Platform.SENSOR][device_class].append(self._attr_unique_id)
         
         # Dictionary to keep track of the last known state for each sensor key
         self._last_sensor_state = {}
@@ -1442,7 +1443,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up PETLIBRO sensors using config entry."""
     # Retrieve the hub from hass.data that was set up in __init__.py
-    hub = hass.data[DOMAIN].get(entry.entry_id)
+    hub: PetLibroHub = hass.data[DOMAIN].get(entry.entry_id)
 
     if not hub:
         _LOGGER.error("Hub not found for entry: %s", entry.entry_id)
@@ -1456,7 +1457,11 @@ async def async_setup_entry(
     if not (devices := hub.devices):
         _LOGGER.warning("No devices found in hub during sensor setup.")
 
-    if not (devices or member):
+    # Ensure that the pets are loaded
+    if not (pets := hub.pets):
+        _LOGGER.warning("No pets found in hub during sensor setup.")
+
+    if not (devices or member or pets):
         return
 
     entities = []
@@ -1472,7 +1477,7 @@ async def async_setup_entry(
         entities.extend(
             [
                 PetLibroSensorEntity(device, hub, description)
-                for device in devices  # Iterate through devices from the hub
+                for device in devices.values()  # Iterate through devices from the hub
                 for device_type, entity_descriptions in DEVICE_SENSOR_MAP.items()
                 if isinstance(device, device_type)
                 for description in entity_descriptions
@@ -1485,14 +1490,21 @@ async def async_setup_entry(
         # Log the number of entities and their details
         _LOGGER.debug("Adding %d PetLibro sensors", len(entities))
         for entity in entities:
-            _LOGGER.debug("Adding sensor entity: %s for device %s", entity.entity_description.name, entity.device.name)
+            _LOGGER.debug(
+                "Adding sensor entity: %s for device %s",
+                entity.entity_description.name,
+                entity.device.name,
+            )
 
     # Create Member sensor entity for front-end use.
     if member:
         entities.append(MemberEntity(member))
         _LOGGER.debug("Adding sensor entity for Petlibro member: %s", member.email)
 
+    if pets:
+        for pet in pets.values():
+            entities.extend(pet.entities(PL_PetSensorEntity, hub))
+
     if entities:
         # Add sensor entities to Home Assistant
         async_add_entities(entities)
-

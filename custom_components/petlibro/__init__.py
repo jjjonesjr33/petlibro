@@ -167,14 +167,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         # Store the hub in hass.data
         hass.data.setdefault(DOMAIN, {})[entry.entry_id] = hub
 
+        # Initialize Helpers
+        await hub._initialize_helpers()
+
         # Load member only once here
         await hub.load_member()
 
         # Load devices only once here
         await hub.load_devices()
-        
-        # Initialize Helpers
-        await hub._initialize_helpers()
+
+        # Load pets only once here
+        await hub.load_pets()
 
         # Start the coordinator for periodic updates
         await hub.coordinator.async_config_entry_first_refresh()
@@ -224,6 +227,6 @@ async def async_remove_config_entry_device(hass: HomeAssistant, entry: ConfigEnt
         identifier
         for identifier in device_entry.identifiers
         if identifier[0] == DOMAIN
-        for device in hub.devices
+        for device in hub.devices.values()
         if device.serial == identifier[1]
     )

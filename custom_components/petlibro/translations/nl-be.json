@@ -46,10 +46,14 @@
             "integration_settings": {
                 "title": "Integratie-instellingen",
                 "data": {
-                    "manual_feed_portions": "Handmatige voerhoeveelheid instellen per portie"
+                    "manual_feed_portions": "Handmatige voerhoeveelheid instellen per portie",
+                    "pet_feed_quantity_no_rfid": "Niet-RFID huisdierconsumptie opnemen",
+                    "enable_shared_pets": "Huisdieren van gedeelde apparaten tonen"
                 },
                 "data_description": {
-                    "manual_feed_portions": "Standaard: ingesteld volgens de gekozen eenheid voor dierenvoer ({uom})."
+                    "manual_feed_portions": "Standaard: ingesteld volgens de gekozen eenheid voor dierenvoer ({uom}).",
+                    "pet_feed_quantity_no_rfid": "Huisdierconsumptie zal niet-RFID apparaten omvatten wanneer er slechts één huisdier aan is gekoppeld.",
+                    "enable_shared_pets": "Krijg toegang tot huisdieren van andere accounts die gekoppeld zijn aan apparaten die zij met u delen."
                 }
             },
             "account_settings": {
@@ -209,6 +213,48 @@
             },
             "display_selection": {
                 "name": "Schermwaarde"
+            },
+            "name": {
+                "name": "Naam"
+            },
+            "type": {
+                "name": "Huisdiertype"
+            },
+            "breed_name": {
+                "name": "Ras"
+            },
+            "age": {
+                "name": "Leeftijd",
+                "state_attributes": {
+                    "years": {
+                        "name": "Jaren"
+                    },
+                    "months": {
+                        "name": "Maanden"
+                    },
+                    "days": {
+                        "name": "Dagen"
+                    },
+                    "days_until_birthday": {
+                        "name": "Dagen tot verjaardag"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "Gekoppelde apparaten"
+            },
+            "rfid": {
+                "name": "RFID-halsband"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "Avatar"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "Geboortedatum"
             }
         },
         "switch": {
@@ -223,6 +269,9 @@
             },
             "manual_feed_now": {
                 "name": "Handmatig openen/sluiten deksel"
+            },
+            "sterilization": {
+                "name": "Gecastreerd/Gesteriliseerd"
             }
         },
         "button": {
@@ -310,6 +359,27 @@
             },
             "manual_feed_quantity": {
                 "name": "Handmatige voederhoeveelheid"
+            },
+            "weight": {
+                "name": "Huidig gewicht"
+            },
+            "drinking_goal": {
+                "name": "Drinkdoel"
+            },
+            "feeding_goal": {
+                "name": "Droogvoerdoel"
+            },
+            "weight_goal": {
+                "name": "Gewichtsdoel"
+            },
+            "training_goal": {
+                "name": "Trainingsdoel"
+            },
+            "playing_goal": {
+                "name": "Speeldoel"
+            },
+            "walking_goal": {
+                "name": "Wandeldoel"
             }
         },
         "select": {
@@ -324,6 +394,14 @@
             },
             "manual_feed_quantity_cups": {
                 "name": "Handmatige voederhoeveelheid"
+            },
+            "pet_sex": {
+                "name": "Geslacht",
+                "state": {
+                    "none":"Geen",
+                    "male": "Mannelijk",
+                    "female": "Vrouwelijk"
+                }
             }
         },
         "text": {

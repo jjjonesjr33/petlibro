@@ -15,13 +15,14 @@
 
 from logging import getLogger
 from hashlib import md5
+import sys
 from urllib.parse import urljoin
 from typing import Any, Dict, List, TypeAlias
-from datetime import datetime, timedelta
+from datetime import timedelta
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from homeassistant.exceptions import ConfigEntryAuthFailed
-from .exceptions import PetLibroAPIError, PetLibroInvalidAuth
-from aiohttp import ClientSession, ClientError
+from homeassistant.util.dt import utcnow
+from .exceptions import PetLibroAPIError
+from aiohttp import ClientSession
 
 import aiohttp
 import uuid  # To generate unique request IDs
@@ -204,6 +205,10 @@ class PetLibroAPI:
         self._last_api_call_times = {}  # To store last call time per device
         self._cached_responses = {}  # To store cached responses for short periods
 
+        if "PL_PetAPI" not in sys.modules:
+            from .pets.api import PL_PetAPI
+        self.pets = PL_PetAPI(self.hass, self.config_entry, self.session)
+
     @staticmethod
     def hash_password(password: str) -> str:
         """Generate the password hash for the API"""
@@ -242,7 +247,7 @@ class PetLibroAPI:
 
     async def get_device_real_info(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
-        now = datetime.utcnow()
+        now = utcnow()
         last_call_time = self._last_api_call_times.get(f"{device_id}_realInfo")
 
         # If we made the request within the last 10 seconds, return cached response
@@ -268,7 +273,7 @@ class PetLibroAPI:
 
     async def get_device_data_real_info(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
-        now = datetime.utcnow()
+        now = utcnow()
         last_call_time = self._last_api_call_times.get(f"{device_id}_dataRealInfo")
 
         # If we made the request within the last 10 seconds, return cached response
@@ -294,7 +299,7 @@ class PetLibroAPI:
 
     async def get_device_drink_water(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
-        now = datetime.utcnow()
+        now = utcnow()
         last_call_time = self._last_api_call_times.get(f"{device_id}_drinkWater")
 
         # If we made the request within the last 10 seconds, return cached response
@@ -320,7 +325,7 @@ class PetLibroAPI:
 
     async def get_device_attribute_settings(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
-        now = datetime.utcnow()
+        now = utcnow()
         last_call_time = self._last_api_call_times.get(f"{device_id}_getAttributeSetting")
 
         # If we made the request within the last 10 seconds, return cached response
@@ -345,7 +350,7 @@ class PetLibroAPI:
 
     async def get_device_upgrade(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
-        now = datetime.utcnow()
+        now = utcnow()
         last_call_time = self._last_api_call_times.get(f"{device_id}_getUpgrade")
 
         # If we made the request within the last 10 seconds, return cached response
@@ -370,7 +375,7 @@ class PetLibroAPI:
 
     async def get_device_base_info(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
-        now = datetime.utcnow()
+        now = utcnow()
         last_call_time = self._last_api_call_times.get(f"{device_id}_baseInfo")
 
         # If we made the request within the last 10 seconds, return cached response
@@ -395,7 +400,7 @@ class PetLibroAPI:
 
     async def get_device_work_record(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
-        now = datetime.utcnow()
+        now = utcnow()
         last_call_time = self._last_api_call_times.get(f"{device_id}_work_record")
 
         if last_call_time and (now - last_call_time) < timedelta(seconds=10):
@@ -432,7 +437,7 @@ class PetLibroAPI:
 
     async def get_device_events(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
-        now = datetime.utcnow()
+        now = utcnow()
         last_call_time = self._last_api_call_times.get(f"{device_id}_events")
 
         # If we made the request within the last 10 seconds, return cached response
@@ -463,7 +468,7 @@ class PetLibroAPI:
         :return: The default matrix data.
         """
         # Check cache for recently fetched data
-        now = datetime.utcnow()
+        now = utcnow()
         cache_key = f"{device_sn}_getDefaultMatrix"
         last_call_time = self._last_api_call_times.get(cache_key)
 
@@ -541,6 +546,21 @@ class PetLibroAPI:
 
     async def device_wet_feeding_plan(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/wetFeedingPlan/wetListV3", serial)
+
+    async def device_get_bound_pets(self, device_sn: str) -> list[dict]:
+        """Get pets bound to a device."""
+        _LOGGER.debug("Requesting pets bound to device sn: %s", device_sn)
+
+        try:
+            data = await self.session.post("/device/devicePetRelation/getBoundPets", json={"deviceSn": device_sn})
+        except Exception as exc:
+            raise PetLibroAPIError("Failed to fetch list of bound pets") from exc
+
+        if data and not isinstance(data, list):
+            raise PetLibroAPIError(f"Invalid bound pets response format: {data}")
+        
+        _LOGGER.debug("Bound pets retrieved successfully")
+        return data or []
 
     # Support for new switch functions
     async def set_feeding_plan(self, serial: str, enable: bool):

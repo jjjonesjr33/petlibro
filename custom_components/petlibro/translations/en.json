@@ -45,10 +45,14 @@
             "integration_settings": {
                 "title": "Integration Settings",
                 "data": {
-                    "manual_feed_portions": "Set Manual Feed amount by Portions"
+                    "manual_feed_portions": "Set Manual Feed amount by Portions",
+                    "pet_feed_quantity_no_rfid": "Include non-RFID Pet Consumption",
+                    "enable_shared_pets": "Show Pets from Shared Devices"
                 },
                 "data_description": {
-                    "manual_feed_portions": "Default: Set by your chosen unit for pet feed ({uom})."
+                    "manual_feed_portions": "Default: Set by your chosen unit for pet feed ({uom}).",
+                    "pet_feed_quantity_no_rfid": "Pet consumption will include non-RFID devices when only one pet is assigned to them.",
+                    "enable_shared_pets": "Access pets from other accounts that are linked to device(s) they share with you."
                 }
             },
             "account_settings": {
@@ -244,6 +248,48 @@
             },
             "yesterday_drinking_amount": {
                 "name": "Yesterday's Water Consumption"
+            },
+            "name": {
+                "name": "Name"
+            },
+            "type": {
+                "name": "Pet type"
+            },
+            "breed_name": {
+                "name": "Breed"
+            },
+            "age": {
+                "name": "Age",
+                "state_attributes": {
+                    "years": {
+                        "name": "Years"
+                    },
+                    "months": {
+                        "name": "Months"
+                    },
+                    "days": {
+                        "name": "Days"
+                    },
+                    "days_until_birthday": {
+                        "name": "Days until Birthday"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "Linked Devices"
+            },
+            "rfid": {
+                "name": "RFID Collar"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "Avatar"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "Date of Birth"
             }
         },
         "switch": {
@@ -258,6 +304,9 @@
             },
             "manual_feed_now": {
                 "name": "Manually Open/Close Lid"
+            },
+            "sterilization": {
+                "name": "Neutered/Spayed"
             }
         },
         "button": {
@@ -393,6 +442,27 @@
             },
             "manual_feed_quantity": {
                 "name": "Manual Feed Quantity"
+            },
+            "weight": {
+                "name": "Current Weight"
+            },
+            "drinking_goal": {
+                "name": "Drinking Goal"
+            },
+            "feeding_goal": {
+                "name": "Dry Food Goal"
+            },
+            "weight_goal": {
+                "name": "Weight Goal"
+            },
+            "training_goal": {
+                "name": "Training Goal"
+            },
+            "playing_goal": {
+                "name": "Playing Goal"
+            },
+            "walking_goal": {
+                "name": "Walking Goal"
             }
         },
         "select": {
@@ -413,6 +483,14 @@
             },
             "manual_feed_quantity_cups": {
                 "name": "Manual Feed Quantity"
+            },
+            "pet_sex": {
+                "name": "Sex",
+                "state": {
+                    "none":"None",
+                    "male": "Male",
+                    "female": "Female"
+                }
             }
         },
         "text": {

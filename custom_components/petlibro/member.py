@@ -26,13 +26,12 @@ _LOGGER = getLogger(__name__)
 class Member(Event):
     """Object representing the user's Petlibro account."""
 
-    def __init__(self, data: dict, api: PetLibroAPI) -> None:
+    def __init__(self, api: PetLibroAPI) -> None:
         """Initialise the Member object."""
         super().__init__()
         self._data: dict[str, str | Any] = {}
         self.force_refresh: bool = False
         self.api = api
-        self.update_data(data)
 
     def update_data(self, data: dict[str, Any]) -> None:
         """Save the member info from a data dictionary."""
@@ -54,6 +53,10 @@ class Member(Event):
         """Entity ID."""
         return f"PL-{self._data.get(API.ID, API.EMAIL)}-data"
 
+    @property
+    def id(self) -> int:
+        """Account ID."""
+        return self._data.get(API.ID)
 
     @property
     def email(self) -> str:

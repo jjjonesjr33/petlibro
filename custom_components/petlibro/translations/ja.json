@@ -46,10 +46,14 @@
             "integration_settings": {
                 "title": "統合設定",
                 "data": {
-                    "manual_feed_portions": "手動給餌量をポーション単位で設定"
+                    "manual_feed_portions": "手動給餌量をポーション単位で設定",
+                    "pet_feed_quantity_no_rfid": "非RFIDのペット消費量を含める",
+                    "enable_shared_pets": "共有デバイスのペットを表示"
                 },
                 "data_description": {
-                    "manual_feed_portions": "デフォルト: ペットフードの選択単位に基づいて設定します ({uom})。"
+                    "manual_feed_portions": "デフォルト: ペットフードの選択単位に基づいて設定します ({uom})。",
+                    "pet_feed_quantity_no_rfid": "デバイスに1匹のペットのみが割り当てられている場合、ペットの消費量には非RFIDデバイスも含まれます。",
+                    "enable_shared_pets": "あなたと共有しているデバイスにリンクされた他のアカウントのペットにアクセスします。"
                 }
             },
             "account_settings": {
@@ -209,6 +213,48 @@
             },
             "display_selection": {
                 "name": "表示値"
+            },
+            "name": {
+                "name": "名前"
+            },
+            "type": {
+                "name": "ペットの種類"
+            },
+            "breed_name": {
+                "name": "品種"
+            },
+            "age": {
+                "name": "年齢",
+                "state_attributes": {
+                    "years": {
+                        "name": "年"
+                    },
+                    "months": {
+                        "name": "か月"
+                    },
+                    "days": {
+                        "name": "日"
+                    },
+                    "days_until_birthday": {
+                        "name": "誕生日までの日数"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "リンクされたデバイス"
+            },
+            "rfid": {
+                "name": "RFID首輪"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "アバター"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "生年月日"
             }
         },
         "switch": {
@@ -223,6 +269,9 @@
             },
             "manual_feed_now": {
                 "name": "蓋を手動/閉じます"
+            },
+            "sterilization": {
+                "name": "去勢/避妊済み"
             }
         },
         "button": {
@@ -307,6 +356,27 @@
             },
             "manual_feed_quantity": {
                 "name": "手動給餌量"
+            },
+            "weight": {
+                "name": "現在の体重"
+            },
+            "drinking_goal": {
+                "name": "飲水目標"
+            },
+            "feeding_goal": {
+                "name": "ドライフード目標"
+            },
+            "weight_goal": {
+                "name": "体重目標"
+            },
+            "training_goal": {
+                "name": "トレーニング目標"
+            },
+            "playing_goal": {
+                "name": "遊び目標"
+            },
+            "walking_goal": {
+                "name": "散歩目標"
             }
         },
         "select": {
@@ -321,6 +391,14 @@
             },
             "manual_feed_quantity_cups": {
                 "name": "手動給餌量"
+            },
+            "pet_sex": {
+                "name": "性別",
+                "state": {
+                    "none":"なし",
+                    "male": "オス",
+                    "female": "メス"
+                }
             }
         },
         "text": {

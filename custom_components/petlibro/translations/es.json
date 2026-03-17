@@ -46,10 +46,14 @@
             "integration_settings": {
                 "title": "Configuración de la integración",
                 "data": {
-                    "manual_feed_portions": "Establecer alimentación manual por porciones"
+                    "manual_feed_portions": "Establecer alimentación manual por porciones",
+                    "pet_feed_quantity_no_rfid": "Incluir consumo de mascotas sin RFID",
+                    "enable_shared_pets": "Mostrar mascotas de dispositivos compartidos"
                 },
                 "data_description": {
-                    "manual_feed_portions": "Predeterminado: establecer según la unidad seleccionada para comida de mascotas ({uom})."
+                    "manual_feed_portions": "Predeterminado: establecer según la unidad seleccionada para comida de mascotas ({uom}).",
+                    "pet_feed_quantity_no_rfid": "El consumo de la mascota incluirá dispositivos sin RFID cuando solo haya una mascota asignada a ellos.",
+                    "enable_shared_pets": "Accede a mascotas de otras cuentas vinculadas a dispositivos que comparten contigo."
                 }
             },
             "account_settings": {
@@ -209,6 +213,48 @@
             },
             "display_selection": {
                 "name": "Valor de visualización"
+            },
+            "name": {
+                "name": "Nombre"
+            },
+            "type": {
+                "name": "Tipo de mascota"
+            },
+            "breed_name": {
+                "name": "Raza"
+            },
+            "age": {
+                "name": "Edad",
+                "state_attributes": {
+                    "years": {
+                        "name": "Años"
+                    },
+                    "months": {
+                        "name": "Meses"
+                    },
+                    "days": {
+                        "name": "Días"
+                    },
+                    "days_until_birthday": {
+                        "name": "Días hasta el cumpleaños"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "Dispositivos vinculados"
+            },
+            "rfid": {
+                "name": "Collar RFID"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "Avatar"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "Fecha de nacimiento"
             }
         },
         "switch": {
@@ -223,6 +269,9 @@
             },
             "manual_feed_now": {
                 "name": "Tapa abierta/cerrada manualmente"
+            },
+            "sterilization": {
+                "name": "Castrado/Esterilizado"
             }
         },
         "button": {
@@ -307,6 +356,27 @@
             },
             "manual_feed_quantity": {
                 "name": "Cantidad de alimento manual"
+            },
+            "weight": {
+                "name": "Peso actual"
+            },
+            "drinking_goal": {
+                "name": "Objetivo de bebida"
+            },
+            "feeding_goal": {
+                "name": "Objetivo de comida seca"
+            },
+            "weight_goal": {
+                "name": "Objetivo de peso"
+            },
+            "training_goal": {
+                "name": "Objetivo de entrenamiento"
+            },
+            "playing_goal": {
+                "name": "Objetivo de juego"
+            },
+            "walking_goal": {
+                "name": "Objetivo de paseo"
             }
         },
         "select": {
@@ -321,6 +391,14 @@
             },
             "manual_feed_quantity_cups": {
                 "name": "Cantidad de alimento manual"
+            },
+            "pet_sex": {
+                "name": "Sexo",
+                "state": {
+                    "none":"Ninguno",
+                    "male": "Macho",
+                    "female": "Hembra"
+                }
             }
         },
         "text": {

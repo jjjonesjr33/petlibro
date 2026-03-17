@@ -46,10 +46,14 @@
             "integration_settings": {
                 "title": "集成设置",
                 "data": {
-                    "manual_feed_portions": "按份量设置手动喂食量"
+                    "manual_feed_portions": "按份量设置手动喂食量",
+                    "pet_feed_quantity_no_rfid": "包含非 RFID 宠物消耗量",
+                    "enable_shared_pets": "显示来自共享设备的宠物"
                 },
                 "data_description": {
-                    "manual_feed_portions": "默认：根据您选择的宠物饲料单位设置 ({uom})。"
+                    "manual_feed_portions": "默认：根据您选择的宠物饲料单位设置 ({uom})。",
+                    "pet_feed_quantity_no_rfid": "当设备只分配给一只宠物时，宠物消耗量将包含非 RFID 设备。",
+                    "enable_shared_pets": "访问来自其他账户的宠物，这些宠物关联到与您共享的设备。"
                 }
             },
             "account_settings": {
@@ -209,6 +213,48 @@
             },
             "display_selection": {
                 "name": "显示值"
+            },
+            "name": {
+                "name": "名称"
+            },
+            "type": {
+                "name": "宠物类型"
+            },
+            "breed_name": {
+                "name": "品种"
+            },
+            "age": {
+                "name": "年龄",
+                "state_attributes": {
+                    "years": {
+                        "name": "年"
+                    },
+                    "months": {
+                        "name": "月"
+                    },
+                    "days": {
+                        "name": "天"
+                    },
+                    "days_until_birthday": {
+                        "name": "距离生日的天数"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "关联设备"
+            },
+            "rfid": {
+                "name": "RFID 项圈"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "头像"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "出生日期"
             }
         },
         "switch": {
@@ -223,6 +269,9 @@
             },
             "manual_feed_now": {
                 "name": "手动打开/关闭盖子"
+            },
+            "sterilization": {
+                "name": "绝育"
             }
         },
         "button": {
@@ -307,6 +356,27 @@
             },
             "manual_feed_quantity": {
                 "name": "手动喂食量"
+            },
+            "weight": {
+                "name": "当前体重"
+            },
+            "drinking_goal": {
+                "name": "饮水目标"
+            },
+            "feeding_goal": {
+                "name": "干粮目标"
+            },
+            "weight_goal": {
+                "name": "体重目标"
+            },
+            "training_goal": {
+                "name": "训练目标"
+            },
+            "playing_goal": {
+                "name": "玩耍目标"
+            },
+            "walking_goal": {
+                "name": "散步目标"
             }
         },
         "select": {
@@ -321,6 +391,14 @@
             },
             "manual_feed_quantity_cups": {
                 "name": "手动喂食量"
+            },
+            "pet_sex": {
+                "name": "性别",
+                "state": {
+                    "none":"无",
+                    "male": "雄性",
+                    "female": "雌性"
+                }
             }
         },
         "text": {

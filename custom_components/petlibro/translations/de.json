@@ -46,10 +46,14 @@
             "integration_settings": {
                 "title": "Integrationseinstellungen",
                 "data": {
-                    "manual_feed_portions": "Manuelle Futtermenge nach Portionen festlegen"
+                    "manual_feed_portions": "Manuelle Futtermenge nach Portionen festlegen",
+                    "pet_feed_quantity_no_rfid": "Nicht-RFID-Futterverbrauch einbeziehen",
+                    "enable_shared_pets": "Haustiere von freigegebenen Geräten anzeigen"
                 },
                 "data_description": {
-                    "manual_feed_portions": "Standard: Festgelegt nach der gewählten Einheit für Tierfutter ({uom})."
+                    "manual_feed_portions": "Standard: Festgelegt nach der gewählten Einheit für Tierfutter ({uom}).",
+                    "pet_feed_quantity_no_rfid": "Der Futterverbrauch umfasst auch Nicht-RFID-Geräte, wenn ihnen nur ein Haustier zugeordnet ist.",
+                    "enable_shared_pets": "Greifen Sie auf Haustiere anderer Konten zu, die mit Geräten verknüpft sind, die sie mit Ihnen teilen."
                 }
             },
             "account_settings": {
@@ -209,6 +213,48 @@
             },
             "display_selection": {
                 "name": "Anzeigewert"
+            },
+            "name": {
+                "name": "Name"
+            },
+            "type": {
+                "name": "Haustiertyp"
+            },
+            "breed_name": {
+                "name": "Rasse"
+            },
+            "age": {
+                "name": "Alter",
+                "state_attributes": {
+                    "years": {
+                        "name": "Jahre"
+                    },
+                    "months": {
+                        "name": "Monate"
+                    },
+                    "days": {
+                        "name": "Tage"
+                    },
+                    "days_until_birthday": {
+                        "name": "Tage bis zum Geburtstag"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "Verknüpfte Geräte"
+            },
+            "rfid": {
+                "name": "RFID-Halsband"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "Avatar"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "Geburtsdatum"
             }
         },
         "switch": {
@@ -220,6 +266,9 @@
             },
             "enable_sound": {
                 "name": "Ton aktivieren"
+            },
+            "sterilization": {
+                "name": "Kastriert/Sterilisiert"
             }
         },
         "button": {
@@ -301,6 +350,27 @@
             },
             "manual_feed_quantity": {
                 "name": "Manuelle Futtermenge"
+            },
+            "weight": {
+                "name": "Aktuelles Gewicht"
+            },
+            "drinking_goal": {
+                "name": "Trinkziel"
+            },
+            "feeding_goal": {
+                "name": "Trockenfutter-Ziel"
+            },
+            "weight_goal": {
+                "name": "Gewichtsziel"
+            },
+            "training_goal": {
+                "name": "Trainingsziel"
+            },
+            "playing_goal": {
+                "name": "Spielziel"
+            },
+            "walking_goal": {
+                "name": "Spazierziel"
             }
         },
         "select": {
@@ -315,6 +385,14 @@
             },
             "manual_feed_quantity_cups": {
                 "name": "Manuelle Futtermenge"
+            },
+            "pet_sex": {
+                "name": "Geschlecht",
+                "state": {
+                    "none":"Keine",
+                    "male": "Männlich",
+                    "female": "Weiblich"
+                }
             }
         },
         "text": {

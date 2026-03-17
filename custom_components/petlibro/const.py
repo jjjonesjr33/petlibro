@@ -1,6 +1,7 @@
 """Constants and Enums for Petlibro."""
 
 from enum import IntEnum, StrEnum
+from typing import Any
 
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, UnitOfMass, UnitOfVolume
 
@@ -17,7 +18,7 @@ CONF_API_TOKEN = "api_token"
 CONF_REGION = "region"
 
 # Supported platforms
-PLATFORMS = ["sensor", "switch", "button", "binary_sensor", "number", "select", "text", "update"]  # Add any other platforms as needed
+PLATFORMS = ["sensor", "switch", "button", "binary_sensor", "number", "select", "text", "date", "image", "update"]  # Add any other platforms as needed
 
 # Update interval for device data in seconds
 UPDATE_INTERVAL_SECONDS = 60  # You can adjust this value based on your needs
@@ -30,6 +31,7 @@ class Gender(IntEnum):
     NONE = 0, "mdi:gender-male-female", "\u26a5", ""
     MALE = 1, "mdi:gender-male", "\u2642", "\u2642\ufe0f"
     FEMALE = 2, "mdi:gender-female", "\u2640", "\u2640\ufe0f"
+    # API value for NONE is 0 for the member, but None/null for pets.
 
     def __new__(cls, value: int, icon: str, symbol: str, emoji: str):
         "Ensures IntEnum functionality while allowing symbols."
@@ -66,24 +68,22 @@ class APIKey(StrEnum):
 
     # Common
     ID = "id"
-    NAME = "name"
-    WEIGHT = "weight"
 
     # Member
+    NAME = "name"
     EMAIL = "email"
     NICKNAME = "nickname"
     GENDER = "gender"
+    AVATAR = "avatar"
     FEED_UNIT = "feedUnitType"
     WATER_UNIT = "waterUnitType"
     WEIGHT_UNIT = "weightUnitType"
 
-    # Pet
-    BIRTHDAY = "birthday"
-    TYPE = "type"
-    SEX = "gender"
-    BREED_NAME = "breedName"
-    BREED_ID = "breedId"
-    PET_ID = "petId"
+    # Device
+    WEIGHT = "weight"
+    DEVICE_SN = "deviceSn"
+    PRODUCT_ID = "productIdentifier"
+    RFID = "rfid"
 
 
 class Unit(IntEnum):
@@ -169,7 +169,6 @@ DEFAULT_FEED = Unit.CUPS
 DEFAULT_WATER = Unit.WATER_OUNCES
 DEFAULT_PORTIONS_IN_CUP = 12
 DEFAULT_MAX_FEED_PORTIONS = 48
-MANUAL_FEED_PORTIONS = "manual_feed_portions"
 VALID_UNIT_TYPES: dict[str, set[Unit]] = {
     APIKey.WEIGHT_UNIT: {Unit.POUNDS, Unit.KILOGRAMS, None},
     APIKey.FEED_UNIT: {Unit.CUPS, Unit.OUNCES, Unit.GRAMS, Unit.MILLILITERS, None},
@@ -181,3 +180,21 @@ ROUNDING_RULES = {
 WATER_MAPPING = {
     Unit.MILLILITERS: Unit.WATER_MILLILITERS, Unit.OUNCES: Unit.WATER_OUNCES
 }
+
+
+class IntegrationSetting(StrEnum):
+    """Integration settings and their default values."""
+    
+    MANUAL_FEED_PORTIONS = "manual_feed_portions", False
+    ENABLE_SHARED_PETS = "enable_shared_pets", True
+
+    def __new__(cls, value: str, default: bool):
+        obj = str.__new__(cls, value)
+        obj._value_ = value
+        obj._default = default
+        return obj
+
+    @property
+    def default(self) -> Any:
+        """Default value."""
+        return self._default

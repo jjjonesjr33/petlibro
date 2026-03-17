@@ -46,10 +46,14 @@
             "integration_settings": {
                 "title": "इंटीग्रेशन सेटिंग्स",
                 "data": {
-                    "manual_feed_portions": "पोरशन के अनुसार मैनुअल फीड मात्रा सेट करें"
+                    "manual_feed_portions": "पोरशन के अनुसार मैनुअल फीड मात्रा सेट करें",
+                    "pet_feed_quantity_no_rfid": "गैर-RFID पालतू खपत शामिल करें",
+                    "enable_shared_pets": "साझा डिवाइसों से पालतू जानवर दिखाएँ"
                 },
                 "data_description": {
-                    "manual_feed_portions": "डिफ़ॉल्ट: आपके द्वारा चुनी गई पालतू भोजन इकाई के अनुसार सेट करें ({uom})।"
+                    "manual_feed_portions": "डिफ़ॉल्ट: आपके द्वारा चुनी गई पालतू भोजन इकाई के अनुसार सेट करें ({uom})।",
+                    "pet_feed_quantity_no_rfid": "जब किसी डिवाइस से केवल एक पालतू जुड़ा होता है, तो पालतू खपत में गैर-RFID डिवाइस भी शामिल किए जाएंगे।",
+                    "enable_shared_pets": "उन डिवाइसों से जुड़े अन्य खातों के पालतू जानवरों तक पहुँचें जिन्हें वे आपके साथ साझा करते हैं।"
                 }
             },
             "account_settings": {
@@ -209,6 +213,48 @@
             },
             "display_selection": {
                 "name": "प्रदर्शन मान"
+            },
+            "name": {
+                "name": "नाम"
+            },
+            "type": {
+                "name": "पालतू प्रकार"
+            },
+            "breed_name": {
+                "name": "नस्ल"
+            },
+            "age": {
+                "name": "आयु",
+                "state_attributes": {
+                    "years": {
+                        "name": "वर्ष"
+                    },
+                    "months": {
+                        "name": "महीने"
+                    },
+                    "days": {
+                        "name": "दिन"
+                    },
+                    "days_until_birthday": {
+                        "name": "जन्मदिन तक दिन"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "जुड़े हुए डिवाइस"
+            },
+            "rfid": {
+                "name": "RFID कॉलर"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "अवतार"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "जन्म तिथि"
             }
         },
         "switch": {
@@ -223,6 +269,9 @@
             },
             "manual_feed_now": {
                 "name": "मैन्युअल रूप से खुला/बंद ढक्कन"
+            },
+            "sterilization": {
+                "name": "नसबंदी किया हुआ"
             }
         },
         "button": {
@@ -307,6 +356,27 @@
             },
             "manual_feed_quantity": {
                 "name": "मैनुअल खिलाने की मात्रा"
+            },
+            "weight": {
+                "name": "वर्तमान वजन"
+            },
+            "drinking_goal": {
+                "name": "पानी पीने का लक्ष्य"
+            },
+            "feeding_goal": {
+                "name": "सूखे भोजन का लक्ष्य"
+            },
+            "weight_goal": {
+                "name": "वजन लक्ष्य"
+            },
+            "training_goal": {
+                "name": "प्रशिक्षण लक्ष्य"
+            },
+            "playing_goal": {
+                "name": "खेल लक्ष्य"
+            },
+            "walking_goal": {
+                "name": "टहलने का लक्ष्य"
             }
         },
         "select": {
@@ -321,6 +391,14 @@
             },
             "manual_feed_quantity_cups": {
                 "name": "मैनुअल खिलाने की मात्रा"
+            },
+            "pet_sex": {
+                "name": "लिंग",
+                "state": {
+                    "none":"कोई नहीं",
+                    "male": "नर",
+                    "female": "मादा"
+                }
             }
         },
         "text": {
