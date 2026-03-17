@@ -45,10 +45,9 @@ If you enjoy this integration and want to support its development, please consid
 * Dockstream 2 Smart Fountain | Cordless Model (PLWF116)
 
 ### Litter Boxes
-* N/A
+* Luma Smart Litter Box (PLLB001)
 
 ### Pending Device(s)
-* Luma Smart Litter Box (PLLB001)
 
 ### Some Devices / May or may not work as intended
 

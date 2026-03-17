@@ -35,6 +35,7 @@ from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
+from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
 
@@ -523,7 +524,85 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.water_state is not None,
             name="Water Dispensing State"
         ),
-    ]
+    ],
+    LumaSmartLitterBox: [
+        PetLibroBinarySensorEntityDescription[LumaSmartLitterBox](
+            key="online",
+            translation_key="online",
+            icon="mdi:wifi",
+            device_class=BinarySensorDeviceClass.CONNECTIVITY,
+            should_report=lambda device: device.online is not None,
+            name="Wi-Fi"
+        ),
+        PetLibroBinarySensorEntityDescription[LumaSmartLitterBox](
+            key="rubbish_full_state",
+            translation_key="rubbish_full_state",
+            icon="mdi:delete-alert",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.rubbish_full_state is not None,
+            name="Waste Bin Full"
+        ),
+        PetLibroBinarySensorEntityDescription[LumaSmartLitterBox](
+            key="rubbish_inplace_state",
+            translation_key="rubbish_inplace_state",
+            icon="mdi:delete-variant",
+            device_class=BinarySensorDeviceClass.PRESENCE,
+            should_report=lambda device: device.rubbish_inplace_state is not None,
+            name="Waste Bin Installed"
+        ),
+        PetLibroBinarySensorEntityDescription[LumaSmartLitterBox](
+            key="vacuum_state",
+            translation_key="vacuum_state",
+            icon="mdi:robot-vacuum",
+            should_report=lambda device: device.vacuum_state is not None,
+            name="Vacuum Active"
+        ),
+        PetLibroBinarySensorEntityDescription[LumaSmartLitterBox](
+            key="deodorization_state_on",
+            translation_key="deodorization_state_on",
+            icon="mdi:air-purifier",
+            should_report=lambda device: device.deodorization_state_on is not None,
+            name="Deodorization Active"
+        ),
+        PetLibroBinarySensorEntityDescription[LumaSmartLitterBox](
+            key="door_open",
+            translation_key="door_open",
+            icon="mdi:door-open",
+            device_class=BinarySensorDeviceClass.DOOR,
+            should_report=lambda device: device.door_open is not None,
+            name="Door"
+        ),
+        PetLibroBinarySensorEntityDescription[LumaSmartLitterBox](
+            key="device_stopped_working",
+            translation_key="device_stopped_working",
+            icon="mdi:alert-octagon",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.device_stopped_working is not None,
+            name="Device Error"
+        ),
+        PetLibroBinarySensorEntityDescription[LumaSmartLitterBox](
+            key="light_switch",
+            translation_key="light_switch",
+            icon="mdi:lightbulb",
+            should_report=lambda device: device.light_switch is not None,
+            name="Indicator"
+        ),
+        PetLibroBinarySensorEntityDescription[LumaSmartLitterBox](
+            key="whether_in_sleep_mode",
+            translation_key="whether_in_sleep_mode",
+            icon="mdi:sleep",
+            should_report=lambda device: device.whether_in_sleep_mode is not None,
+            name="Sleep Mode"
+        ),
+        PetLibroBinarySensorEntityDescription[LumaSmartLitterBox](
+            key="barn_door_error",
+            translation_key="barn_door_error",
+            icon="mdi:door-sliding-open",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.barn_door_error is not None,
+            name="Door Error"
+        ),
+    ],
 }
 
 async def async_setup_entry(

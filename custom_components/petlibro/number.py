@@ -28,6 +28,7 @@ from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
+from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 from .pets.entity import PL_PetNumberEntity
 
@@ -532,6 +533,8 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             method=lambda device, value: device.set_water_dispensing_duration(value),
             name="Water Dispensing Duration"
         ),
+    ],
+    LumaSmartLitterBox: [
     ],
 }
 

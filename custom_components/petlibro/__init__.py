@@ -18,6 +18,8 @@ from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
+from .devices.litterboxes.litter_box import LitterBox
+from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
 from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD, PLATFORMS, UPDATE_INTERVAL_SECONDS  # Assuming UPDATE_INTERVAL_SECONDS is defined in const
 from .hub import PetLibroHub
 
@@ -127,6 +129,16 @@ PLATFORMS_BY_TYPE = {
         Platform.UPDATE
     ),
     Dockstream2SmartFountain: (
+        Platform.SENSOR,
+        Platform.BINARY_SENSOR,
+        Platform.SWITCH,
+        Platform.BUTTON,
+        Platform.NUMBER,
+        Platform.SELECT,
+        Platform.TEXT,
+        Platform.UPDATE
+    ),
+    LumaSmartLitterBox: (
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
         Platform.SWITCH,

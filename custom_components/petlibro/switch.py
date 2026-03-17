@@ -25,6 +25,7 @@ from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
+from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
 from .pets.entity import PL_PetSwitchEntity
 
 
@@ -70,6 +71,26 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
     Dockstream2SmartCordlessFountain: [
     ],
     Dockstream2SmartFountain: [
+    ],
+    LumaSmartLitterBox: [
+        PetLibroSwitchEntityDescription[LumaSmartLitterBox](
+            key="sound_switch",
+            translation_key="sound_switch",
+            set_fn=lambda device, value: device.set_sound_switch(value),
+            name="Sound",
+        ),
+        PetLibroSwitchEntityDescription[LumaSmartLitterBox](
+            key="light_switch",
+            translation_key="light_switch",
+            set_fn=lambda device, value: device.set_light_switch(value),
+            name="Light",
+        ),
+        PetLibroSwitchEntityDescription[LumaSmartLitterBox](
+            key="deodorization_mode_switch",
+            translation_key="deodorization_mode_switch",
+            set_fn=lambda device, value: device.set_deodorization_switch(value),
+            name="Deodorization",
+        ),
     ],
 }
 

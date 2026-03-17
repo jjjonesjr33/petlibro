@@ -14,6 +14,8 @@ from .fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
+from .litterboxes.litter_box import LitterBox
+from .litterboxes.luma_smart_litter_box import LumaSmartLitterBox
 
 product_name_map : Dict[str, Type[Device]] = {
     "Air Smart Feeder": AirSmartFeeder,
@@ -25,5 +27,6 @@ product_name_map : Dict[str, Type[Device]] = {
     "Dockstream Smart RFID Fountain": DockstreamSmartRFIDFountain,
     "Dockstream 2 Smart Cordless Fountain": Dockstream2SmartCordlessFountain,
     "Dockstream 2 Smart Fountain": Dockstream2SmartFountain,
-    "Space Smart Feeder": SpaceSmartFeeder
+    "Space Smart Feeder": SpaceSmartFeeder,
+    "Luma Smart Litter Box": LumaSmartLitterBox
 }

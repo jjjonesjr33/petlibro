@@ -30,6 +30,7 @@ from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
+from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
 @dataclass(frozen=True)
@@ -193,6 +194,11 @@ DEVICE_UPDATE_MAP: dict[type[Device], list[PetLibroUpdateEntityDescription]] = {
     ],
     Dockstream2SmartFountain: [
         PetLibroUpdateEntityDescription[Dockstream2SmartFountain](
+            key="firmware",
+        ),
+    ],
+    LumaSmartLitterBox: [
+        PetLibroUpdateEntityDescription[LumaSmartLitterBox](
             key="firmware",
         ),
     ],
