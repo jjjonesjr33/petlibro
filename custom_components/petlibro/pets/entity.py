@@ -214,7 +214,10 @@ class PL_PetEntity(CoordinatorEntity[DataUpdateCoordinator[bool]]):
     @property
     def enable_for_manual_feed(self) -> bool:
         """Return True if entity should be enabled for manual feed setting."""
-        if self.desc.petlibro_unit != API.FEED_UNIT:
+        if (
+            self.desc.petlibro_unit != API.FEED_UNIT
+            or "feedingGoal" not in self.desc.key
+        ):
             return True
 
         domain = self.platform_data.domain
@@ -232,6 +235,13 @@ class PL_PetEntity(CoordinatorEntity[DataUpdateCoordinator[bool]]):
         self.async_on_remove(self.pet.on(EVENT_UPDATE, self.async_write_ha_state))
 
     def _handle_coordinator_update(self) -> None:
+        if (
+            "feedingGoal" in self.desc.key
+            and self.enabled != self.enable_for_manual_feed
+        ):
+            self.hub.unit_entities.schedule_manual_feed_sync()
+            _LOGGER.warning("Feed unit mismatch, reloading integration.")
+
         if self.enabled:
             super()._handle_coordinator_update()
 
