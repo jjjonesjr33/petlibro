@@ -30,6 +30,7 @@ from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
+from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
 def icon_for_gauge_level(gauge_level: int | None = None, offset: int = 0) -> str:
@@ -1431,6 +1432,155 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:history",
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Yesterday Drinking Times"
+        ),
+    ],
+    LumaSmartLitterBox: [
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="wifi_ssid",
+            translation_key="wifi_ssid",
+            icon="mdi:wifi",
+            name="Wi-Fi SSID"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="wifi_rssi",
+            translation_key="wifi_rssi",
+            icon="mdi:wifi",
+            native_unit_of_measurement="dBm",
+            name="Wi-Fi Signal Strength"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="electric_quantity",
+            translation_key="electric_quantity",
+            icon="mdi:battery",
+            native_unit_of_measurement="%",
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Battery / AC %"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="battery_state",
+            translation_key="battery_state",
+            icon="mdi:battery",
+            name="Battery Level"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="remaining_replacement_days",
+            translation_key="remaining_replacement_days",
+            icon="mdi:air-filter",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Filter Replacement Days"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="remaining_cleaning_days",
+            translation_key="remaining_cleaning_days",
+            icon="mdi:broom",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Remaining Cleaning Days"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="remaining_mat_days",
+            translation_key="remaining_mat_days",
+            icon="mdi:rectangle-outline",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Mat Replacement Days"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="filter_state",
+            translation_key="filter_state",
+            icon="mdi:air-filter",
+            name="Filter State"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="clean_state",
+            translation_key="clean_state",
+            icon="mdi:broom",
+            name="Cleanliness State"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="mat_state",
+            translation_key="mat_state",
+            icon="mdi:rectangle-outline",
+            name="Mat State"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="door_state",
+            translation_key="door_state",
+            icon="mdi:door",
+            name="Door State"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="vacuum_mode",
+            translation_key="vacuum_mode",
+            icon="mdi:robot-vacuum",
+            name="Vacuum Mode"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="throw_mode",
+            translation_key="throw_mode",
+            icon="mdi:delete-variant",
+            name="Throw Mode"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="deodorization_mode",
+            translation_key="deodorization_mode",
+            icon="mdi:air-purifier",
+            name="Deodorization Mode"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="garbage_warehouse_state",
+            translation_key="garbage_warehouse_state",
+            icon="mdi:delete-variant",
+            name="Waste Bin State"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="running_state",
+            translation_key="running_state",
+            icon="mdi:state-machine",
+            name="Running State"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="exception_message",
+            translation_key="exception_message",
+            icon="mdi:alert-circle-outline",
+            name="Exception Message",
+            should_report=lambda device: bool(device.exception_message),
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="weight",
+            translation_key="weight",
+            icon="mdi:weight",
+            native_unit_of_measurement="g",
+            device_class=SensorDeviceClass.WEIGHT,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Litter Weight",
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="weight_percent",
+            translation_key="weight_percent",
+            icon="mdi:gauge",
+            native_unit_of_measurement="%",
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Litter Level",
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="clean_mode",
+            translation_key="clean_mode",
+            icon="mdi:cog",
+            name="Clean Mode",
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="volume",
+            translation_key="volume",
+            icon="mdi:volume-high",
+            native_unit_of_measurement="%",
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Volume",
         ),
     ],
 }
