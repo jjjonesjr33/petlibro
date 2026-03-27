@@ -1243,7 +1243,7 @@ class PetLibroAPI:
             })
 
             # Granary smart feeder quirk: response can be None on success
-            if response is None:
+            if response is None or response == {}:
                 _LOGGER.debug("Desiccant reset set successfully, got no extra data")
                 return
 
@@ -1251,16 +1251,17 @@ class PetLibroAPI:
             if isinstance(response, int):
                 _LOGGER.debug(f"Desiccant reset set successfully, returned code: {response}")
                 return response
+            
+            # Check if response code indicates success
+            if response.code == 200 or response.code == 0:
+                _LOGGER.debug(f"Desiccant reset set successfully, returned code: {response.status}")
+                return response
 
-            # If response is a dictionary (JSON), handle it
-            response_data = await response.json()
-            _LOGGER.debug(f"Desiccant reset response data: {response_data}")
+            # If not response 200 assume failure
+            else:
+                raise PetLibroAPIError(f"Failed to trigger desiccant reset: {response.msg}")
 
-            # Check if the response indicates success
-            if response.status != 200 or response_data.get("code") != 0:
-                raise PetLibroAPIError(f"Failed to trigger desiccant reset: {response_data.get('msg')}")
-
-            return response_data
+            return response
 
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger desiccant reset for device {serial}: {err}")

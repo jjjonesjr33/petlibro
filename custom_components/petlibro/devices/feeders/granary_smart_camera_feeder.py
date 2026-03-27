@@ -347,6 +347,11 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
             _LOGGER.warning(f"manual_feed_quantity is None for {self.serial}, setting default to 1.")
             self._manual_feed_quantity = 1  # Default value
         return self._manual_feed_quantity
+        
+    @property
+    def desiccant_frequency(self) -> float:
+        frequency = self._data.get("realInfo", {}).get("changeDesiccantFrequency")
+        return frequency if isinstance(frequency, (float, int)) else 0
     
     # Error-handling updated for set_feeding_plan
     async def set_feeding_plan(self, value: bool) -> None:
@@ -492,3 +497,22 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
 
         progress = upgrade_data.get("progress")
         return float(progress) if progress is not None else 0.0
+    
+    async def set_desiccant_cycle(self, value: float) -> None:
+        _LOGGER.debug(f"Setting desiccant frequency to {value} for {self.serial}")
+        try:
+            key = "DESICCANT"
+            await self.api.set_desiccant_cycle(self.serial, value, key)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set desiccant cycle for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting desiccant cycle: {err}")
+
+    async def set_desiccant_reset(self) -> None:
+        _LOGGER.debug(f"Triggering desiccant reset for {self.serial}")
+        try:
+            await self.api.set_desiccant_reset(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger desiccant reset for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
