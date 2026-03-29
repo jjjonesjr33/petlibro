@@ -430,11 +430,11 @@
                 "name": "Water Dispensing State"
             },
             "feeding_plan_state": {
-                "name": "Feeding Plan"
+                "name": "Feeding Schedule"
             },
             "feeding_schedule": {
-                "name": "Feeding Schedule"
-            }
+                "name": "Today's Feeding Schedule"
+            },
         },
         "number": {
             "sound_level": {
