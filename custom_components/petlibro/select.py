@@ -503,12 +503,12 @@ async def async_setup_entry(
             if hasattr(device, "feeding_plan_data"):
                 entities.append(
                     FeedingScheduleSelectEntity(
-                        device, hub, "feeding_plan_select", "Feeding Plan"
+                        device, hub, "feeding_plan_select", "Feeding Schedule"
                     )
                 )
                 entities.append(
                     FeedingTodaySelectEntity(
-                        device, hub, "feeding_plan_today_select", "Today's Feeding Plan"
+                        device, hub, "feeding_plan_today_select", "Today's Feeding Schedule"
                     )
                 )
 
