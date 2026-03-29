@@ -8,7 +8,7 @@ from collections.abc import Callable
 from functools import cached_property
 from typing import Optional
 import logging
-from .const import DOMAIN
+from .const import DOMAIN, Unit, APIKey as API, VALID_UNIT_TYPES
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
@@ -16,9 +16,8 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
-from .hub import PetLibroHub  # Adjust the import path as necessary
-
+from homeassistant.config_entries import ConfigEntry
+from .hub import PetLibroHub
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -46,9 +45,12 @@ class PetLibroBinarySensorEntityDescription(BinarySensorEntityDescription, PetLi
     device_class_fn: Callable[[_DeviceT], BinarySensorDeviceClass | None] = lambda _: None
     should_report: Callable[[_DeviceT], bool] = lambda _: True
     device_class: Optional[BinarySensorDeviceClass] = None
+    # Optional override for is_on — use when the entity key differs from the device property
+    value_fn: Callable | None = None
+
 
 class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
-    """PETLIBRO sensor entity."""
+    """PETLIBRO binary sensor entity."""
 
     entity_description: PetLibroBinarySensorEntityDescription[_DeviceT]
 
@@ -60,33 +62,78 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         """Return True if the binary sensor is on."""
-        # Check if the binary sensor should report its state
         if not self.entity_description.should_report(self.device):
             return False
 
-        # Retrieve the state using getattr, defaulting to None if the attribute is missing
+        # Use value_fn override when the key doesn't match a device property directly
+        if self.entity_description.value_fn is not None:
+            return bool(self.entity_description.value_fn(self.device))
+
         state = getattr(self.device, self.entity_description.key, None)
 
-        # Check if this is the first time the sensor is being refreshed by checking if _last_state exists
         last_state = getattr(self, '_last_state', None)
-        initial_log_done = getattr(self, '_initial_log_done', False)  # Track if we've logged the initial state
+        initial_log_done = getattr(self, '_initial_log_done', False)
 
-        # If this is the initial boot, don't log anything but track the state
         if not initial_log_done:
-            # Mark the initial log as done without logging
-            self._initial_log_done = True  
+            self._initial_log_done = True
         elif last_state != state:
-            # Log state changes: log online with INFO and offline with WARNING
             if state:
                 _LOGGER.info(f"Device {self.device.name} is online.")
             else:
                 _LOGGER.warning(f"Device {self.device.name} is offline.")
 
-        # Store the last state for future comparisons
         self._last_state = state
-
-        # Return the state, ensuring it's a boolean
         return bool(state)
+
+    @property
+    def extra_state_attributes(self):
+        """Return entity specific state attributes."""
+        match self.key:
+            case "feeding_plan_state":
+                # Today's feeding plan events with formatted amounts
+                today_data = getattr(self.device, "feeding_plan_today_data", {})
+                plans = today_data.get("plans", []) if isinstance(today_data, dict) else []
+                if not plans:
+                    return {}
+                plan_data = getattr(self.device, "feeding_plan_data", {})
+                conv = getattr(self.device, "feed_conv_factor", 1)
+                unit = self.member.feedUnitType
+                weight = unit if unit in (Unit.GRAMS, Unit.OUNCES) else Unit.GRAMS
+                volume = unit if unit in (Unit.MILLILITERS, Unit.CUPS) else Unit.MILLILITERS
+                return {
+                    plan_data.get(str(plan["planId"]), {}).get("label") or f"plan_{plan.get('index', plan['planId'])}": {
+                        "time": plan.get("time"),
+                        "amount (weight)": f"{Unit.convert_feed(plan.get('grainNum', 0) * conv, None, weight, True)} {weight.symbol}",
+                        "amount (volume)": f"{Unit.convert_feed(plan.get('grainNum', 0) * conv, None, volume, True)} {volume.symbol}",
+                        "state": {1: "Pending", 2: "Skipped", 3: "Completed", 4: "Skipped, Time Passed"}.get(plan.get("state"), "Unknown"),
+                        "repeat": plan.get("repeat"),
+                        "planID": plan.get("planId"),
+                    }
+                    for plan in plans
+                } or {}
+            case "feeding_schedule":
+                # Full recurring schedule with formatted amounts
+                plans = getattr(self.device, "feeding_plan_data", {})
+                if not plans:
+                    return {}
+                conv = getattr(self.device, "feed_conv_factor", 1)
+                unit = self.member.feedUnitType
+                weight = unit if unit in (Unit.GRAMS, Unit.OUNCES) else Unit.GRAMS
+                volume = unit if unit in (Unit.MILLILITERS, Unit.CUPS) else Unit.MILLILITERS
+                return {
+                    plan.get("label") or f"plan_{plan_id}": {
+                        "planID": int(plan_id),
+                        "time": plan.get("executionTime"),
+                        "amount (weight)": f"{Unit.convert_feed(plan.get('grainNum', 0) * conv, None, weight, True)} {weight.symbol}",
+                        "amount (volume)": f"{Unit.convert_feed(plan.get('grainNum', 0) * conv, None, volume, True)} {volume.symbol}",
+                        "enabled": plan.get("enable", False),
+                        "repeat_days": plan.get("repeatDay", "[]"),
+                        "sound": plan.get("enableAudio", False),
+                    }
+                    for plan_id, plan in plans.items()
+                } or {}
+        return {}
+
 
 DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDescription]] = {
     Feeder: [
@@ -138,6 +185,21 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
         ),
+        PetLibroBinarySensorEntityDescription[AirSmartFeeder](
+            key="feeding_plan_state",
+            translation_key="feeding_plan_state",
+            icon="mdi:calendar-check",
+            should_report=lambda device: device.feeding_plan_state is not None,
+            name="Today's Feeding Schedule"
+        ),
+        PetLibroBinarySensorEntityDescription[AirSmartFeeder](
+            key="feeding_schedule",
+            translation_key="feeding_schedule",
+            icon="mdi:calendar-clock",
+            should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
+            value_fn=lambda device: device.feeding_plan_state,
+            name="Feeding Schedule"
+        ),
     ],
     GranarySmartFeeder: [
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
@@ -186,6 +248,21 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
         ),
+        PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
+            key="feeding_plan_state",
+            translation_key="feeding_plan_state",
+            icon="mdi:calendar-check",
+            should_report=lambda device: device.feeding_plan_state is not None,
+            name="Today's Feeding Schedule"
+        ),
+        PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
+            key="feeding_schedule",
+            translation_key="feeding_schedule",
+            icon="mdi:calendar-clock",
+            should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
+            value_fn=lambda device: device.feeding_plan_state,
+            name="Feeding Schedule"
+        ),
     ],
     GranarySmartCameraFeeder: [
         PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
@@ -233,6 +310,21 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
+        ),
+        PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
+            key="feeding_plan_state",
+            translation_key="feeding_plan_state",
+            icon="mdi:calendar-check",
+            should_report=lambda device: device.feeding_plan_state is not None,
+            name="Today's Feeding Schedule"
+        ),
+        PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
+            key="feeding_schedule",
+            translation_key="feeding_schedule",
+            icon="mdi:calendar-clock",
+            should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
+            value_fn=lambda device: device.feeding_plan_state,
+            name="Feeding Schedule"
         ),
     ],
     OneRFIDSmartFeeder: [
@@ -313,6 +405,21 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.display_switch is not None,
             name="Display Status"
         ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="feeding_plan_state",
+            translation_key="feeding_plan_state",
+            icon="mdi:calendar-check",
+            should_report=lambda device: device.feeding_plan_state is not None,
+            name="Today's Feeding Schedule"
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="feeding_schedule",
+            translation_key="feeding_schedule",
+            icon="mdi:calendar-clock",
+            should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
+            value_fn=lambda device: device.feeding_plan_state,
+            name="Feeding Schedule"
+        ),
     ],
     PolarWetFoodFeeder: [
         PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
@@ -360,6 +467,13 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
+        ),
+        PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
+            key="feeding_plan_state",
+            translation_key="feeding_plan_state",
+            icon="mdi:calendar-check",
+            should_report=lambda device: device.feeding_plan_state is not None,
+            name="Feeding Plan"
         ),
     ],
     SpaceSmartFeeder: [
@@ -431,6 +545,21 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
+        ),
+        PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
+            key="feeding_plan_state",
+            translation_key="feeding_plan_state",
+            icon="mdi:calendar-check",
+            should_report=lambda device: device.feeding_plan_state is not None,
+            name="Today's Feeding Schedule"
+        ),
+        PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
+            key="feeding_schedule",
+            translation_key="feeding_schedule",
+            icon="mdi:calendar-clock",
+            should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
+            value_fn=lambda device: device.feeding_plan_state,
+            name="Feeding Schedule"
         ),
     ],
     DockstreamSmartFountain: [
@@ -605,34 +734,30 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
     ],
 }
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,  # Use ConfigEntry
+    entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up PETLIBRO binary sensors using config entry."""
-    # Retrieve the hub from hass.data that was set up in __init__.py
     hub: PetLibroHub = hass.data[DOMAIN].get(entry.entry_id)
 
     if not hub:
         _LOGGER.error("Hub not found for entry: %s", entry.entry_id)
         return
 
-    # Ensure that the devices are loaded (if load_devices is not already called elsewhere)
     if not hub.devices:
         _LOGGER.warning("No devices found in hub during binary sensor setup.")
         return
 
-    # Log the contents of the hub data for debugging
     _LOGGER.debug("Hub data: %s", hub)
-
-    devices = hub.devices  # Devices should already be loaded in the hub
+    devices = hub.devices
     _LOGGER.debug("Devices in hub: %s", devices)
 
-    # Create binary sensor entities for each device based on the binary sensor map
     entities = [
         PetLibroBinarySensorEntity(device, hub, description)
-        for device in devices.values()  # Iterate through devices from the hub
+        for device in devices.values()
         for device_type, entity_descriptions in DEVICE_BINARY_SENSOR_MAP.items()
         if isinstance(device, device_type)
         for description in entity_descriptions
@@ -641,10 +766,11 @@ async def async_setup_entry(
     if not entities:
         _LOGGER.warning("No binary sensors added, entities list is empty!")
     else:
-        # Log the number of entities and their details
         _LOGGER.debug("Adding %d PetLibro binary sensors", len(entities))
         for entity in entities:
-            _LOGGER.debug("Adding binary sensor entity: %s for device %s", entity.entity_description.name, entity.device.name)
-
-        # Add binary sensor entities to Home Assistant
+            _LOGGER.debug(
+                "Adding binary sensor entity: %s for device %s",
+                entity.entity_description.name,
+                entity.device.name,
+            )
         async_add_entities(entities)

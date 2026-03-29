@@ -213,6 +213,76 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
         return mappings.get(key, {}).get(current_selection, "unknown")
 
 
+# ---------------------------------------------------------------------------
+# Feeding plan select entities
+# Used by feeding plan services to let the user pick a plan from a dropdown.
+# Options are formatted as "Label - ID" (e.g. "MorningFeed - 3907147").
+# Selecting an option stores the choice locally — no API call is made.
+# The service handlers read the selected option to extract the plan ID.
+# ---------------------------------------------------------------------------
+
+class FeedingPlanSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
+    """Base select entity for picking a feeding plan."""
+
+    _attr_has_entity_name = True
+    _attr_icon = "mdi:calendar-clock"
+    _attr_should_poll = False
+
+    def __init__(self, device, hub, key: str, name: str) -> None:
+        desc = PetLibroEntityDescription(key=key, name=name)
+        super().__init__(device, hub, desc)
+        self._attr_unique_id = f"{device.serial}-{key}"
+        self._current: str | None = None
+
+    def _build_options(self) -> list[str]:
+        raise NotImplementedError
+
+    @property
+    def options(self) -> list[str]:
+        return self._build_options()
+
+    @property
+    def current_option(self) -> str | None:
+        opts = self.options
+        if not opts:
+            return None
+        if self._current in opts:
+            return self._current
+        return opts[0]
+
+    async def async_select_option(self, option: str) -> None:
+        """User picked a plan — store locally, no API call."""
+        self._current = option
+        self.async_write_ha_state()
+
+
+class FeedingScheduleSelectEntity(FeedingPlanSelectEntity[_DeviceT]):
+    """Select listing ALL plans in the recurring schedule."""
+
+    def _build_options(self) -> list[str]:
+        plans = getattr(self.device, "feeding_plan_data", {})
+        return [
+            f"{plan.get('label') or f'plan_{pid}'} - {pid}"
+            for pid, plan in plans.items()
+        ] or ["No plans"]
+
+
+class FeedingTodaySelectEntity(FeedingPlanSelectEntity[_DeviceT]):
+    """Select listing only TODAY's feeding plan events."""
+
+    def _build_options(self) -> list[str]:
+        today = getattr(self.device, "feeding_plan_today_data", {}).get("plans", [])
+        plan_data = getattr(self.device, "feeding_plan_data", {})
+        opts = []
+        for p in today:
+            if not p.get("planId"):
+                continue
+            plan_id = p["planId"]
+            label = plan_data.get(str(plan_id), {}).get("label") or f"plan_{p['index']}"
+            opts.append(f"{label} - {plan_id}")
+        return opts or ["No plans today"]
+
+
 DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
     Feeder: [
     ],
@@ -421,12 +491,26 @@ async def async_setup_entry(
         entities.extend(
             [
                 PetLibroSelectEntity(device, hub, description)
-                for device in devices.values()  # Iterate through devices from the hub
+                for device in devices.values()
                 for device_type, entity_descriptions in DEVICE_SELECT_MAP.items()
                 if isinstance(device, device_type)
                 for description in entity_descriptions
             ]
         )
+
+        # Add feeding plan select entities for dry feeders
+        for device in devices.values():
+            if hasattr(device, "feeding_plan_data"):
+                entities.append(
+                    FeedingScheduleSelectEntity(
+                        device, hub, "feeding_plan_select", "Feeding Plan"
+                    )
+                )
+                entities.append(
+                    FeedingTodaySelectEntity(
+                        device, hub, "feeding_plan_today_select", "Today's Feeding Plan"
+                    )
+                )
 
     if not entities:
         _LOGGER.warning("No select entities added, entities list is empty!")

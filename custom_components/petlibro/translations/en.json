@@ -165,9 +165,6 @@
             "next_feed_quantity_volume": {
                 "name": "Next Feed Quantity (Volume)"
             },
-            "feeding_plan_state": {
-                "name": "Today's Feeding Plan"
-            },
             "today_drinking_amount": {
                 "name": "Today's Water Consumption"
             },
@@ -215,9 +212,6 @@
             },
             "next_feeding_end_time": {
                 "name": "Feeding Ends"
-            },
-            "feeding_plan": {
-                "name": "Feeding Plan"
             },
             "temperature": {
                 "name": "Temperature"
@@ -317,10 +311,10 @@
                 "name": "Manual Cleaning"
             },
             "enable_feeding_plan": {
-                "name": "Enable Feeding Plan"
+                "name": "Enable Feeding Schedule"
             },
             "disable_feeding_plan": {
-                "name": "Disable Feeding Plan"
+                "name": "Disable Feeding Schedule"
             },
             "manual_lid_open": {
                 "name": "Manually Open Lid"
@@ -366,6 +360,27 @@
             },
             "filter_reset": {
                 "name": "Filter Reset"
+            },
+            "feeding_plan_enable": {
+                "name": "Enable Selected Plan"
+            },
+            "feeding_plan_disable": {
+                "name": "Disable Selected Plan"
+            },
+            "feeding_plan_delete": {
+                "name": "Delete Selected Plan"
+            },
+            "feeding_plan_skip_today": {
+                "name": "Skip Selected Plan Today"
+            },
+            "feeding_plan_unskip_today": {
+                "name": "Un-skip Selected Plan Today"
+            },
+            "feeding_plan_today_enable_all": {
+                "name": "Enable Today's Feeding Schedule"
+            },
+            "feeding_plan_today_disable_all": {
+                "name": "Disable Today's Feeding Schedule"
             }
         },
         "binary_sensor": {
@@ -413,6 +428,12 @@
             },
             "water_state": {
                 "name": "Water Dispensing State"
+            },
+            "feeding_plan_state": {
+                "name": "Feeding Plan"
+            },
+            "feeding_schedule": {
+                "name": "Feeding Schedule"
             }
         },
         "number": {
@@ -483,6 +504,15 @@
             },
             "manual_feed_quantity_cups": {
                 "name": "Manual Feed Quantity"
+            },
+            "feeding_plan_select": {
+                "name": "Feeding Plan"
+            },
+            "feeding_plan_today_select": {
+                "name": "Today's Feeding Plan"
+            },
+            "vacuum_mode": {
+                "name": "Vacuum Mode"
             },
             "pet_sex": {
                 "name": "Sex",

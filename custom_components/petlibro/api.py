@@ -1520,6 +1520,65 @@ class PetLibroAPI:
 
         return success
 
+    async def feeding_plan_toggle(self, serial: str, plan: dict) -> None:
+        """Enable or disable an existing feeding plan via the /enable endpoint."""
+        await self.session.post("/device/feedingPlan/enable", json={
+            "deviceSn": serial,
+            "planId": plan["id"],
+            "enable": plan["enable"],
+        })
+
+    async def feeding_plan_delete(self, serial: str, plan_id: int) -> None:
+        """Permanently remove a feeding plan."""
+        await self.session.post("/device/feedingPlan/remove", json={
+            "deviceSn": serial,
+            "planId": plan_id,
+        })
+
+    async def feeding_plan_add(self, serial: str, plan: dict) -> None:
+        """Create a new feeding plan."""
+        await self.session.post("/device/feedingPlan/add", json={
+            "id": 0,
+            "deviceSn": serial,
+            "executionTime": plan.get("executionTime"),
+            "repeatDay": plan.get("repeatDay", "[]"),
+            "label": plan.get("label", ""),
+            "enable": True,
+            "enableAudio": plan.get("enableAudio", False),
+            "audioTimes": 2,
+            "grainNum": plan.get("grainNum"),
+            "petIds": [],
+        })
+
+    async def feeding_plan_today_skip(self, serial: str, plan_id: int, skip: bool) -> None:
+        """Skip or un-skip a single feeding plan event for today only."""
+        await self.session.post("/device/feedingPlan/enableTodaySingle", json={
+            "deviceSn": serial,
+            "planId": plan_id,
+            "enable": not skip,
+        })
+        
+    async def feeding_plan_update(self, serial: str, plan: dict) -> None:
+        """Enable, disable, or edit an existing feeding plan."""
+        await self.session.post("/device/feedingPlan/update", json={
+            "id": plan["id"],
+            "deviceSn": serial,
+            "executionTime": plan.get("executionTime"),
+            "repeatDay": plan.get("repeatDay", "[]"),
+            "label": plan.get("label", ""),
+            "enable": plan.get("enable", True),
+            "enableAudio": plan.get("enableAudio", False),
+            "audioTimes": plan.get("audioTimes", 2),
+            "grainNum": plan.get("grainNum"),
+            "petIds": [],
+        })
+
+    async def feeding_plan_today_all(self, serial: str, enable: bool) -> None:
+        """Enable or disable ALL feeding plan events for today."""
+        await self.session.post("/device/feedingPlan/enableTodayAll", json={
+            "deviceSn": serial,
+            "enable": enable,
+        })
 
 ## Added this to fix dupe logs
 class PetLibroDataCoordinator(DataUpdateCoordinator):

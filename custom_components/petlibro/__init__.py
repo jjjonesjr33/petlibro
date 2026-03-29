@@ -22,6 +22,7 @@ from .devices.litterboxes.litter_box import LitterBox
 from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
 from .const import DOMAIN, CONF_EMAIL, CONF_PASSWORD, PLATFORMS, UPDATE_INTERVAL_SECONDS  # Assuming UPDATE_INTERVAL_SECONDS is defined in const
 from .hub import PetLibroHub
+from .services import async_setup_services, async_unload_services
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -197,6 +198,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         # Forward entry setups for each platform
         await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+        await async_setup_services(hass)
+
         _LOGGER.info(f"Successfully set up PetLibro integration for {email}")
         return True
 
@@ -220,6 +223,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unload_ok:
         _LOGGER.info(f"Successfully unloaded PetLibro entry for {entry.data.get(CONF_EMAIL)}")
         await hub.async_unload()  # If you have any cleanup to do in the hub
+        await async_unload_services(hass)
     else:
         _LOGGER.error(f"Failed to unload PetLibro entry for {entry.data.get(CONF_EMAIL)}")
 

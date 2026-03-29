@@ -1,0 +1,137 @@
+edit_feeding_plan:
+  name: Edit Feeding Plan
+  description: >
+    Edit an existing scheduled feeding plan on a dry food feeder.
+    Only the fields you provide will be changed — anything left blank keeps its current value.
+    Find the Plan ID in the feeder's Feeding Schedule sensor attributes.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    plan_id:
+      name: Plan ID
+      description: >
+        The ID of the plan to edit. Find this in the feeder's
+        Feeding Schedule sensor attributes (planID field).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 99999999
+          mode: box
+    time:
+      name: Time
+      description: "New feed time (e.g. 08:00)."
+      required: false
+      selector:
+        time:
+    portions:
+      name: Portions
+      description: Number of portions to dispense (1–48).
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 48
+          mode: box
+    label:
+      name: Label
+      description: "A name for this feeding plan. No spaces allowed (e.g. MorningFeed)."
+      required: false
+      example: "MorningFeed"
+      selector:
+        text:
+    days:
+      name: Repeat Days
+      description: Days of the week to repeat. Leave empty to keep existing days.
+      required: false
+      selector:
+        select:
+          multiple: true
+          options:
+            - label: Monday
+              value: "1"
+            - label: Tuesday
+              value: "2"
+            - label: Wednesday
+              value: "3"
+            - label: Thursday
+              value: "4"
+            - label: Friday
+              value: "5"
+            - label: Saturday
+              value: "6"
+            - label: Sunday
+              value: "7"
+    sound:
+      name: Meal Call Sound
+      description: Play the meal call sound when dispensing.
+      required: false
+      selector:
+        boolean:
+
+add_feeding_plan:
+  name: Add Feeding Plan
+  description: Add a new scheduled feeding plan to a dry food feeder.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    time:
+      name: Time
+      description: "Feed time (e.g. 08:00)."
+      required: true
+      selector:
+        time:
+    portions:
+      name: Portions
+      description: Number of portions to dispense (1–48).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 48
+          mode: box
+    label:
+      name: Label
+      description: "A name for this feeding plan. No spaces allowed (e.g. MorningFeed)."
+      required: false
+      example: "MorningFeed"
+      selector:
+        text:
+    days:
+      name: Repeat Days
+      description: Days of the week to repeat. Leave empty for a one-time feed.
+      required: false
+      selector:
+        select:
+          multiple: true
+          options:
+            - label: Monday
+              value: "1"
+            - label: Tuesday
+              value: "2"
+            - label: Wednesday
+              value: "3"
+            - label: Thursday
+              value: "4"
+            - label: Friday
+              value: "5"
+            - label: Saturday
+              value: "6"
+            - label: Sunday
+              value: "7"
+    sound:
+      name: Meal Call Sound
+      description: Play the meal call sound when dispensing.
+      required: false
+      selector:
+        boolean:
