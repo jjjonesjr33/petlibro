@@ -434,7 +434,7 @@
             },
             "feeding_schedule": {
                 "name": "Today's Feeding Schedule"
-            },
+            }
         },
         "number": {
             "sound_level": {
