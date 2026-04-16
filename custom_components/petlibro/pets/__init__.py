@@ -68,14 +68,24 @@ class Pet(Event):
         fountain_drinking = {"todayFountainDrinkingCount": 0,
                              "todayFountainDrinkingAmount": 0,
                              "todayFountainDrinkingTime": 0}
-        rfid_fountains = [
-            d for d in (bound_devices or [])
-            if d.get("productName") == "Dockstream Smart RFID Fountain"
-        ]
-        for fountain in rfid_fountains:
-            device_sn = fountain.get("deviceSn")
-            if not device_sn:
-                continue
+
+        # Collect RFID fountain serial numbers from bound devices and hub devices
+        fountain_sns = set()
+        for d in (bound_devices or []):
+            if d.get("productName") == "Dockstream Smart RFID Fountain":
+                sn = d.get("deviceSn")
+                if sn:
+                    fountain_sns.add(sn)
+
+        # Also check hub's loaded devices for RFID fountains (shared accounts
+        # return empty from getBoundDevices)
+        if self.hub and self.hub.devices:
+            from ..devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
+            for device in self.hub.devices.values():
+                if isinstance(device, DockstreamSmartRFIDFountain):
+                    fountain_sns.add(device.serial)
+
+        for device_sn in fountain_sns:
             try:
                 wear_list = await self.api.device_wear_list(device_sn)
                 for entry in wear_list:
