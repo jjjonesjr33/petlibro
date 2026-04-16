@@ -245,6 +245,15 @@
             },
             "rfid": {
                 "name": "RFID-ошейник"
+            },
+            "today_fountain_drinking_count": {
+                "name": "Today's Fountain Drinking Count"
+            },
+            "today_fountain_drinking_amount": {
+                "name": "Today's Fountain Water Consumption"
+            },
+            "today_fountain_drinking_time": {
+                "name": "Today's Fountain Drinking Time"
             }
         },
         "image": {
