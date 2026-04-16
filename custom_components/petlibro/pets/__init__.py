@@ -63,10 +63,35 @@ class Pet(Event):
         """Refresh the pet info from the API."""
         pet_details = await self.api.pets.get_details(self.id)
         bound_devices = await self.api.pets.get_bound_devices(self.id)
+
+        # Fetch per-pet drinking data from RFID fountains
+        fountain_drinking = {"todayFountainDrinkingCount": 0,
+                             "todayFountainDrinkingAmount": 0,
+                             "todayFountainDrinkingTime": 0}
+        rfid_fountains = [
+            d for d in (bound_devices or [])
+            if d.get("productName") == "Dockstream Smart RFID Fountain"
+        ]
+        for fountain in rfid_fountains:
+            device_sn = fountain.get("deviceSn")
+            if not device_sn:
+                continue
+            try:
+                wear_list = await self.api.device_wear_list(device_sn)
+                for entry in wear_list:
+                    if entry.get("petId") == self.id:
+                        fountain_drinking["todayFountainDrinkingCount"] += (entry.get("todayDrinkTimes") or 0)
+                        fountain_drinking["todayFountainDrinkingAmount"] += (entry.get("todayDrinkAmount") or 0)
+                        fountain_drinking["todayFountainDrinkingTime"] += (entry.get("petEatingTime") or 0)
+                        break
+            except Exception:
+                _LOGGER.warning("Failed to fetch wearListV2 for fountain %s", device_sn)
+
         self.update_data(
             {
                 **pet_details,
                 "boundDevices": bound_devices,
+                **fountain_drinking,
             }
         )
 
@@ -298,3 +323,20 @@ class Pet(Event):
     def walkingGoal(self) -> float:
         """Walking goal of pet in minutes per day."""
         return self._data.get("walkingGoal") or 0
+
+    # --- Fountain Drinking (from wearListV2)
+
+    @property
+    def today_fountain_drinking_count(self) -> int:
+        """Number of drinking sessions at RFID fountains today."""
+        return self._data.get("todayFountainDrinkingCount") or 0
+
+    @property
+    def today_fountain_drinking_amount(self) -> int:
+        """Total milliliters consumed at RFID fountains today."""
+        return self._data.get("todayFountainDrinkingAmount") or 0
+
+    @property
+    def today_fountain_drinking_time(self) -> int:
+        """Total seconds spent drinking at RFID fountains today."""
+        return self._data.get("todayFountainDrinkingTime") or 0
