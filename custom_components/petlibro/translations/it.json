@@ -25,7 +25,7 @@
             }
         }
     },
-	"options": {
+    "options": {
         "abort": {
             "no_member_data": "Dati membro non caricati, controlla i log",
             "account_settings_abort": "{account_settings_abort}",
@@ -35,13 +35,13 @@
         "error": {
             "unknown": "Errore imprevisto"
         },
-		"step": {
-			"init": {
+        "step": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "Impostazioni integrazione",
                     "account_settings": "Impostazioni account"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "Impostazioni Integrazione",
                 "data": {
@@ -274,6 +274,15 @@
             },
             "rfid": {
                 "name": "Collare RFID"
+            },
+            "today_fountain_drinking_count": {
+                "name": "Today's Fountain Drinking Count"
+            },
+            "today_fountain_drinking_amount": {
+                "name": "Today's Fountain Water Consumption"
+            },
+            "today_fountain_drinking_time": {
+                "name": "Today's Fountain Drinking Time"
             }
         },
         "image": {
@@ -517,7 +526,7 @@
             "pet_sex": {
                 "name": "Sesso",
                 "state": {
-                    "none":"Nessuno",
+                    "none": "Nessuno",
                     "male": "Maschio",
                     "female": "Femmina"
                 }

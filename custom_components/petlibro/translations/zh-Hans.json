@@ -37,12 +37,12 @@
             "unknown": "意外错误"
         },
         "step": {
-			"init": {
+            "init": {
                 "menu_options": {
                     "integration_settings": "集成设置",
                     "account_settings": "账户设置"
                 }
-			},
+            },
             "integration_settings": {
                 "title": "集成设置",
                 "data": {
@@ -151,7 +151,7 @@
             "today_eating_time": {
                 "name": "今天的总饮食时间"
             },
-            "today_feeding_schedule": {
+            "feeding_plan_state": {
                 "name": "今天的喂养计划"
             },
             "today_drinking_amount": {
@@ -202,7 +202,7 @@
             "next_feeding_end_time": {
                 "name": "进食末端"
             },
-            "feeding_schedule": {
+            "feeding_plan": {
                 "name": "喂养计划"
             },
             "temperature": {
@@ -245,6 +245,15 @@
             },
             "rfid": {
                 "name": "RFID 项圈"
+            },
+            "today_fountain_drinking_count": {
+                "name": "Today's Fountain Drinking Count"
+            },
+            "today_fountain_drinking_amount": {
+                "name": "Today's Fountain Water Consumption"
+            },
+            "today_fountain_drinking_time": {
+                "name": "Today's Fountain Drinking Time"
             }
         },
         "image": {
@@ -395,7 +404,7 @@
             "pet_sex": {
                 "name": "性别",
                 "state": {
-                    "none":"无",
+                    "none": "无",
                     "male": "雄性",
                     "female": "雌性"
                 }
