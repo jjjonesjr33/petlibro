@@ -99,8 +99,11 @@ class PetLibroHub:
 
                 # Get pet ids bound to this device if it's shared and shared pets are enabled
                 if (
-                    self.entry.options.get(IntegrationSetting.ENABLE_SHARED_PETS)
-                    and device_data.get("shareId") 
+                    self.entry.options.get(
+                        IntegrationSetting.ENABLE_SHARED_PETS,
+                        IntegrationSetting.ENABLE_SHARED_PETS.default,
+                    )
+                    and device_data.get("shareId")
                     and device_sn != "unknown"
                 ):
                     bound_pets = await self.api.device_get_bound_pets(device_sn)
@@ -166,18 +169,10 @@ class PetLibroHub:
         try:
             response = await self.api.pets.get_list()
             pet_list: list[dict] = response.get("petList", [])
-
-            #TODO seperate shared pets into a different try so owned ones can still get loaded
-            if self.entry.options.get(IntegrationSetting.ENABLE_SHARED_PETS):
-                for pet_data in pet_list:
-                    self.pets_helper.shared_pet_ids.discard(pet_data.get("id"))
-            
-                for pet_id in self.pets_helper.shared_pet_ids:
-                    pet_list.append(await self.api.pets.get_details(pet_id))
-        
-            _LOGGER.debug(f"Fetched {len(pet_list)} pets from the API.")
+            pet_count = len(pet_list)
+            _LOGGER.debug(f"Fetched {pet_count} owned pets from the API.")
         except Exception:
-            _LOGGER.exception("Error fetching pet info.")
+            _LOGGER.exception("Error fetching owned pet info.")
             return
 
         # Get shared pets if set to do so.
@@ -189,6 +184,7 @@ class PetLibroHub:
                 for pet_id in self.pets_helper.shared_pet_ids:
                     if pet_data := await self.api.pets.get_details(pet_id):
                         pet_list.append(pet_data)
+                _LOGGER.debug(f"Fetched {len(pet_list) - pet_count} shared pets from the API.")
             except Exception:
                 _LOGGER.error("Error fetching shared pet info.")
 
