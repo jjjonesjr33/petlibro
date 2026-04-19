@@ -1,0 +1,537 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Il dispositivo è già configurato",
+            "reauth_successful": "Re-autenticazione riuscita"
+        },
+        "error": {
+            "cannot_connect": "Impossibile connettersi",
+            "invalid_auth": "Autenticazione non valida",
+            "unknown": "Errore imprevisto"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "email": "Email",
+                    "password": "Password",
+                    "region": "Regione"
+                }
+            },
+            "reauth_confirm": {
+                "description": "L'integrazione PETLIBRO richiede di re-autenticare il tuo account",
+                "data": {
+                    "password": "Password"
+                }
+            }
+        }
+    },
+	"options": {
+        "abort": {
+            "no_member_data": "Dati membro non caricati, controlla i log",
+            "account_settings_abort": "{account_settings_abort}",
+            "integration_settings_abort": "{integration_settings_abort}",
+            "error_check_logs": "Errore, controlla i log"
+        },
+        "error": {
+            "unknown": "Errore imprevisto"
+        },
+		"step": {
+			"init": {
+                "menu_options": {
+                    "integration_settings": "Impostazioni integrazione",
+                    "account_settings": "Impostazioni account"
+                }
+			},
+            "integration_settings": {
+                "title": "Impostazioni Integrazione",
+                "data": {
+                    "manual_feed_portions": "Imposta quantità alimentazione manuale in porzioni",
+                    "pet_feed_quantity_no_rfid": "Includi consumo animali senza RFID",
+                    "enable_shared_pets": "Mostra animali da dispositivi condivisi"
+                },
+                "data_description": {
+                    "manual_feed_portions": "Predefinito: impostato in base all'unità scelta per l'alimentazione ({uom}).",
+                    "pet_feed_quantity_no_rfid": "Il consumo dell'animale includerà dispositivi senza RFID quando è assegnato un solo animale.",
+                    "enable_shared_pets": "Accedi agli animali di altri account collegati ai dispositivi condivisi con te."
+                }
+            },
+            "account_settings": {
+                "title": "Impostazioni Account",
+                "description": "Per l'account: {email}",
+                "data": {
+                    "nickname": "Soprannome",
+                    "gender": "Genere"
+                },
+                "sections": {
+                    "measurement_unit": {
+                        "name": "Unità di Misura",
+                        "data": {
+                            "feedUnitType": "Alimentatore/Alimentazione",
+                            "waterUnitType": "Fontana/Bevuta",
+                            "weightUnitType": "Peso",
+                            "update_all_units": "Aggiorna l'unità di misura di tutti i sensori Petlibro"
+                        },
+                        "data_description": {
+                            "feedUnitType": "Nota: le 'cups' non sono supportate per le entità sensore.",
+                            "update_all_units": "Per impostazione predefinita, la modifica di un'unità aggiorna solo i sensori di quel tipo."
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "common": {
+        "reloading_integration": "L'integrazione verrà ricaricata a breve",
+        "settings_updated": "Impostazioni aggiornate",
+        "no_settings_changed": "Nessuna impostazione è stata modificata",
+        "sensors_updated": "Le entità sensore sono state aggiornate",
+        "account_updated": "Account aggiornato con successo"
+    },
+    "selector": {
+        "member_gender": {
+            "options": {
+                "male": "Maschio",
+                "female": "Femmina",
+                "none": "Preferisco non dirlo"
+            }
+        },
+        "pet_sex": {
+            "options": {
+                "male": "Maschio",
+                "female": "Femmina",
+                "none": "Nessuno selezionato"
+            }
+        },
+        "unit_type": {
+            "options": {
+                "cups": "cups (tazza USA legale)",
+                "ounces": "oz (oncia)",
+                "grams": "g (grammo)",
+                "milliliters": "mL (millilitro)",
+                "kilograms": "kg (chilogrammo)",
+                "pounds": "lb (libbra)",
+                "water_ounces": "fl. oz. (oncia fluida)",
+                "water_milliliters": "mL (millilitro)"
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "wifi_ssid": {
+                "name": "SSID Wi-Fi"
+            },
+            "wifi_rssi": {
+                "name": "Intensità segnale Wi-Fi"
+            },
+            "remaining_desiccant": {
+                "name": "Giorni rimanenti essiccante"
+            },
+            "battery_state": {
+                "name": "Livello batteria"
+            },
+            "electric_quantity": {
+                "name": "Batteria / AC %"
+            },
+            "today_feeding_quantity_weight": {
+                "name": "Quantità alimentata oggi (Peso)"
+            },
+            "today_feeding_quantity_volume": {
+                "name": "Quantità alimentata oggi (Volume)"
+            },
+            "today_feeding_times": {
+                "name": "Numero pasti oggi"
+            },
+            "today_eating_times": {
+                "name": "Numero pasti consumati oggi"
+            },
+            "today_eating_time": {
+                "name": "Tempo totale mangiato oggi"
+            },
+            "last_feed_time": {
+                "name": "Ora ultimo pasto"
+            },
+            "last_feed_quantity_weight": {
+                "name": "Quantità ultimo pasto (Peso)"
+            },
+            "last_feed_quantity_volume": {
+                "name": "Quantità ultimo pasto (Volume)"
+            },
+            "next_feed_time": {
+                "name": "Prossimo pasto"
+            },
+            "next_feed_quantity_weight": {
+                "name": "Quantità prossimo pasto (Peso)"
+            },
+            "next_feed_quantity_volume": {
+                "name": "Quantità prossimo pasto (Volume)"
+            },
+            "today_drinking_amount": {
+                "name": "Consumo acqua oggi"
+            },
+            "weight": {
+                "name": "Peso attuale"
+            },
+            "weight_percent": {
+                "name": "Acqua rimanente (%)"
+            },
+            "remaining_water": {
+                "name": "Acqua rimanente"
+            },
+            "use_water_interval": {
+                "name": "Intervallo erogazione acqua"
+            },
+            "use_water_duration": {
+                "name": "Durata erogazione acqua"
+            },
+            "remaining_filter_days": {
+                "name": "Giorni filtro rimanenti"
+            },
+            "remaining_cleaning_days": {
+                "name": "Giorni pulizia rimanenti"
+            },
+            "resolution": {
+                "name": "Risoluzione fotocamera"
+            },
+            "night_vision": {
+                "name": "Modalità visione notturna"
+            },
+            "enable_video_record": {
+                "name": "Registrazione video abilitata"
+            },
+            "video_record_switch": {
+                "name": "Interruttore registrazione video"
+            },
+            "video_record_mode": {
+                "name": "Modalità registrazione video"
+            },
+            "next_feeding_day": {
+                "name": "Programma alimentazione"
+            },
+            "next_feeding_time": {
+                "name": "Inizio alimentazione"
+            },
+            "next_feeding_end_time": {
+                "name": "Fine alimentazione"
+            },
+            "temperature": {
+                "name": "Temperatura"
+            },
+            "plate_position": {
+                "name": "Posizione piatto"
+            },
+            "display_selection": {
+                "name": "Valore visualizzato"
+            },
+            "vacuum_mode": {
+                "name": "Modalità aspirazione"
+            },
+            "battery_charge_state": {
+                "name": "Stato batteria"
+            },
+            "today_drinking_time": {
+                "name": "Tempo totale bevuto oggi"
+            },
+            "today_drinking_count": {
+                "name": "Numero bevute oggi"
+            },
+            "yesterday_drinking_count": {
+                "name": "Numero bevute ieri"
+            },
+            "today_avg_time": {
+                "name": "Tempo medio bevuta oggi"
+            },
+            "yesterday_drinking_amount": {
+                "name": "Consumo acqua ieri"
+            },
+            "name": {
+                "name": "Nome"
+            },
+            "type": {
+                "name": "Tipo animale"
+            },
+            "breed_name": {
+                "name": "Razza"
+            },
+            "age": {
+                "name": "Età",
+                "state_attributes": {
+                    "years": {
+                        "name": "Anni"
+                    },
+                    "months": {
+                        "name": "Mesi"
+                    },
+                    "days": {
+                        "name": "Giorni"
+                    },
+                    "days_until_birthday": {
+                        "name": "Giorni al compleanno"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "Dispositivi collegati"
+            },
+            "rfid": {
+                "name": "Collare RFID"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "Avatar"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "Data di nascita"
+            }
+        },
+        "switch": {
+            "child_lock_switch": {
+                "name": "Blocco pulsanti"
+            },
+            "enable_light": {
+                "name": "Abilita display"
+            },
+            "enable_sound": {
+                "name": "Abilita suono"
+            },
+            "manual_feed_now": {
+                "name": "Apri/Chiudi coperchio manualmente"
+            },
+            "sterilization": {
+                "name": "Sterilizzato/Castrato"
+            }
+        },
+        "button": {
+            "manual_feed": {
+                "name": "Alimentazione manuale"
+            },
+            "manual_cleaning": {
+                "name": "Pulizia manuale"
+            },
+            "enable_feeding_plan": {
+                "name": "Abilita programma alimentazione"
+            },
+            "disable_feeding_plan": {
+                "name": "Disabilita programma alimentazione"
+            },
+            "manual_lid_open": {
+                "name": "Apri coperchio manualmente"
+            },
+            "display_on": {
+                "name": "Accendi display"
+            },
+            "display_off": {
+                "name": "Spegni display"
+            },
+            "sound_on": {
+                "name": "Accendi suono"
+            },
+            "sound_off": {
+                "name": "Spegni suono"
+            },
+            "sleep_on": {
+                "name": "Attiva modalità sonno"
+            },
+            "sleep_off": {
+                "name": "Disattiva modalità sonno"
+            },
+            "desiccant_reset": {
+                "name": "Reset essiccante"
+            },
+            "ring_bell": {
+                "name": "Suona campanello"
+            },
+            "rotate_food_bowl": {
+                "name": "Ruota ciotola"
+            },
+            "reposition_schedule": {
+                "name": "Riposiziona programma"
+            },
+            "light_on": {
+                "name": "Accendi indicatore"
+            },
+            "light_off": {
+                "name": "Spegni indicatore"
+            },
+            "cleaning_reset": {
+                "name": "Reset pulizia"
+            },
+            "filter_reset": {
+                "name": "Reset filtro"
+            },
+            "feeding_plan_enable": {
+                "name": "Abilita piano selezionato"
+            },
+            "feeding_plan_disable": {
+                "name": "Disabilita piano selezionato"
+            },
+            "feeding_plan_delete": {
+                "name": "Elimina piano selezionato"
+            },
+            "feeding_plan_skip_today": {
+                "name": "Salta piano oggi"
+            },
+            "feeding_plan_unskip_today": {
+                "name": "Annulla salto piano oggi"
+            },
+            "feeding_plan_today_enable_all": {
+                "name": "Abilita programma alimentazione di oggi"
+            },
+            "feeding_plan_today_disable_all": {
+                "name": "Disabilita programma alimentazione di oggi"
+            }
+        },
+        "binary_sensor": {
+            "door_state": {
+                "name": "Coperchio"
+            },
+            "food_dispenser_state": {
+                "name": "Dispenser cibo"
+            },
+            "food_outlet_state": {
+                "name": "Uscita cibo"
+            },
+            "vacuum_state": {
+                "name": "Stato aspirazione"
+            },
+            "door_blocked": {
+                "name": "Stato coperchio"
+            },
+            "food_low": {
+                "name": "Stato cibo"
+            },
+            "online": {
+                "name": "Wi-Fi"
+            },
+            "whether_in_sleep_mode": {
+                "name": "Modalità sonno"
+            },
+            "enable_low_battery_notice": {
+                "name": "Stato batteria"
+            },
+            "child_lock_switch": {
+                "name": "Blocco pulsanti"
+            },
+            "sound_switch": {
+                "name": "Stato suono"
+            },
+            "display_switch": {
+                "name": "Stato display"
+            },
+            "light_switch": {
+                "name": "Indicatore"
+            },
+            "power_state": {
+                "name": "Stato alimentazione"
+            },
+            "water_state": {
+                "name": "Stato erogazione acqua"
+            },
+            "feeding_plan_state": {
+                "name": "Programma alimentazione di oggi"
+            },
+            "feeding_schedule": {
+                "name": "Programma alimentazione"
+            }
+        },
+        "number": {
+            "sound_level": {
+                "name": "Livello volume"
+            },
+            "desiccant_cycle": {
+                "name": "Ciclo essiccante"
+            },
+            "lid_close_time": {
+                "name": "Tempo chiusura coperchio"
+            },
+            "water_interval": {
+                "name": "Intervallo acqua"
+            },
+            "water_low_threshold": {
+                "name": "Soglia acqua bassa"
+            },
+            "water_dispensing_duration": {
+                "name": "Durata erogazione acqua"
+            },
+            "cleaning_cycle": {
+                "name": "Ciclo pulizia"
+            },
+            "filter_cycle": {
+                "name": "Ciclo filtro"
+            },
+            "manual_feed_quantity": {
+                "name": "Quantità alimentazione manuale"
+            },
+            "weight": {
+                "name": "Peso attuale"
+            },
+            "drinking_goal": {
+                "name": "Obiettivo bevute"
+            },
+            "feeding_goal": {
+                "name": "Obiettivo cibo secco"
+            },
+            "weight_goal": {
+                "name": "Obiettivo peso"
+            },
+            "training_goal": {
+                "name": "Obiettivo addestramento"
+            },
+            "playing_goal": {
+                "name": "Obiettivo gioco"
+            },
+            "walking_goal": {
+                "name": "Obiettivo passeggiate"
+            }
+        },
+        "select": {
+            "lid_speed": {
+                "name": "Velocità coperchio"
+            },
+            "lid_mode": {
+                "name": "Modalità coperchio"
+            },
+            "display_icon": {
+                "name": "Icona sul display"
+            },
+            "water_dispensing_mode": {
+                "name": "Modalità erogazione acqua"
+            },
+            "plate_position": {
+                "name": "Posizione piatto"
+            },
+            "manual_feed_quantity_cups": {
+                "name": "Quantità alimentazione manuale"
+            },
+            "feeding_plan_select": {
+                "name": "Programma alimentazione"
+            },
+            "feeding_plan_today_select": {
+                "name": "Programma alimentazione di oggi"
+            },
+            "vacuum_mode": {
+                "name": "Modalità aspirazione"
+            },
+            "pet_sex": {
+                "name": "Sesso",
+                "state": {
+                    "none":"Nessuno",
+                    "male": "Maschio",
+                    "female": "Femmina"
+                }
+            }
+        },
+        "text": {
+            "display_text": {
+                "name": "Testo sul display"
+            }
+        },
+        "update": {
+            "firmware": {
+                "name": "Aggiornamento"
+            }
+        }
+    }
+}
