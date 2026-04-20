@@ -90,7 +90,7 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
         """Return entity specific state attributes."""
         match self.key:
             case "feeding_plan_state":
-                # Today's feeding plan events with amounts in all units
+                # Today's feeding schedule events with amounts in all units
                 today_data = getattr(self.device, "feeding_plan_today_data", {})
                 plans = today_data.get("plans", []) if isinstance(today_data, dict) else []
                 if not plans:
@@ -203,7 +203,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:calendar-check",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
-            name="Feeding Plan"
+            name="Today's Feeding Schedule"
         ),
         PetLibroBinarySensorEntityDescription[AirSmartFeeder](
             key="feeding_schedule",
@@ -268,7 +268,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:calendar-check",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
-            name="Feeding Plan"
+            name="Today's Feeding Schedule"
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
             key="feeding_schedule",
@@ -333,7 +333,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:calendar-check",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
-            name="Feeding Plan"
+            name="Today's Feeding Schedule"
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
             key="feeding_schedule",
@@ -429,7 +429,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:calendar-check",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
-            name="Feeding Plan"
+            name="Today's Feeding Schedule"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="feeding_schedule",
@@ -494,7 +494,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:calendar-check",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
-            name="Feeding Plan"
+            name="Today's Feeding Schedule"
         ),
     ],
     SpaceSmartFeeder: [
@@ -573,7 +573,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:calendar-check",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
-            name="Feeding Plan"
+            name="Today's Feeding Schedule"
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
             key="feeding_schedule",
