@@ -90,45 +90,57 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
         """Return entity specific state attributes."""
         match self.key:
             case "feeding_plan_state":
-                # Today's feeding plan events with formatted amounts
+                # Today's feeding plan events with amounts in all units
                 today_data = getattr(self.device, "feeding_plan_today_data", {})
                 plans = today_data.get("plans", []) if isinstance(today_data, dict) else []
                 if not plans:
                     return {}
                 plan_data = getattr(self.device, "feeding_plan_data", {})
                 conv = getattr(self.device, "feed_conv_factor", 1)
-                unit = self.member.feedUnitType
-                weight = unit if unit in (Unit.GRAMS, Unit.OUNCES) else Unit.GRAMS
-                volume = unit if unit in (Unit.MILLILITERS, Unit.CUPS) else Unit.MILLILITERS
                 return {
                     plan_data.get(str(plan["planId"]), {}).get("label") or f"plan_{plan.get('index', plan['planId'])}": {
-                        "time": plan.get("time"),
-                        "amount (weight)": f"{Unit.convert_feed(plan.get('grainNum', 0) * conv, None, weight, True)} {weight.symbol}",
-                        "amount (volume)": f"{Unit.convert_feed(plan.get('grainNum', 0) * conv, None, volume, True)} {volume.symbol}",
-                        "state": {1: "Pending", 2: "Skipped", 3: "Completed", 4: "Skipped, Time Passed"}.get(plan.get("state"), "Unknown"),
-                        "repeat": plan.get("repeat"),
                         "planID": plan.get("planId"),
+                        "time": plan.get("time"),
+                        **{
+                            f"amount_{unit.symbol.lower()}": Unit.convert_feed(plan.get("grainNum", 0) * conv, None, unit, True)
+                            for unit in VALID_UNIT_TYPES[API.FEED_UNIT] if unit
+                        },
+                        "amount_raw": plan.get("grainNum", 0),
+                        "feed_conv_factor": conv,
+                        "enabled": plan_data.get(str(plan["planId"]), {}).get("enable", False),
+                        "repeat_days": plan_data.get(str(plan["planId"]), {}).get("repeatDay", "[]"),
+                        "sound": plan_data.get(str(plan["planId"]), {}).get("enableAudio", False),
+                        "feed_state": {1: "Pending", 2: "Skipped", 3: "Completed", 4: "Skipped, Time Passed"}.get(plan.get("state"), "Unknown"),
+                        "repeat": plan.get("repeat"),
                     }
                     for plan in plans
                 } or {}
             case "feeding_schedule":
-                # Full recurring schedule with formatted amounts
+                # Full recurring schedule with amounts in all units + today's state
                 plans = getattr(self.device, "feeding_plan_data", {})
                 if not plans:
                     return {}
                 conv = getattr(self.device, "feed_conv_factor", 1)
-                unit = self.member.feedUnitType
-                weight = unit if unit in (Unit.GRAMS, Unit.OUNCES) else Unit.GRAMS
-                volume = unit if unit in (Unit.MILLILITERS, Unit.CUPS) else Unit.MILLILITERS
+                # Build lookup of today's feed states by planId
+                today_data = getattr(self.device, "feeding_plan_today_data", {})
+                today_plans = today_data.get("plans", []) if isinstance(today_data, dict) else []
+                today_state_map = {p["planId"]: p.get("state") for p in today_plans}
                 return {
                     plan.get("label") or f"plan_{plan_id}": {
                         "planID": int(plan_id),
                         "time": plan.get("executionTime"),
-                        "amount (weight)": f"{Unit.convert_feed(plan.get('grainNum', 0) * conv, None, weight, True)} {weight.symbol}",
-                        "amount (volume)": f"{Unit.convert_feed(plan.get('grainNum', 0) * conv, None, volume, True)} {volume.symbol}",
+                        **{
+                            f"amount_{unit.symbol.lower()}": Unit.convert_feed(plan.get("grainNum", 0) * conv, None, unit, True)
+                            for unit in VALID_UNIT_TYPES[API.FEED_UNIT] if unit
+                        },
+                        "amount_raw": plan.get("grainNum", 0),
+                        "feed_conv_factor": conv,
                         "enabled": plan.get("enable", False),
                         "repeat_days": plan.get("repeatDay", "[]"),
                         "sound": plan.get("enableAudio", False),
+                        "feed_state": {1: "Pending", 2: "Skipped", 3: "Completed", 4: "Skipped, Time Passed"}.get(
+                            today_state_map.get(int(plan_id)), "Not Scheduled Today"
+                        ),
                     }
                     for plan_id, plan in plans.items()
                 } or {}
@@ -189,13 +201,15 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_plan_state",
             translation_key="feeding_plan_state",
             icon="mdi:calendar-check",
+            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
-            name="Today's Feeding Schedule"
+            name="Feeding Plan"
         ),
         PetLibroBinarySensorEntityDescription[AirSmartFeeder](
             key="feeding_schedule",
             translation_key="feeding_schedule",
             icon="mdi:calendar-clock",
+            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
@@ -252,13 +266,15 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_plan_state",
             translation_key="feeding_plan_state",
             icon="mdi:calendar-check",
+            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
-            name="Today's Feeding Schedule"
+            name="Feeding Plan"
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
             key="feeding_schedule",
             translation_key="feeding_schedule",
             icon="mdi:calendar-clock",
+            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
@@ -315,13 +331,15 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_plan_state",
             translation_key="feeding_plan_state",
             icon="mdi:calendar-check",
+            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
-            name="Today's Feeding Schedule"
+            name="Feeding Plan"
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
             key="feeding_schedule",
             translation_key="feeding_schedule",
             icon="mdi:calendar-clock",
+            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
@@ -409,13 +427,15 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_plan_state",
             translation_key="feeding_plan_state",
             icon="mdi:calendar-check",
+            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
-            name="Today's Feeding Schedule"
+            name="Feeding Plan"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
             key="feeding_schedule",
             translation_key="feeding_schedule",
             icon="mdi:calendar-clock",
+            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
@@ -472,6 +492,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_plan_state",
             translation_key="feeding_plan_state",
             icon="mdi:calendar-check",
+            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
             name="Feeding Plan"
         ),
@@ -550,13 +571,15 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_plan_state",
             translation_key="feeding_plan_state",
             icon="mdi:calendar-check",
+            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
-            name="Today's Feeding Schedule"
+            name="Feeding Plan"
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
             key="feeding_schedule",
             translation_key="feeding_schedule",
             icon="mdi:calendar-clock",
+            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
