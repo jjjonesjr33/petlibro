@@ -151,7 +151,7 @@
             "today_eating_time": {
                 "name": "Сегодняшнее время еды"
             },
-            "feeding_plan_state": {
+            "today_feeding_schedule": {
                 "name": "Сегодняшний план кормления"
             },
             "today_drinking_amount": {
@@ -202,7 +202,7 @@
             "next_feeding_end_time": {
                 "name": "Кормление заканчивается"
             },
-            "feeding_plan": {
+            "feeding_schedule": {
                 "name": "План кормления"
             },
             "temperature": {

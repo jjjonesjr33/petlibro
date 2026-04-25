@@ -1,0 +1,410 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "设备已经配置",
+            "reauth_successful": "重新验证成功"
+        },
+        "error": {
+            "cannot_connect": "无法连接",
+            "invalid_auth": "无效的身份验证",
+            "unknown": "意外错误"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "email": "电子邮件",
+                    "password": "密码",
+                    "region": "地区"
+                }
+            },
+            "reauth_confirm": {
+                "description": "Petlibro集成需要重新认证您的帐户",
+                "data": {
+                    "password": "密码"
+                }
+            }
+        }
+    },
+    "options": {
+        "abort": {
+            "no_member_data": "未加载成员数据，请检查日志",
+            "account_settings_abort": "{account_settings_abort}",
+            "integration_settings_abort": "{integration_settings_abort}",
+            "no_settings_changed": "未更改任何设置",
+            "error_check_logs": "错误，请检查日志"
+        },
+        "error": {
+            "unknown": "意外错误"
+        },
+        "step": {
+			"init": {
+                "menu_options": {
+                    "integration_settings": "集成设置",
+                    "account_settings": "账户设置"
+                }
+			},
+            "integration_settings": {
+                "title": "集成设置",
+                "data": {
+                    "manual_feed_portions": "按份量设置手动喂食量",
+                    "pet_feed_quantity_no_rfid": "包含非 RFID 宠物消耗量",
+                    "enable_shared_pets": "显示来自共享设备的宠物"
+                },
+                "data_description": {
+                    "manual_feed_portions": "默认：根据您选择的宠物饲料单位设置 ({uom})。",
+                    "pet_feed_quantity_no_rfid": "当设备只分配给一只宠物时，宠物消耗量将包含非 RFID 设备。",
+                    "enable_shared_pets": "访问来自其他账户的宠物，这些宠物关联到与您共享的设备。"
+                }
+            },
+            "account_settings": {
+                "title": "账户设置",
+                "description": "账户：{email}",
+                "data": {
+                    "nickname": "昵称",
+                    "gender": "性别"
+                },
+                "sections": {
+                    "measurement_unit": {
+                        "name": "计量单位",
+                        "data": {
+                            "feedUnitType": "喂食器/喂食",
+                            "waterUnitType": "饮水机/饮用",
+                            "weightUnitType": "重量",
+                            "update_all_units": "更新所有 Petlibro 单位传感器实体的计量单位"
+                        },
+                        "data_description": {
+                            "feedUnitType": "请注意，“杯”单位不支持传感器实体。",
+                            "update_all_units": "默认情况下，在此更改单位只会更新该类型的传感器实体。"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "common": {
+        "reloading_integration": "集成即将重新加载",
+        "settings_updated": "设置已更新",
+        "no_settings_changed": "未更改任何设置",
+        "sensors_updated": "传感器实体已更新",
+        "account_updated": "账户更新成功"
+    },
+    "selector": {
+        "member_gender": {
+            "options": {
+                "male": "男",
+                "female": "女",
+                "none": "不愿透露"
+            }
+        },
+        "pet_sex": {
+            "options": {
+                "male": "公",
+                "female": "母",
+                "none": "未选择"
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "wifi_ssid": {
+                "name": "Wi-Fi SSID"
+            },
+            "wifi_rssi": {
+                "name": "Wi-Fi信号强度"
+            },
+            "remaining_desiccant": {
+                "name": "剩余日子"
+            },
+            "battery_state": {
+                "name": "电池水平"
+            },
+            "electric_quantity": {
+                "name": "电池 / AC％"
+            },
+            "today_feeding_quantity_weight": {
+                "name": "今日喂食量（重量）"
+            },
+            "today_feeding_quantity_volume": {
+                "name": "今日喂食量（体积）"
+            },
+            "last_feed_quantity_weight": {
+                "name": "上次喂食量（重量）"
+            },
+            "last_feed_quantity_volume": {
+                "name": "上次喂食量（体积）"
+            },
+            "next_feed_time": {
+                "name": "下一次喂食时间"
+            },
+            "next_feed_quantity_weight": {
+                "name": "下一次喂食量（重量）"
+            },
+            "next_feed_quantity_volume": {
+                "name": "下一次喂食量（体积）"
+            },
+            "today_feeding_times": {
+                "name": "今天的喂养时间"
+            },
+            "today_eating_times": {
+                "name": "今天的饮食时间"
+            },
+            "today_eating_time": {
+                "name": "今天的总饮食时间"
+            },
+            "today_feeding_schedule": {
+                "name": "今天的喂养计划"
+            },
+            "today_drinking_amount": {
+                "name": "今天的用水（ML）"
+            },
+            "weight": {
+                "name": "当前重量"
+            },
+            "weight_percent": {
+                "name": "剩余的水 (%)"
+            },
+            "remaining_water": {
+                "name": "剩余的水"
+            },
+            "use_water_interval": {
+                "name": "水间隔"
+            },
+            "use_water_duration": {
+                "name": "水时间持续时间"
+            },
+            "remaining_filter_days": {
+                "name": "剩余的过滤日"
+            },
+            "remaining_cleaning_days": {
+                "name": "剩余的清洁日"
+            },
+            "resolution": {
+                "name": "相机分辨率"
+            },
+            "night_vision": {
+                "name": "夜视模式"
+            },
+            "enable_video_record": {
+                "name": "启用了视频录制"
+            },
+            "video_record_switch": {
+                "name": "视频记录开关"
+            },
+            "video_record_mode": {
+                "name": "视频录制模式"
+            },
+            "next_feeding_day": {
+                "name": "喂食时间表"
+            },
+            "next_feeding_time": {
+                "name": "喂食开始"
+            },
+            "next_feeding_end_time": {
+                "name": "进食末端"
+            },
+            "feeding_schedule": {
+                "name": "喂养计划"
+            },
+            "temperature": {
+                "name": "温度"
+            },
+            "plate_position": {
+                "name": "板位置"
+            },
+            "display_selection": {
+                "name": "显示值"
+            },
+            "name": {
+                "name": "名称"
+            },
+            "type": {
+                "name": "宠物类型"
+            },
+            "breed_name": {
+                "name": "品种"
+            },
+            "age": {
+                "name": "年龄",
+                "state_attributes": {
+                    "years": {
+                        "name": "年"
+                    },
+                    "months": {
+                        "name": "月"
+                    },
+                    "days": {
+                        "name": "天"
+                    },
+                    "days_until_birthday": {
+                        "name": "距离生日的天数"
+                    }
+                }
+            },
+            "bound_device_nums": {
+                "name": "关联设备"
+            },
+            "rfid": {
+                "name": "RFID 项圈"
+            }
+        },
+        "image": {
+            "avatar": {
+                "name": "头像"
+            }
+        },
+        "date": {
+            "birthday": {
+                "name": "出生日期"
+            }
+        },
+        "switch": {
+            "child_lock_switch": {
+                "name": "按钮锁"
+            },
+            "enable_light": {
+                "name": "启用显示"
+            },
+            "enable_sound": {
+                "name": "启用声音"
+            },
+            "manual_feed_now": {
+                "name": "手动打开/关闭盖子"
+            },
+            "sterilization": {
+                "name": "绝育"
+            }
+        },
+        "button": {
+            "manual_feed": {
+                "name": "手动饲料"
+            },
+            "manual_cleaning": {
+                "name": "手动清洁"
+            },
+            "enable_feeding_plan": {
+                "name": "启用喂养计划"
+            },
+            "disable_feeding_plan": {
+                "name": "禁用喂养计划"
+            },
+            "manual_lid_open": {
+                "name": "手动打开盖子"
+            },
+            "display_on": {
+                "name": "打开显示"
+            },
+            "display_off": {
+                "name": "关闭显示"
+            },
+            "sound_on": {
+                "name": "打开声音"
+            },
+            "sound_off": {
+                "name": "关闭声音"
+            },
+            "desiccant_reset": {
+                "name": "干燥剂更换"
+            },
+            "ring_bell": {
+                "name": "铃铛"
+            },
+            "rotate_food_bowl": {
+                "name": "旋转食物碗"
+            }
+        },
+        "binary_sensor": {
+            "door_state": {
+                "name": "盖"
+            },
+            "food_dispenser_state": {
+                "name": "食物分配器"
+            },
+            "door_blocked": {
+                "name": "盖状态"
+            },
+            "food_low": {
+                "name": "食物状况"
+            },
+            "online": {
+                "name": "无线上网"
+            },
+            "whether_in_sleep_mode": {
+                "name": "睡眠模式"
+            },
+            "enable_low_battery_notice": {
+                "name": "电池状态"
+            },
+            "child_lock_switch": {
+                "name": "按钮锁"
+            },
+            "sound_switch": {
+                "name": "声音状态"
+            },
+            "display_switch": {
+                "name": "显示状态"
+            }
+        },
+        "number": {
+            "sound_level": {
+                "name": "音量水平"
+            },
+            "desiccant_cycle": {
+                "name": "干燥频率"
+            },
+            "lid_close_time": {
+                "name": "盖关闭时间"
+            },
+            "manual_feed_quantity": {
+                "name": "手动喂食量"
+            },
+            "weight": {
+                "name": "当前体重"
+            },
+            "drinking_goal": {
+                "name": "饮水目标"
+            },
+            "feeding_goal": {
+                "name": "干粮目标"
+            },
+            "weight_goal": {
+                "name": "体重目标"
+            },
+            "training_goal": {
+                "name": "训练目标"
+            },
+            "playing_goal": {
+                "name": "玩耍目标"
+            },
+            "walking_goal": {
+                "name": "散步目标"
+            }
+        },
+        "select": {
+            "lid_speed": {
+                "name": "盖子速度"
+            },
+            "lid_mode": {
+                "name": "盖模式"
+            },
+            "display_icon": {
+                "name": "显示的图标"
+            },
+            "manual_feed_quantity_cups": {
+                "name": "手动喂食量"
+            },
+            "pet_sex": {
+                "name": "性别",
+                "state": {
+                    "none":"无",
+                    "male": "雄性",
+                    "female": "雌性"
+                }
+            }
+        },
+        "text": {
+            "display_text": {
+                "name": "显示文字"
+            }
+        }
+    }
+}

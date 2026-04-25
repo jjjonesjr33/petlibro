@@ -32,7 +32,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
             get_device_events = await self.api.device_events(self.serial)
             feeding_plan_list = (await self.api.device_feeding_plan_list(self.serial)
                 if self._data.get("enableFeedingPlan") else [])
-    
+
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
@@ -42,7 +42,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
                 "feedingPlan": feeding_plan_list or [],
                 "getDeviceEvents": get_device_events or {},
                 "getUpgrade": get_upgrade or {},
-                "workRecord": get_work_record if get_work_record is not None else []
+                "workRecord": get_work_record if get_work_record is not None else [],
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for SpaceSmartFeeder: {err}")
@@ -70,6 +70,11 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
     def feeding_plan_state(self) -> bool:
         """Return the state of the feeding plan, based on API data."""
         return bool(self._data.get("enableFeedingPlan", False))
+
+    @property
+    def today_feeding_plan_state(self) -> bool:
+        """Return True if all of today's plans are skipped."""
+        return bool(self.feeding_plan_today_data.get("allSkipped", False))
 
     @property
     def battery_state(self) -> str:

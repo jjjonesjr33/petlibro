@@ -42,7 +42,7 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
                 "getDefaultMatrix": get_default_matrix or {},
                 "getfeedingplantoday": get_feeding_plan_today or {},
                 "feedingPlan": feeding_plan_list or [],
-                "workRecord": get_work_record if get_work_record is not None else []
+                "workRecord": get_work_record if get_work_record is not None else [],
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for GranarySmartFeeder: {err}")
@@ -70,6 +70,11 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
     def feeding_plan_state(self) -> bool:
         """Return the state of the feeding plan, based on API data."""
         return bool(self._data.get("enableFeedingPlan", False))
+
+    @property
+    def today_feeding_plan_state(self) -> bool:
+        """Return True if all of today's plans are skipped."""
+        return bool(self.feeding_plan_today_data.get("allSkipped", False))
 
     @property
     def battery_state(self) -> str:

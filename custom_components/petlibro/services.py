@@ -13,8 +13,13 @@ from .const import DOMAIN
 _LOGGER = logging.getLogger(__name__)
 
 # Service names
-SERVICE_EDIT_FEEDING_PLAN = "edit_feeding_plan"
-SERVICE_ADD_FEEDING_PLAN  = "add_feeding_plan"
+SERVICE_EDIT_FEEDING_PLAN       = "edit_feeding_plan"
+SERVICE_ADD_FEEDING_PLAN        = "add_feeding_plan"
+SERVICE_TOGGLE_FEEDING_PLAN     = "toggle_feeding_plan"
+SERVICE_SKIP_FEEDING_PLAN       = "skip_feeding_plan"
+SERVICE_DELETE_FEEDING_PLAN     = "delete_feeding_plan"
+SERVICE_TOGGLE_FEEDING_SCHEDULE = "toggle_feeding_schedule"
+SERVICE_TOGGLE_TODAY_SCHEDULE   = "toggle_today_feeding_schedule"
 
 # Field keys
 _DEVICE_ID = "device_id"
@@ -24,6 +29,8 @@ _PORTIONS  = "portions"
 _LABEL     = "label"
 _DAYS      = "days"
 _SOUND     = "sound"
+_ENABLE    = "enable"
+_SKIP      = "skip"
 
 
 def _get_feeder(hass: HomeAssistant, device_id: str):
@@ -127,6 +134,90 @@ async def async_setup_services(hass: HomeAssistant) -> None:
 
     hass.services.async_register(DOMAIN, SERVICE_ADD_FEEDING_PLAN, handle_add_feeding_plan)
 
+    # ------------------------------------------------------------------
+    # toggle_feeding_plan  (enable / disable a single plan)
+    # ------------------------------------------------------------------
+    async def handle_toggle_feeding_plan(call: ServiceCall) -> None:
+        device = _get_feeder(hass, call.data[_DEVICE_ID])
+        plan_id: int = call.data[_PLAN_ID]
+        enable: bool = call.data[_ENABLE]
+
+        existing = device.feeding_plan_data.get(str(plan_id))
+        if not existing:
+            raise ServiceValidationError(
+                f"Plan ID {plan_id} not found on {device.name}. "
+                "Check the Feeding Schedule sensor attributes for valid plan IDs."
+            )
+
+        await device.api.feeding_plan_toggle(
+            device.serial,
+            {**existing, "id": plan_id, "enable": enable},
+        )
+        await device.refresh()
+        _LOGGER.debug("Toggled plan %d to %s on %s", plan_id, enable, device.name)
+
+    hass.services.async_register(DOMAIN, SERVICE_TOGGLE_FEEDING_PLAN, handle_toggle_feeding_plan)
+
+    # ------------------------------------------------------------------
+    # skip_feeding_plan  (skip / un-skip a single plan for today)
+    # ------------------------------------------------------------------
+    async def handle_skip_feeding_plan(call: ServiceCall) -> None:
+        device = _get_feeder(hass, call.data[_DEVICE_ID])
+        plan_id: int = call.data[_PLAN_ID]
+        skip: bool = call.data[_SKIP]
+
+        await device.api.feeding_plan_today_skip(device.serial, plan_id, skip=skip)
+        await device.refresh()
+        _LOGGER.debug("Set skip=%s for plan %d on %s", skip, plan_id, device.name)
+
+    hass.services.async_register(DOMAIN, SERVICE_SKIP_FEEDING_PLAN, handle_skip_feeding_plan)
+
+    # ------------------------------------------------------------------
+    # delete_feeding_plan  (permanently remove a plan)
+    # ------------------------------------------------------------------
+    async def handle_delete_feeding_plan(call: ServiceCall) -> None:
+        device = _get_feeder(hass, call.data[_DEVICE_ID])
+        plan_id: int = call.data[_PLAN_ID]
+
+        existing = device.feeding_plan_data.get(str(plan_id))
+        if not existing:
+            raise ServiceValidationError(
+                f"Plan ID {plan_id} not found on {device.name}. "
+                "Check the Feeding Schedule sensor attributes for valid plan IDs."
+            )
+
+        await device.api.feeding_plan_delete(device.serial, plan_id)
+        await device.refresh()
+        _LOGGER.debug("Deleted plan %d on %s", plan_id, device.name)
+
+    hass.services.async_register(DOMAIN, SERVICE_DELETE_FEEDING_PLAN, handle_delete_feeding_plan)
+
+    # ------------------------------------------------------------------
+    # toggle_feeding_schedule  (enable / disable the entire schedule)
+    # ------------------------------------------------------------------
+    async def handle_toggle_feeding_schedule(call: ServiceCall) -> None:
+        device = _get_feeder(hass, call.data[_DEVICE_ID])
+        enable: bool = call.data[_ENABLE]
+
+        await device.api.set_feeding_plan(device.serial, enable)
+        await device.refresh()
+        _LOGGER.debug("Toggled entire feeding schedule to %s on %s", enable, device.name)
+
+    hass.services.async_register(DOMAIN, SERVICE_TOGGLE_FEEDING_SCHEDULE, handle_toggle_feeding_schedule)
+
+    # ------------------------------------------------------------------
+    # toggle_today_feeding_schedule  (enable / disable all of today's feeds)
+    # ------------------------------------------------------------------
+    async def handle_toggle_today_schedule(call: ServiceCall) -> None:
+        device = _get_feeder(hass, call.data[_DEVICE_ID])
+        enable: bool = call.data[_ENABLE]
+
+        await device.api.feeding_plan_today_all(device.serial, enable)
+        await device.refresh()
+        _LOGGER.debug("Toggled today's schedule to %s on %s", enable, device.name)
+
+    hass.services.async_register(DOMAIN, SERVICE_TOGGLE_TODAY_SCHEDULE, handle_toggle_today_schedule)
+
     _LOGGER.debug("PETLIBRO feeding plan services registered.")
 
 
@@ -135,6 +226,11 @@ async def async_unload_services(hass: HomeAssistant) -> None:
     for service in (
         SERVICE_EDIT_FEEDING_PLAN,
         SERVICE_ADD_FEEDING_PLAN,
+        SERVICE_TOGGLE_FEEDING_PLAN,
+        SERVICE_SKIP_FEEDING_PLAN,
+        SERVICE_DELETE_FEEDING_PLAN,
+        SERVICE_TOGGLE_FEEDING_SCHEDULE,
+        SERVICE_TOGGLE_TODAY_SCHEDULE,
     ):
         hass.services.async_remove(DOMAIN, service)
     _LOGGER.debug("PETLIBRO feeding plan services removed.")
