@@ -120,8 +120,8 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                     else:
                         state = "pending"
                     schedule.append({
-                        "label": plan.get("label") or f"plan_{plan_id}",
                         "id": pid,
+                        "label": plan.get("label", ""),
                         "time": plan.get("executionTime"),
                         **{
                             f"amount_{unit.symbol.lower()}": Unit.convert_feed(plan.get("grainNum", 0) * conv, None, unit, True)
@@ -143,8 +143,8 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                     raw_state = tp.get("state")
                     state = state_map.get(raw_state, "unknown")
                     schedule.append({
-                        "label": f"plan_{pid}",
                         "id": pid,
+                        "label": "",
                         "time": tp.get("time"),
                         **{
                             f"amount_{unit.symbol.lower()}": Unit.convert_feed(tp.get("grainNum", 0) * conv, None, unit, True)
