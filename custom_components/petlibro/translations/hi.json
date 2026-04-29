@@ -151,7 +151,7 @@
             "today_eating_time": {
                 "name": "आज का कुल खाने का समय"
             },
-            "feeding_plan_state": {
+            "today_feeding_schedule": {
                 "name": "आज की फीडिंग प्लान"
             },
             "today_drinking_amount": {
@@ -202,7 +202,7 @@
             "next_feeding_end_time": {
                 "name": "खिला समाप्त होता है"
             },
-            "feeding_plan": {
+            "feeding_schedule": {
                 "name": "भरी योजना"
             },
             "temperature": {

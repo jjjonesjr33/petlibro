@@ -429,7 +429,7 @@
             "water_state": {
                 "name": "Stato erogazione acqua"
             },
-            "feeding_plan_state": {
+            "today_feeding_schedule": {
                 "name": "Programma alimentazione di oggi"
             },
             "feeding_schedule": {

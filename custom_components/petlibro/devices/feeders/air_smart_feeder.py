@@ -69,8 +69,13 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
 
     @property
     def feeding_plan_state(self) -> bool:
-        """Return the state of the feeding plan, based on API data."""
+        """Return the state of the feeding schedule, based on API data."""
         return bool(self._data.get("enableFeedingPlan", False))
+
+    @property
+    def today_feeding_plan_state(self) -> bool:
+        """Return True if all of today's plans are skipped."""
+        return bool(self.feeding_plan_today_data.get("allSkipped", False))
 
     @property
     def battery_state(self) -> str:

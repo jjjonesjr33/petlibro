@@ -135,3 +135,130 @@ add_feeding_plan:
       required: false
       selector:
         boolean:
+
+toggle_feeding_plan:
+  name: Toggle Feeding Plan
+  description: >
+    Enable or disable a specific feeding plan on a dry food feeder.
+    Find the Plan ID in the feeder's Feeding Schedule binary sensor attributes.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    plan_id:
+      name: Plan ID
+      description: >
+        The ID of the plan to toggle. Find this in the feeder's
+        Feeding Schedule binary sensor attributes (planID field).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 99999999
+          mode: box
+    enable:
+      name: Enable
+      description: Set to true to enable the plan, false to disable it.
+      required: true
+      selector:
+        boolean:
+
+skip_feeding_plan:
+  name: Skip Feeding Plan
+  description: >
+    Skip or un-skip a specific feeding plan for today only.
+    Find the Plan ID in the feeder's Today's Feeding Schedule binary sensor attributes.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    plan_id:
+      name: Plan ID
+      description: >
+        The ID of the plan to skip or un-skip. Find this in the feeder's
+        Today's Feeding Schedule binary sensor attributes (planID field).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 99999999
+          mode: box
+    skip:
+      name: Skip
+      description: Set to true to skip the plan for today, false to un-skip it.
+      required: true
+      selector:
+        boolean:
+
+delete_feeding_plan:
+  name: Delete Feeding Plan
+  description: >
+    Permanently remove a feeding plan from a dry food feeder.
+    This action cannot be undone. Find the Plan ID in the feeder's
+    Feeding Schedule binary sensor attributes.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    plan_id:
+      name: Plan ID
+      description: >
+        The ID of the plan to delete. Find this in the feeder's
+        Feeding Schedule binary sensor attributes (planID field).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 99999999
+          mode: box
+
+toggle_feeding_schedule:
+  name: Toggle Feeding Schedule
+  description: >
+    Enable or disable the entire feeding schedule on a dry food feeder.
+    When disabled, no scheduled feeds will dispense.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    enable:
+      name: Enable
+      description: Set to true to enable the schedule, false to disable it.
+      required: true
+      selector:
+        boolean:
+
+toggle_today_feeding_schedule:
+  name: Toggle Today's Feeding Schedule
+  description: >
+    Enable or disable all feeding plan events for today on a dry food feeder.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    enable:
+      name: Enable
+      description: Set to true to enable all of today's feeds, false to disable them.
+      required: true
+      selector:
+        boolean:

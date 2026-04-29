@@ -31,7 +31,6 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
             get_work_record = await self.api.get_device_work_record(self.serial)
             feeding_plan_list = (await self.api.device_feeding_plan_list(self.serial)
                 if self._data.get("enableFeedingPlan") else [])
-    
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
@@ -40,7 +39,7 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
                 "getUpgrade": get_upgrade or {},
                 "getfeedingplantoday": get_feeding_plan_today or {},
                 "feedingPlan": feeding_plan_list or [],
-                "workRecord": get_work_record or [],
+                "workRecord": get_work_record or [],          
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for GranarySmartCameraFeeder: {err}")
@@ -68,6 +67,11 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
     def feeding_plan_state(self) -> bool:
         """Return the state of the feeding plan, based on API data."""
         return bool(self._data.get("enableFeedingPlan", False))
+
+    @property
+    def today_feeding_plan_state(self) -> bool:
+        """Return True if all of today's plans are skipped."""
+        return bool(self.feeding_plan_today_data.get("allSkipped", False))
 
     @property
     def battery_state(self) -> str:

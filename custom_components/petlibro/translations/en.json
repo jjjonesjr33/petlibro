@@ -429,7 +429,7 @@
             "water_state": {
                 "name": "Water Dispensing State"
             },
-            "feeding_plan_state": {
+            "today_feeding_schedule": {
                 "name": "Today's Feeding Schedule"
             },
             "feeding_schedule": {
@@ -506,10 +506,10 @@
                 "name": "Manual Feed Quantity"
             },
             "feeding_plan_select": {
-                "name": "Feeding Schedule"
+                "name": "Feeding Plan"
             },
             "feeding_plan_today_select": {
-                "name": "Today's Feeding Schedule"
+                "name": "Today's Feeding Plan"
             },
             "vacuum_mode": {
                 "name": "Vacuum Mode"

@@ -151,7 +151,7 @@
             "today_eating_time": {
                 "name": "Tempo total de alimentação de hoje"
             },
-            "feeding_plan_state": {
+            "today_feeding_schedule": {
                 "name": "Plano de alimentação de hoje"
             },
             "today_drinking_amount": {
@@ -202,7 +202,7 @@
             "next_feeding_end_time": {
                 "name": "Fins de alimentação"
             },
-            "feeding_plan": {
+            "feeding_schedule": {
                 "name": "Plano de alimentação"
             },
             "temperature": {

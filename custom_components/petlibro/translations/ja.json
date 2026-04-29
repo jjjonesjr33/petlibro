@@ -151,7 +151,7 @@
             "today_eating_time": {
                 "name": "今日の総食事時間"
             },
-            "feeding_plan_state": {
+            "today_feeding_schedule": {
                 "name": "今日の給餌計画"
             },
             "today_drinking_amount": {
@@ -202,7 +202,7 @@
             "next_feeding_end_time": {
                 "name": "給餌の終わり"
             },
-            "feeding_plan": {
+            "feeding_schedule": {
                 "name": "給餌計画"
             },
             "temperature": {
