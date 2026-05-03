@@ -563,10 +563,6 @@ PET_ENTITY_MAP: dict[PL_PetEntity, tuple[PL_PetEntityDescription]] = {
             name="Today's Fountain Drinking Count",
             icon="mdi:water-plus",
             state_class=SensorStateClass.TOTAL_INCREASING,
-            entity_registry_enabled_default_fn=lambda pet, _: any(
-                d.get("productName") == "Dockstream Smart RFID Fountain"
-                for d in pet.boundDevices
-            ),
         ),
         PL_PetSensorEntityDescription(
             key="today_fountain_drinking_amount",
@@ -577,10 +573,6 @@ PET_ENTITY_MAP: dict[PL_PetEntity, tuple[PL_PetEntityDescription]] = {
             device_class=SensorDeviceClass.VOLUME,
             native_unit_of_measurement=UnitOfVolume.MILLILITERS,
             petlibro_unit=API.WATER_UNIT,
-            entity_registry_enabled_default_fn=lambda pet, _: any(
-                d.get("productName") == "Dockstream Smart RFID Fountain"
-                for d in pet.boundDevices
-            ),
         ),
         PL_PetSensorEntityDescription(
             key="today_fountain_drinking_time",
@@ -590,10 +582,6 @@ PET_ENTITY_MAP: dict[PL_PetEntity, tuple[PL_PetEntityDescription]] = {
             state_class=SensorStateClass.TOTAL_INCREASING,
             device_class=SensorDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
-            entity_registry_enabled_default_fn=lambda pet, _: any(
-                d.get("productName") == "Dockstream Smart RFID Fountain"
-                for d in pet.boundDevices
-            ),
         ),
     ),
     PL_PetImageEntity: (
