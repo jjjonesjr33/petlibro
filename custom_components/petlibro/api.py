@@ -562,6 +562,30 @@ class PetLibroAPI:
         _LOGGER.debug("Bound pets retrieved successfully")
         return data or []
 
+    async def device_wear_list(self, device_sn: str) -> list[dict]:
+        """Get wear/RFID data for pets bound to a device, with caching."""
+        now = utcnow()
+        cache_key = f"{device_sn}_wearListV2"
+        last_call_time = self._last_api_call_times.get(cache_key)
+
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Skipping wearListV2 request for {device_sn}, using cached response.")
+            return self._cached_responses.get(cache_key, [])
+
+        try:
+            response = await self.session.request("POST", "/device/device/wear/wearListV2", json={
+                "deviceSn": device_sn,
+                "type": 1
+            })
+
+            self._last_api_call_times[cache_key] = now
+            self._cached_responses[cache_key] = response if isinstance(response, list) else []
+
+            return self._cached_responses[cache_key]
+        except Exception as e:
+            _LOGGER.error(f"Error fetching wearListV2 for device {device_sn}: {e}")
+            raise PetLibroAPIError(f"Error fetching wearListV2 for device {device_sn}: {e}")
+
     # Support for new switch functions
     async def set_feeding_plan(self, serial: str, enable: bool):
         """Set the feeding plan on/off."""
