@@ -1,6 +1,5 @@
 """Support for PETLIBRO text entities."""
 from __future__ import annotations
-from .api import make_api_call
 import aiohttp
 from aiohttp import ClientSession, ClientError
 from dataclasses import dataclass

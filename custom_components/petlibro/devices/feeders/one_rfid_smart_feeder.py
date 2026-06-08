@@ -2,7 +2,6 @@ import ast
 from zoneinfo import ZoneInfo
 import aiohttp
 
-from ...api import make_api_call
 from aiohttp import ClientSession, ClientError
 from ...exceptions import PetLibroAPIError
 from ..device import Device

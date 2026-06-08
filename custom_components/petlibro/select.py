@@ -1,7 +1,6 @@
 """Support for PETLIBRO selects."""
 from __future__ import annotations
 import math
-from .api import make_api_call
 import aiohttp
 from aiohttp import ClientSession, ClientError
 from dataclasses import dataclass

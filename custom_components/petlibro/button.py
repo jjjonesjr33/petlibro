@@ -1,7 +1,6 @@
 """Support for PETLIBRO buttons."""
 from __future__ import annotations
 import re
-from .api import make_api_call
 import aiohttp
 from aiohttp import ClientSession, ClientError
 from collections.abc import Callable, Coroutine
