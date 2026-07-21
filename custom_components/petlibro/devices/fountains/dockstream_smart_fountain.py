@@ -15,18 +15,51 @@ class DockstreamSmartFountain(Device):
     async def refresh(self):
         """Refresh the device data from the API."""
         try:
-            await super().refresh()  # Call the refresh method from the parent class (Device)
-        
-            # Fetch real info from the API
-            real_info = await self.api.device_real_info(self.serial)
-            data_real_info = await self.api.device_data_real_info(self.serial)
-            attribute_settings = await self.api.device_attribute_settings(self.serial)
-            get_upgrade = await self.api.get_device_upgrade(self.serial)
-            get_work_record = await self.api.get_device_work_record(self.serial)
-            get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
-            get_drink_water = await self.api.get_device_drink_water(self.serial)
+            await super().refresh()
 
-            # Update internal data with fetched API data
+            real_info = None
+            data_real_info = None
+            attribute_settings = None
+            get_upgrade = None
+            get_work_record = None
+            get_feeding_plan_today = None
+            get_drink_water = None
+
+            try:
+                real_info = await self.api.device_real_info(self.serial)
+            except PetLibroAPIError as err:
+                _LOGGER.warning(f"Error fetching realInfo for DockstreamSmartFountain: {err}")
+
+            try:
+                data_real_info = await self.api.device_data_real_info(self.serial)
+            except PetLibroAPIError as err:
+                _LOGGER.warning(f"Error fetching dataRealInfo for DockstreamSmartFountain: {err}")
+
+            try:
+                attribute_settings = await self.api.device_attribute_settings(self.serial)
+            except PetLibroAPIError as err:
+                _LOGGER.warning(f"Error fetching attributeSettings for DockstreamSmartFountain: {err}")
+
+            try:
+                get_upgrade = await self.api.get_device_upgrade(self.serial)
+            except PetLibroAPIError as err:
+                _LOGGER.warning(f"Error fetching getUpgrade for DockstreamSmartFountain: {err}")
+
+            try:
+                get_work_record = await self.api.get_device_work_record(self.serial)
+            except PetLibroAPIError as err:
+                _LOGGER.warning(f"Error fetching workRecord for DockstreamSmartFountain: {err}")
+
+            try:
+                get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
+            except PetLibroAPIError as err:
+                _LOGGER.warning(f"Error fetching feedingPlanToday for DockstreamSmartFountain: {err}")
+
+            try:
+                get_drink_water = await self.api.get_device_drink_water(self.serial)
+            except PetLibroAPIError as err:
+                _LOGGER.warning(f"Error fetching drinkWater for DockstreamSmartFountain: {err}")
+
             self.update_data({
                 "realInfo": real_info or {},
                 "dataRealInfo": data_real_info or {},

@@ -13,6 +13,7 @@
 # https://api.us.petlibro.com/device/feedingPlan/list
 # https://api.us.petlibro.com/device/wetFeedingPlan/wetListV3
 
+import asyncio
 from logging import getLogger
 from hashlib import md5
 import sys
@@ -98,6 +99,26 @@ class PetLibroSession:
                 raise PetLibroAPIError(f"Error parsing response JSON: {e}")
 
             _LOGGER.debug(f"Response data: {data}")
+
+            # Retry on 5xx server errors (transient failures)
+            max_retries = 2
+            retry_delay = 2
+            if resp.status >= 500:
+                for attempt in range(max_retries):
+                    _LOGGER.warning(
+                        "Retrying %s %s (attempt %d/%d) after status %d",
+                        method, joined_url, attempt + 1, max_retries, resp.status,
+                    )
+                    await asyncio.sleep(retry_delay)
+                    async with self.websession.request(method, joined_url, **kwargs) as retry_resp:
+                        resp = retry_resp
+                        try:
+                            data = await resp.json()
+                        except Exception as e:
+                            raise PetLibroAPIError(f"Error parsing response JSON: {e}")
+                        if resp.status < 500:
+                            break
+                _LOGGER.debug(f"Response data: {data}")
 
             if resp.status != 200:
                 raise PetLibroAPIError(f"Request failed with status: {resp.status}")
