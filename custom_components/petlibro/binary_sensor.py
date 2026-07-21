@@ -613,6 +613,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
         ),
+        PetLibroBinarySensorEntityDescription[DockstreamSmartFountain](
+            key="weight_calibration_error",
+            translation_key="weight_calibration_error",
+            icon="mdi:alert",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.weight_calibration_error is not None,
+            name="Weight Calibration Error"
+        ),
     ],
     DockstreamSmartRFIDFountain: [
         PetLibroBinarySensorEntityDescription[DockstreamSmartRFIDFountain](
