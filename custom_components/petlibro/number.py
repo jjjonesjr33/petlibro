@@ -10,6 +10,7 @@ from homeassistant.components.number import (
     NumberMode
 )
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.const import UnitOfVolume, Platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
@@ -42,7 +43,7 @@ class PetLibroNumberEntityDescription(NumberEntityDescription, PetLibroEntityDes
     method: Callable[[_DeviceT, float], float] = lambda d, v: None
     petlibro_unit: APIKey | str | None = None
 
-class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
+class PetLibroNumberEntity(PetLibroEntity[_DeviceT], RestoreEntity, NumberEntity):
     """PETLIBRO number entity."""
     entity_description: PetLibroNumberEntityDescription[_DeviceT]
 
@@ -52,6 +53,24 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
 
         if (unit_type := self.entity_description.petlibro_unit) and unit_type == APIKey.FEED_UNIT:
             self.hub.unit_entities.feed_number_unique_ids[Platform.NUMBER].append(self._attr_unique_id)
+
+    async def async_added_to_hass(self) -> None:
+        """Restore last state on startup."""
+        await super().async_added_to_hass()
+        if self.key != "manual_feed_quantity":
+            return
+        last_state = await self.async_get_last_state()
+        if last_state is not None and last_state.state not in ("unknown", "unavailable"):
+            try:
+                restored_value = float(last_state.state)
+                if not self.portions_enabled:
+                    restored_value = Unit.convert_feed(
+                        restored_value, self.member.feedUnitType, None)
+                    restored_value = restored_value / self.device.feed_conv_factor
+                restored_value = max(1, min(round(restored_value), self.device.max_feed_portions))
+                self.device.manual_feed_quantity = restored_value
+            except (TypeError, ValueError) as err:
+                _LOGGER.warning("Failed to restore manual_feed_quantity: %s", err)
 
     @property
     def native_value(self) -> float | None:
