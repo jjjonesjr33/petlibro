@@ -230,6 +230,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
         ),
+        PetLibroBinarySensorEntityDescription[AirSmartFeeder](
+            key="power_connected",
+            translation_key="power_connected",
+            icon="mdi:power-plug",
+            device_class=BinarySensorDeviceClass.PLUG,
+            should_report=lambda device: device.power_connected is not None,
+            name="Power Connected"
+        ),
     ],
     GranarySmartFeeder: [
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
