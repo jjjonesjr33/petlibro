@@ -31,6 +31,7 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
             get_work_record = await self.api.get_device_work_record(self.serial)
             feeding_plan_list = (await self.api.device_feeding_plan_list(self.serial)
                 if self._data.get("enableFeedingPlan") else [])
+            get_device_events = await self.api.device_events(self.serial)
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
@@ -39,7 +40,8 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
                 "getUpgrade": get_upgrade or {},
                 "getfeedingplantoday": get_feeding_plan_today or {},
                 "feedingPlan": feeding_plan_list or [],
-                "workRecord": get_work_record or [],          
+                "workRecord": get_work_record or [],
+                "getDeviceEvents": get_device_events or {},
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for GranarySmartCameraFeeder: {err}")
@@ -216,6 +218,16 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
     def video_record_mode(self) -> str:
         """Return the current video recording mode."""
         return self._data.get("realInfo", {}).get("videoRecordMode", "unknown")
+
+    @property
+    def motion_detected(self) -> bool:
+        events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
+        return any(event.get("eventKey") == "MOTION_DETECTED" for event in events)
+
+    @property
+    def sound_detected(self) -> bool:
+        events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
+        return any(event.get("eventKey") == "SOUND_DETECTED" for event in events)
     
     @property
     def remaining_desiccant(self) -> float | None:

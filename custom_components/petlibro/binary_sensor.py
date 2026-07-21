@@ -358,6 +358,22 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
         ),
+        PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
+            key="motion_detected",
+            translation_key="motion_detected",
+            icon="mdi:motion-sensor",
+            device_class=BinarySensorDeviceClass.MOTION,
+            should_report=lambda device: device.motion_detected is not None,
+            name="Motion Detected"
+        ),
+        PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
+            key="sound_detected",
+            translation_key="sound_detected",
+            icon="mdi:ear-hearing",
+            device_class=BinarySensorDeviceClass.SOUND,
+            should_report=lambda device: device.sound_detected is not None,
+            name="Sound Detected"
+        ),
     ],
     OneRFIDSmartFeeder: [
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
