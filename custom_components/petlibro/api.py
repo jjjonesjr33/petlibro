@@ -93,14 +93,8 @@ class PetLibroSession:
         # Send the request
         async with self.websession.request(method, joined_url, **kwargs) as resp:
             _LOGGER.debug(f"Received response status: {resp.status}")
-            try:
-                data = await resp.json()
-            except Exception as e:
-                raise PetLibroAPIError(f"Error parsing response JSON: {e}")
 
-            _LOGGER.debug(f"Response data: {data}")
-
-            # Retry on 5xx server errors (transient failures)
+            # Retry on 5xx server errors before attempting to parse JSON
             max_retries = 2
             retry_delay = 2
             if resp.status >= 500:
@@ -112,13 +106,15 @@ class PetLibroSession:
                     await asyncio.sleep(retry_delay)
                     async with self.websession.request(method, joined_url, **kwargs) as retry_resp:
                         resp = retry_resp
-                        try:
-                            data = await resp.json()
-                        except Exception as e:
-                            raise PetLibroAPIError(f"Error parsing response JSON: {e}")
                         if resp.status < 500:
                             break
-                _LOGGER.debug(f"Response data: {data}")
+
+            try:
+                data = await resp.json()
+            except Exception as e:
+                raise PetLibroAPIError(f"Error parsing response JSON: {e}")
+
+            _LOGGER.debug(f"Response data: {data}")
 
             if resp.status != 200:
                 raise PetLibroAPIError(f"Request failed with status: {resp.status}")
