@@ -117,6 +117,10 @@ class PolarWetFoodFeeder(Device):
         except ValueError:
             return "Invalid time"
         
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._rotating = False
+
     @property
     def manual_feed_id(self) -> int:
         """Returns the manual feed ID."""
@@ -187,24 +191,28 @@ class PolarWetFoodFeeder(Device):
                 await self.api.set_manual_feed_now(self.serial, plate)
             else:
                 _LOGGER.debug(f"Triggering stop feed now for {self.serial}")
-                await self.api.set_stop_feed_now(self.serial, self.manual_feed_id)
+                if self.manual_feed_id is None:
+                    _LOGGER.warning("No manual feed ID available to stop for %s", self.serial)
+                else:
+                    await self.api.set_stop_feed_now(self.serial, self.manual_feed_id)
             
-            await self.refresh()  # Refresh the state after the action
+            await self.refresh()
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger manual feed now for {self.serial} with plate no.{plate}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feed now: {err}")
     
     async def set_plate_position(self, value: str | int) -> None:
         """Rotate bowl to requested plate (1-3)"""
+        if self._rotating:
+            _LOGGER.warning("Rotation already in progress for %s", self.serial)
+            return
         try:
             target = int(value)
         except (TypeError, ValueError):
             raise PetLibroAPIError(f"Invalid plate value: {value!r}")
         if target not in (1, 2, 3):
-            # Raise an error if plate count somehow became less than 1 or more than 3.
             raise PetLibroAPIError(f"Plate must be 1, 2, or 3, got {target}")
 
-        # Ensure we know current position
         if not self.plate_position:
             await self.refresh()
         curr = self.plate_position or 1
@@ -212,25 +220,33 @@ class PolarWetFoodFeeder(Device):
         steps = (target - curr) % 3
         _LOGGER.debug("Rotate-to-plate: curr=%s target=%s steps=%s for %s", curr, target, steps, self.serial)
 
-        # didnt test other cooldowns, may be able reduce.
-        ROTATE_COOLDOWN = 0.6
-        for _ in range(steps):
-            await self.api.set_rotate_food_bowl(self.serial)
-            await asyncio.sleep(ROTATE_COOLDOWN)
-            await self.refresh()
+        self._rotating = True
+        try:
+            ROTATE_COOLDOWN = 2.0
+            for _ in range(steps):
+                await self.api.set_rotate_food_bowl(self.serial)
+                await asyncio.sleep(ROTATE_COOLDOWN)
+                await self.refresh()
 
-        # Final refresh so sensor/current_option show the target
-        await self.refresh()
+            await self.refresh()
+        finally:
+            self._rotating = False
 
     async def rotate_food_bowl(self) -> None:
+        if self._rotating:
+            _LOGGER.warning("Rotation already in progress for %s", self.serial)
+            return
         _LOGGER.debug(f"Triggering rotate food bowl for {self.serial}")
 
+        self._rotating = True
         try:
             await self.api.set_rotate_food_bowl(self.serial)
-            await self.refresh()  # Refresh the state after the action
+            await self.refresh()
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger rotate food bowl for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering rotate food bowl: {err}")
+        finally:
+            self._rotating = False
 
     async def feed_audio(self) -> None:
         _LOGGER.debug(f"Triggering feed audio for {self.serial}")
