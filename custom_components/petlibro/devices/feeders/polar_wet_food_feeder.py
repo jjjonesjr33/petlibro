@@ -76,6 +76,7 @@ class PolarWetFoodFeeder(Device):
     def feeding_plan_state(self) -> bool:
         """Return the state of the feeding plan from wetFeedingPlan data."""
         wet_plan = self._data.get("wetFeedingPlan", {})
+        # API does not provide an explicit enabled flag for wet plans; non-empty plan = enabled
         if not wet_plan or not wet_plan.get("templateName"):
             return False
         plan_entries = wet_plan.get("plan", [])
