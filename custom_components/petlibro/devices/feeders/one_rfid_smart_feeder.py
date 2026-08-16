@@ -34,10 +34,12 @@ class OneRFIDSmartFeeder(Device):
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
             feeding_plan_list = (await self.api.device_feeding_plan_list(self.serial)
                 if self._data.get("enableFeedingPlan") else [])
+            data_real_info = await self.api.device_data_real_info(self.serial)
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
+                "dataRealInfo": data_real_info or {},
                 "getUpgrade": get_upgrade or {},
                 "getAttributeSetting": attribute_settings or {},
                 "getDefaultMatrix": get_default_matrix or {},
@@ -127,6 +129,13 @@ class OneRFIDSmartFeeder(Device):
     @property
     def running_state(self) -> bool:
         return self._data.get("realInfo", {}).get("runningState", "IDLE") == "RUNNING"
+
+    @property
+    def rotor_stuck(self) -> bool | None:
+        exception = self._data.get("dataRealInfo", {}).get("exceptionMessage")
+        if exception is None:
+            return None
+        return "rotor" in exception.lower() or "stuck" in exception.lower()
 
     @property
     def whether_in_sleep_mode(self) -> bool:
