@@ -1,7 +1,6 @@
 """Support for PETLIBRO buttons."""
 from __future__ import annotations
 import re
-from .api import make_api_call
 import aiohttp
 from aiohttp import ClientSession, ClientError
 from collections.abc import Callable, Coroutine
@@ -657,7 +656,14 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="filter_reset",
             set_fn=lambda device: device.set_filter_reset(),
             name="Filter Reset"
-        )
+        ),
+        PetLibroButtonEntityDescription[DockstreamSmartFountain](
+            key="calibrate_weight",
+            translation_key="calibrate_weight",
+            icon="mdi:scale",
+            set_fn=lambda device: device.calibrate_weight(),
+            name="Calibrate Weight Sensor"
+        ),
     ],
     DockstreamSmartRFIDFountain: [
         PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](

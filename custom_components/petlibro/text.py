@@ -1,6 +1,5 @@
 """Support for PETLIBRO text entities."""
 from __future__ import annotations
-from .api import make_api_call
 import aiohttp
 from aiohttp import ClientSession, ClientError
 from dataclasses import dataclass
@@ -144,7 +143,7 @@ async def async_setup_entry(
     ]
 
     if not entities:
-        _LOGGER.warning("No text entities added, entities list is empty!")
+        _LOGGER.debug("No text entities added, entities list is empty!")
     else:
         # Log the text of entities and their details
         _LOGGER.debug("Adding %d PetLibro text entities", len(entities))
