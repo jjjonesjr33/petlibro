@@ -189,7 +189,7 @@ class PetLibroHub:
                 _LOGGER.error("Error fetching shared pet info.")
 
         if not pet_list:
-            _LOGGER.warning("No pets found in the API response.")
+            _LOGGER.debug("No pets found in the API response.")
             return  # Early return if no pets found
 
         for pet_data in pet_list:
@@ -243,7 +243,7 @@ class PetLibroHub:
         if not self.member:
             _LOGGER.warning("No member to refresh.")
         if not self.pets:
-            _LOGGER.warning("No pets to refresh.")
+            _LOGGER.debug("No pets to refresh.")
 
         now = utcnow()
         refresh_tasks, data_objects = [], []
