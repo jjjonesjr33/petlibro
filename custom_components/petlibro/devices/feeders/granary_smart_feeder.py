@@ -85,8 +85,33 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         return not bool(self._data.get("realInfo", {}).get("grainOutletState", True))
 
     @property
+    def bowl_mode(self) -> str:
+        return self._data.get("realInfo", {}).get("bowlMode", "SINGLE_BOWL")
+
+    @property
     def food_low(self) -> bool:
-        return not bool(self._data.get("realInfo", {}).get("surplusGrain", True))
+        surplus = self._data.get("realInfo", {}).get("surplusGrain")
+        if surplus is not None:
+            return not bool(surplus)
+        left = self._data.get("realInfo", {}).get("leftWarehouseSurplusGrain")
+        right = self._data.get("realInfo", {}).get("rightWarehouseSurplusGrain")
+        if left is not None and right is not None:
+            return not bool(left) or not bool(right)
+        return True
+
+    @property
+    def left_food_low(self) -> bool | None:
+        value = self._data.get("realInfo", {}).get("leftWarehouseSurplusGrain")
+        if value is None:
+            return None
+        return not bool(value)
+
+    @property
+    def right_food_low(self) -> bool | None:
+        value = self._data.get("realInfo", {}).get("rightWarehouseSurplusGrain")
+        if value is None:
+            return None
+        return not bool(value)
 
     @property
     def unit_type(self) -> int:
