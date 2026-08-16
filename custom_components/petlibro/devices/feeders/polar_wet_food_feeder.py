@@ -221,15 +221,17 @@ class PolarWetFoodFeeder(Device):
         if target not in (1, 2, 3):
             raise PetLibroAPIError(f"Plate must be 1, 2, or 3, got {target}")
 
-        if not self.plate_position:
-            await self.refresh()
-        curr = self.plate_position or 1
-
-        steps = (target - curr) % 3
-        _LOGGER.debug("Rotate-to-plate: curr=%s target=%s steps=%s for %s", curr, target, steps, self.serial)
-
+        # Acquire the lock before the first await so concurrent calls can't
+        # both pass the guard above (TOCTOU).
         self._rotating = True
         try:
+            if not self.plate_position:
+                await self.refresh()
+            curr = self.plate_position or 1
+
+            steps = (target - curr) % 3
+            _LOGGER.debug("Rotate-to-plate: curr=%s target=%s steps=%s for %s", curr, target, steps, self.serial)
+
             ROTATE_COOLDOWN = 2.0
             for _ in range(steps):
                 await self.api.set_rotate_food_bowl(self.serial)
