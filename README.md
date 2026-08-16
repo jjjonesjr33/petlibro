@@ -133,7 +133,13 @@ logger:
 ---
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=jjjonesjr33/petlibro&type=Date&theme=dark)](https://www.star-history.com/#jjjonesjr33/petlibro&Date)
+<a href="https://www.star-history.com/?repos=jjjonesjr33%2Fpetlibro&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=jjjonesjr33/petlibro&type=date&theme=dark&legend=top-left&sealed_token=hpOo4LKHDwWaJig-07vmXGM_vv_VOZXCYWNiyL62EViJNtExbKzCNjvwS5x7ZT8Q1LCpRTMrR5vKelTRpBuDjc1_5N-XNwjaHOOOm7FpFWa02M55X_fyrle5peHkqvXZEWdEUwrr5RCbfZTrnOVEo7Y9weU0jZv0L3wIi0ybyvKcxKL477nTaBzFpJdA" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=jjjonesjr33/petlibro&type=date&legend=top-left&sealed_token=hpOo4LKHDwWaJig-07vmXGM_vv_VOZXCYWNiyL62EViJNtExbKzCNjvwS5x7ZT8Q1LCpRTMrR5vKelTRpBuDjc1_5N-XNwjaHOOOm7FpFWa02M55X_fyrle5peHkqvXZEWdEUwrr5RCbfZTrnOVEo7Y9weU0jZv0L3wIi0ybyvKcxKL477nTaBzFpJdA" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=jjjonesjr33/petlibro&type=date&legend=top-left&sealed_token=hpOo4LKHDwWaJig-07vmXGM_vv_VOZXCYWNiyL62EViJNtExbKzCNjvwS5x7ZT8Q1LCpRTMrR5vKelTRpBuDjc1_5N-XNwjaHOOOm7FpFWa02M55X_fyrle5peHkqvXZEWdEUwrr5RCbfZTrnOVEo7Y9weU0jZv0L3wIi0ybyvKcxKL477nTaBzFpJdA" />
+ </picture>
+</a>
 
 [stars]: https://github.com/jjjonesjr33/petlibro/stargazers
 [starsbadge]: https://img.shields.io/github/stars/jjjonesjr33/petlibro?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDE2IDE2Ij48cGF0aCBzdHlsZT0iZmlsbDojY2NjY2NjIiBkPSJNOCAuMjVhLjc1Ljc1IDAgMCAxIC42NzMuNDE4bDEuODgyIDMuODE1IDQuMjEuNjEyYS43NS43NSAwIDAgMSAuNDE2IDEuMjc5bC0zLjA0NiAyLjk3LjcxOSA0LjE5MmEuNzUxLjc1MSAwIDAgMS0xLjA4OC43OTFMOCAxMi4zNDdsLTMuNzY2IDEuOThhLjc1Ljc1IDAgMCAxLTEuMDg4LS43OWwuNzItNC4xOTRMLjgxOCA2LjM3NGEuNzUuNzUgMCAwIDEgLjQxNi0xLjI4bDQuMjEtLjYxMUw3LjMyNy42NjhBLjc1Ljc1IDAgMCAxIDggLjI1Wm0wIDIuNDQ1TDYuNjE1IDUuNWEuNzUuNzUgMCAwIDEtLjU2NC40MWwtMy4wOTcuNDUgMi4yNCAyLjE4NGEuNzUuNzUgMCAwIDEgLjIxNi42NjRsLS41MjggMy4wODQgMi43NjktMS40NTZhLjc1Ljc1IDAgMCAxIC42OTggMGwyLjc3IDEuNDU2LS41My0zLjA4NGEuNzUuNzUgMCAwIDEgLjIxNi0uNjY0bDIuMjQtMi4xODMtMy4wOTYtLjQ1YS43NS43NSAwIDAgMS0uNTY0LS40MUw4IDIuNjk0WiI+PC9wYXRoPjwvc3ZnPg==&label=Stars&color=ffffff
