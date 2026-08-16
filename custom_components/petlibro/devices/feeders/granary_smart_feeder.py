@@ -16,9 +16,11 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         """Initialize the feeder with default values."""
         super().__init__(*args, **kwargs)
         self._manual_feed_quantity = None  # Default to None initially
+        self._cached_get_next_feed = None
 
     async def refresh(self):
         """Refresh the device data from the API."""
+        self._cached_get_next_feed = None
         try:
             await super().refresh()  # Call the refresh method from Device
 
@@ -285,6 +287,8 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
                 "utc_time": datetime,
             }
         """
+        if self._cached_get_next_feed is not None:
+            return self._cached_get_next_feed
         now_utc = dt_util.now(dt_util.UTC)
         next_feed = {}
         
@@ -323,6 +327,7 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
                         "id": feed["id"],
                         "utc_time": candidate_dt_utc,
                     }
+        self._cached_get_next_feed = next_feed
         return next_feed
 
     @property
