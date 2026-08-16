@@ -302,6 +302,22 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
         ),
+        PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
+            key="left_food_low",
+            translation_key="left_food_low",
+            icon="mdi:bowl-mix-outline",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.left_food_low is not None,
+            name="Left Food Status"
+        ),
+        PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
+            key="right_food_low",
+            translation_key="right_food_low",
+            icon="mdi:bowl-mix-outline",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.right_food_low is not None,
+            name="Right Food Status"
+        ),
     ],
     GranarySmartCameraFeeder: [
         PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
