@@ -1,7 +1,6 @@
 """Support for PETLIBRO binary sensors."""
 from __future__ import annotations
 import json
-from .api import make_api_call
 import aiohttp
 from aiohttp import ClientSession, ClientError
 from dataclasses import dataclass

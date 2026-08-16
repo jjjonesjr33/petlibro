@@ -27,10 +27,6 @@ from aiohttp import ClientSession
 import aiohttp
 import uuid  # To generate unique request IDs
 
-async def make_api_call(session, url, data):
-    async with session.post(url, json=data) as response:
-        return await response.json()
-
 JSON: TypeAlias = dict[str, "JSON"] | list["JSON"] | str | int | float | bool | None
 _LOGGER = getLogger(__name__)
 
@@ -85,7 +81,7 @@ class PetLibroSession:
 
         if self.token is not None:
             kwargs["headers"]["token"] = self.token
-            _LOGGER.debug(f"Using token: {self.token}")
+            _LOGGER.debug("Using token from config entry")
         else:
             _LOGGER.warning("No token available for request. Attempting to log in...")
 
@@ -238,7 +234,7 @@ class PetLibroAPI:
                 raise PetLibroAPIError("No token found during login.")
 
             self.session.token = data["token"]
-            _LOGGER.debug(f"Login successful, token: {self.session.token}")
+            _LOGGER.debug("Login successful")
             return self.session.token
 
         except Exception as e:

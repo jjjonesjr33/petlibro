@@ -127,6 +127,40 @@ class PetlibroConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
+    async def async_step_reconfigure(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Allow the user to update their email and/or password."""
+        entry = self.hass.config_entries.async_get_entry(self.context["entry_id"])
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            self.email = user_input[CONF_EMAIL]
+            self.password = user_input[CONF_PASSWORD]
+            self.region = entry.data.get(CONF_REGION, "US")
+
+            if not (error := await self._validate_input()):
+                self.hass.config_entries.async_update_entry(
+                    entry,
+                    title=self.email,
+                    data={
+                        CONF_REGION: self.region,
+                        CONF_EMAIL: self.email,
+                        CONF_PASSWORD: self.password,
+                        CONF_API_TOKEN: self.token,
+                    },
+                )
+                await self.hass.config_entries.async_reload(entry.entry_id)
+                return self.async_abort(reason="reconfigure_successful")
+            errors["base"] = error
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=vol.Schema({
+                vol.Required(CONF_EMAIL, default=entry.data.get(CONF_EMAIL, "")): str,
+                vol.Required(CONF_PASSWORD): str,
+            }),
+            errors=errors,
+        )
+
     async def _validate_input(self) -> str:
         """Validate the user input allows us to connect.
 
@@ -142,7 +176,7 @@ class PetlibroConfigFlow(ConfigFlow, domain=DOMAIN):
             )
 
             self.token = await api.login(self.email, self.password)
-            _LOGGER.debug(f"Login successful, token: {self.token}")
+            _LOGGER.debug("Login successful")
         except PetLibroCannotConnect:
             return "cannot_connect"
         except PetLibroInvalidAuth:
@@ -192,7 +226,7 @@ class PetlibroOptionsFlow(OptionsFlow):
         _LOGGER.debug(
             "Started Petlibro options flow for account %s", self.entry.data[CONF_EMAIL]
         )
-        return self.async_show_menu(menu_options=["integration_settings", "account_settings"])
+        return self.async_show_menu(menu_options=["integration_settings", "account_settings", "change_credentials"])
 
     async def async_step_integration_settings(
         self, user_input: dict[str, Any] | None = None
@@ -324,6 +358,54 @@ class PetlibroOptionsFlow(OptionsFlow):
 
         _LOGGER.debug("Showing account settings form.")
         return self._show_account_settings_form(user_input)
+
+    async def async_step_change_credentials(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Allow the user to update their login email and/or password."""
+        errors: dict[str, str] = {}
+
+        if user_input:
+            new_email = user_input[CONF_EMAIL]
+            new_password = user_input[CONF_PASSWORD]
+            try:
+                api = PetLibroAPI(
+                    async_get_clientsession(self.hass),
+                    self.hass.config.time_zone,
+                    self.entry.data[CONF_REGION],
+                    new_email,
+                    new_password,
+                )
+                new_token = await api.login(new_email, new_password)
+            except PetLibroInvalidAuth:
+                errors["base"] = "invalid_auth"
+            except PetLibroCannotConnect:
+                errors["base"] = "cannot_connect"
+            except Exception:
+                _LOGGER.exception("Unexpected error updating credentials")
+                errors["base"] = "unknown"
+            else:
+                self.hass.config_entries.async_update_entry(
+                    self.entry,
+                    title=new_email,
+                    data={
+                        **self.entry.data,
+                        CONF_EMAIL: new_email,
+                        CONF_PASSWORD: new_password,
+                        CONF_API_TOKEN: new_token,
+                    },
+                )
+                await self.hass.config_entries.async_reload(self.entry.entry_id)
+                return self.async_abort(reason="credentials_updated")
+
+        return self.async_show_form(
+            step_id="change_credentials",
+            data_schema=vol.Schema({
+                vol.Required(CONF_EMAIL, default=self.entry.data.get(CONF_EMAIL, "")): str,
+                vol.Required(CONF_PASSWORD): str,
+            }),
+            errors=errors,
+        )
 
     # ------------------------------
     # Form Builders
