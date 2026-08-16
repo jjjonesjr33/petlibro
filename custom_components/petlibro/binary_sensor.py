@@ -229,6 +229,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
         ),
+        PetLibroBinarySensorEntityDescription[AirSmartFeeder](
+            key="power_connected",
+            translation_key="power_connected",
+            icon="mdi:power-plug",
+            device_class=BinarySensorDeviceClass.PLUG,
+            should_report=lambda device: device.power_connected is not None,
+            name="Power Connected"
+        ),
     ],
     GranarySmartFeeder: [
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
@@ -293,6 +301,22 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
         ),
+        PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
+            key="left_food_low",
+            translation_key="left_food_low",
+            icon="mdi:bowl-mix-outline",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.left_food_low is not None,
+            name="Left Food Status"
+        ),
+        PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
+            key="right_food_low",
+            translation_key="right_food_low",
+            icon="mdi:bowl-mix-outline",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.right_food_low is not None,
+            name="Right Food Status"
+        ),
     ],
     GranarySmartCameraFeeder: [
         PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
@@ -356,6 +380,22 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.feeding_plan_state is not None,
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
+        ),
+        PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
+            key="motion_detected",
+            translation_key="motion_detected",
+            icon="mdi:motion-sensor",
+            device_class=BinarySensorDeviceClass.MOTION,
+            should_report=lambda device: device.motion_detected is not None,
+            name="Motion Detected"
+        ),
+        PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
+            key="sound_detected",
+            translation_key="sound_detected",
+            icon="mdi:ear-hearing",
+            device_class=BinarySensorDeviceClass.SOUND,
+            should_report=lambda device: device.sound_detected is not None,
+            name="Sound Detected"
         ),
     ],
     OneRFIDSmartFeeder: [
@@ -451,6 +491,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.feeding_plan_state is not None,
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="rotor_stuck",
+            translation_key="rotor_stuck",
+            icon="mdi:alert",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.rotor_stuck is not None,
+            name="Rotor Status"
         ),
     ],
     PolarWetFoodFeeder: [
@@ -611,6 +659,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
+        ),
+        PetLibroBinarySensorEntityDescription[DockstreamSmartFountain](
+            key="weight_calibration_error",
+            translation_key="weight_calibration_error",
+            icon="mdi:alert",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.weight_calibration_error is not None,
+            name="Weight Calibration Error"
         ),
     ],
     DockstreamSmartRFIDFountain: [

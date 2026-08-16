@@ -58,7 +58,7 @@ async def async_setup_entry(
 
     # Ensure that the pets are loaded
     if not (pets := hub.pets):
-        _LOGGER.warning("No pets found in hub during image setup.")
+        _LOGGER.debug("No pets found in hub during image setup.")
 
     if not (pets): # or devices
         return
