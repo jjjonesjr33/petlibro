@@ -1521,7 +1521,7 @@ async def async_setup_entry(
         _LOGGER.warning("No devices found in hub during sensor setup.")
 
     if not (pets := hub.pets):
-        _LOGGER.warning("No pets found in hub during sensor setup.")
+        _LOGGER.debug("No pets found in hub during sensor setup.")
 
     if not (devices or member or pets):
         return
