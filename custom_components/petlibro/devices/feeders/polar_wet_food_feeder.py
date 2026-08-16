@@ -1,6 +1,5 @@
 import aiohttp
 
-from ...api import make_api_call
 from aiohttp import ClientSession, ClientError
 import asyncio
 from datetime import datetime
@@ -34,6 +33,8 @@ class PolarWetFoodFeeder(Device):
                 "wetFeedingPlan": wet_feeding_plan or {},
                 "getfeedingplantoday": get_feeding_plan_today or {}
             })
+            if self.manual_feed_id is not None:
+                self._manual_feed_active = True
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for PolarWetFoodFeeder: {err}")
 
@@ -74,8 +75,13 @@ class PolarWetFoodFeeder(Device):
 
     @property
     def feeding_plan_state(self) -> bool:
-        """Return the state of the feeding plan."""
-        return bool(self._data.get("enableFeedingPlan", False))
+        """Return the state of the feeding plan from wetFeedingPlan data."""
+        wet_plan = self._data.get("wetFeedingPlan", {})
+        # API does not provide an explicit enabled flag for wet plans; non-empty plan = enabled
+        if not wet_plan or not wet_plan.get("templateName"):
+            return False
+        plan_entries = wet_plan.get("plan", [])
+        return bool(plan_entries)
 
     @property
     def food_low(self) -> bool:
@@ -117,6 +123,10 @@ class PolarWetFoodFeeder(Device):
         except ValueError:
             return "Invalid time"
         
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._manual_feed_active = False
+
     @property
     def manual_feed_id(self) -> int:
         """Returns the manual feed ID."""
@@ -125,7 +135,7 @@ class PolarWetFoodFeeder(Device):
     @property
     def manual_feed_now(self) -> bool:
         """Returns whether the feeder is set to feed now or not."""
-        return self.manual_feed_id is not None
+        return self._manual_feed_active
 
     @property
     def online(self) -> bool:
@@ -187,9 +197,13 @@ class PolarWetFoodFeeder(Device):
                 await self.api.set_manual_feed_now(self.serial, plate)
             else:
                 _LOGGER.debug(f"Triggering stop feed now for {self.serial}")
-                await self.api.set_stop_feed_now(self.serial, self.manual_feed_id)
+                if self.manual_feed_id is None:
+                    _LOGGER.warning("No manual feed ID available to stop for %s", self.serial)
+                else:
+                    await self.api.set_stop_feed_now(self.serial, self.manual_feed_id)
             
-            await self.refresh()  # Refresh the state after the action
+            self._manual_feed_active = start
+            await self.refresh()
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger manual feed now for {self.serial} with plate no.{plate}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feed now: {err}")

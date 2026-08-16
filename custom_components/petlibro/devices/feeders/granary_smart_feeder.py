@@ -16,9 +16,11 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         """Initialize the feeder with default values."""
         super().__init__(*args, **kwargs)
         self._manual_feed_quantity = None  # Default to None initially
+        self._cached_get_next_feed = None
 
     async def refresh(self):
         """Refresh the device data from the API."""
+        self._cached_get_next_feed = None
         try:
             await super().refresh()  # Call the refresh method from Device
 
@@ -85,8 +87,33 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
         return not bool(self._data.get("realInfo", {}).get("grainOutletState", True))
 
     @property
+    def bowl_mode(self) -> str:
+        return self._data.get("realInfo", {}).get("bowlMode", "SINGLE_BOWL")
+
+    @property
     def food_low(self) -> bool:
-        return not bool(self._data.get("realInfo", {}).get("surplusGrain", True))
+        surplus = self._data.get("realInfo", {}).get("surplusGrain")
+        if surplus is not None:
+            return not bool(surplus)
+        left = self._data.get("realInfo", {}).get("leftWarehouseSurplusGrain")
+        right = self._data.get("realInfo", {}).get("rightWarehouseSurplusGrain")
+        if left is not None and right is not None:
+            return not bool(left) or not bool(right)
+        return True
+
+    @property
+    def left_food_low(self) -> bool | None:
+        value = self._data.get("realInfo", {}).get("leftWarehouseSurplusGrain")
+        if value is None:
+            return None
+        return not bool(value)
+
+    @property
+    def right_food_low(self) -> bool | None:
+        value = self._data.get("realInfo", {}).get("rightWarehouseSurplusGrain")
+        if value is None:
+            return None
+        return not bool(value)
 
     @property
     def unit_type(self) -> int:
@@ -260,6 +287,8 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
                 "utc_time": datetime,
             }
         """
+        if self._cached_get_next_feed is not None:
+            return self._cached_get_next_feed
         now_utc = dt_util.now(dt_util.UTC)
         next_feed = {}
         
@@ -298,6 +327,7 @@ class GranarySmartFeeder(Device):  # Inherit directly from Device
                         "id": feed["id"],
                         "utc_time": candidate_dt_utc,
                     }
+        self._cached_get_next_feed = next_feed
         return next_feed
 
     @property

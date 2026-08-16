@@ -8,6 +8,7 @@ from logging import getLogger
 from pathlib import Path
 import sys
 from typing import Any
+from urllib.parse import urlparse
 
 from homeassistant.util.dt import utcnow
 from homeassistant.const import (
@@ -465,9 +466,20 @@ class PL_PetImageEntity(PL_PetEntity, ImageEntity):
         image_bytes = None
         try:
             if url:
-                async with self.api.session.websession.get(url) as resp:
-                    if resp.status == 200:
-                        image_bytes = await resp.read()
+                try:
+                    parsed = urlparse(url)
+                    host = parsed.hostname or ""
+                    allowed = parsed.scheme == "https" and (
+                        host == "petlibro.com" or host.endswith(".petlibro.com")
+                    )
+                except Exception:
+                    allowed = False
+                if not allowed:
+                    _LOGGER.warning("Avatar URL blocked (not a trusted petlibro.com HTTPS URL): %s", url)
+                else:
+                    async with self.api.session.websession.get(url) as resp:
+                        if resp.status == 200:
+                            image_bytes = await resp.read()
             if not image_bytes:
                 path = (
                     Path(self.hass.config.config_dir)

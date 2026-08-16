@@ -1,12 +1,10 @@
 import aiohttp
 
-from ...api import make_api_call
 from aiohttp import ClientSession, ClientError
 from ...exceptions import PetLibroAPIError
 from ..device import Device
 from typing import cast
 from logging import getLogger
-
 _LOGGER = getLogger(__name__)
 
 class DockstreamSmartFountain(Device):
@@ -356,3 +354,19 @@ class DockstreamSmartFountain(Device):
 
         progress = upgrade_data.get("progress")
         return float(progress) if progress is not None else 0.0
+
+    @property
+    def weight_calibration_error(self) -> bool | None:
+        exception = self._data.get("dataRealInfo", {}).get("exceptionMessage")
+        if exception is None:
+            return None
+        return "calibration" in exception.lower() or "weight" in exception.lower()
+
+    async def calibrate_weight(self) -> None:
+        _LOGGER.debug(f"Calibrating weight sensor for {self.serial}")
+        try:
+            await self.api.exec_device_command(self.serial, "CALIBRATE")
+            await self.refresh()
+        except (aiohttp.ClientError, PetLibroAPIError) as err:
+            _LOGGER.error(f"Failed to calibrate weight sensor for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error calibrating weight sensor: {err}")
