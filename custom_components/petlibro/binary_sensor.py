@@ -461,6 +461,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
         ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="rotor_stuck",
+            translation_key="rotor_stuck",
+            icon="mdi:alert",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.rotor_stuck is not None,
+            name="Rotor Status"
+        ),
     ],
     PolarWetFoodFeeder: [
         PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
