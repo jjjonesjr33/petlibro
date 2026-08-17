@@ -245,6 +245,18 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                     unit.symbol: VolumeConverter.convert(getattr(self.device, key, 0), UnitOfVolume.MILLILITERS, unit.symbol)
                     for unit in VALID_UNIT_TYPES[API.WATER_UNIT] if unit
                 }
+        if isinstance(self.device, GranarySmartCameraFeeder):
+            camera_attributes = {
+                "camera_id": self.device.camera_id,
+                "camera_auth_info": self.device.camera_auth_info,
+                "tutk_user_token": self.device.tutk_user_token,
+                "tutk_app_url": self.device.tutk_app_url,
+                "enable_camera": self.device.enable_camera,
+                "camera_switch": self.device.camera_switch,
+                "motion_detection_switch": self.device.motion_detection_switch,
+                "sound_detection_switch": self.device.sound_detection_switch,
+            }
+            return {**super().extra_state_attributes, **camera_attributes}
         return super().extra_state_attributes
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {

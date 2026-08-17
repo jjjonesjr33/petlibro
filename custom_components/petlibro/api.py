@@ -528,6 +528,14 @@ class PetLibroAPI:
     async def device_events(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/data/event/deviceEventsV2", serial)
 
+    async def tutk_info(self, serial: str) -> Dict[str, Any]:
+        """Fetch the TUTK/Kalay session info (userToken + appTutkUrl) for a camera device.
+
+        The endpoint returns the same credentials to primary and shared accounts;
+        see issue #267. Uses an empty payload.
+        """
+        return await self.session.post("/member/third/tutk/info", json={})
+
     async def device_upgrade(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/ota/getUpgrade", serial)
 
