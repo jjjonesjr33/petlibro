@@ -32,7 +32,11 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
             feeding_plan_list = (await self.api.device_feeding_plan_list(self.serial)
                 if self._data.get("enableFeedingPlan") else [])
             get_device_events = await self.api.device_events(self.serial)
-            get_tutk_info = await self.api.tutk_info(self.serial)
+            try:
+                get_tutk_info = await self.api.tutk_info()
+            except PetLibroAPIError as err:
+                _LOGGER.warning(f"Error fetching TUTK info for GranarySmartCameraFeeder: {err}")
+                get_tutk_info = {}
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
@@ -239,7 +243,8 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
     @property
     def camera_auth_info(self) -> str:
         """Return the camera TUTK auth info from realInfo."""
-        return cast(str, self._data.get("realInfo", {}).get("cameraAuthInfo", "") or "")
+        value = self._data.get("realInfo", {}).get("cameraAuthInfo")
+        return value if isinstance(value, str) else ""
 
     @property
     def tutk_user_token(self) -> str:
