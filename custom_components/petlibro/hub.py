@@ -242,6 +242,14 @@ class PetLibroHub:
             _LOGGER.debug("No devices loaded yet, attempting to load devices again.")
             await self.load_devices()
 
+            if self.devices:
+                _LOGGER.debug(
+                    "Device reload successful, %d device(s) loaded.",
+                    len(self.devices),
+                )
+            else:
+                _LOGGER.debug("Device reload completed, but no devices were found.")
+
         if not self.devices and not self.member and not self.pets:
             _LOGGER.error("No devices, member, or pets to refresh.")
             return False
