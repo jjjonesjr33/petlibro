@@ -510,6 +510,12 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_light_off(),
             name="Turn Off Indicator"
         ),
+        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+            key="cleaning_reset",
+            translation_key="cleaning_reset",
+            set_fn=lambda device: device.set_cleaning_reset(),
+            name="Cleaning Reset"
+        ),
     ],
     SpaceSmartFeeder: [
         PetLibroButtonEntityDescription[SpaceSmartFeeder](
