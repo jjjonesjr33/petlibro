@@ -832,6 +832,29 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Plate Position",
             should_report=lambda device: device.plate_position is not None,
         ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="remaining_cleaning_days",
+            translation_key="remaining_cleaning_days",
+            icon="mdi:package",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Remaining Cleaning Days"
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="last_clean_date",
+            translation_key="last_clean_date",
+            icon="mdi:calendar-check",
+            name="Last Clean Date",
+            device_class=SensorDeviceClass.TIMESTAMP,
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="next_clean_date",
+            translation_key="next_clean_date",
+            icon="mdi:calendar-clock",
+            name="Next Clean Date",
+            device_class=SensorDeviceClass.TIMESTAMP,
+        ),
     ],
     SpaceSmartFeeder: [
         PetLibroSensorEntityDescription[SpaceSmartFeeder](
