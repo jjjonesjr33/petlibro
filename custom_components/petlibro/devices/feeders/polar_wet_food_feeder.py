@@ -177,7 +177,7 @@ class PolarWetFoodFeeder(Device):
             return None
         try:
             return dt_util.utc_from_timestamp(timestamp_ms / 1000)
-        except (TypeError, ValueError, OSError):
+        except (TypeError, ValueError, OverflowError, OSError):
             return None
 
     @property
@@ -188,7 +188,7 @@ class PolarWetFoodFeeder(Device):
             return None
         try:
             return dt_util.utc_from_timestamp(timestamp_ms / 1000)
-        except (TypeError, ValueError, OSError):
+        except (TypeError, ValueError, OverflowError, OSError):
             return None
 
     async def set_cleaning_reset(self) -> None:
