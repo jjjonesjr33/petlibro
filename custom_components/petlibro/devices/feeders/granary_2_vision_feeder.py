@@ -107,15 +107,13 @@ class Granary2VisionFeeder(GranarySmartCameraFeeder):
         return float(value) if isinstance(value, (int, float)) else None
 
     @property
-    def camera_id(self) -> str | None:
-        """Return the Kalay/TUTK camera UID, if this device has camera entitlement."""
-        return self._data.get("tutkInfo", {}).get("cameraId")
-
-    @property
     def camera_auth_info(self) -> str | None:
-        """Return the Kalay/TUTK camera auth info string."""
-        value = self._data.get("tutkInfo", {}).get("cameraAuthInfo")
-        return value if value is not None else self._data.get("realInfo", {}).get("cameraAuthInfo")
+        """Return the Kalay/TUTK per-device camera auth info string.
+
+        Not returned by /member/third/tutk/info (that endpoint only returns
+        the account-level userToken/appTutkUrl) - this comes from realInfo.
+        """
+        return self._data.get("realInfo", {}).get("cameraAuthInfo")
 
     @property
     def tutk_user_token(self) -> str | None:
@@ -125,7 +123,7 @@ class Granary2VisionFeeder(GranarySmartCameraFeeder):
     @property
     def tutk_app_url(self) -> str | None:
         """Return the Kalay/TUTK app URL/endpoint for this account."""
-        return self._data.get("tutkInfo", {}).get("appUrl")
+        return self._data.get("tutkInfo", {}).get("appTutkUrl")
 
     async def set_free_feeding_mode(self) -> None:
         """Enable Free Feeding (Smart Feed) mode."""

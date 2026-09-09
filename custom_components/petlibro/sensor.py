@@ -250,12 +250,11 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                 # Kalay/TUTK camera credential layer (Granary2VisionFeeder only).
                 # Not a video stream itself - an external TUTK-compatible bridge
                 # would use these to establish its own P2P session.
-                camera_id = getattr(self.device, "camera_id", None)
-                if camera_id is None:
+                camera_auth_info = getattr(self.device, "camera_auth_info", None)
+                if camera_auth_info is None:
                     return super().extra_state_attributes
                 return {
-                    "camera_id": camera_id,
-                    "camera_auth_info": getattr(self.device, "camera_auth_info", None),
+                    "camera_auth_info": camera_auth_info,
                     "tutk_user_token": getattr(self.device, "tutk_user_token", None),
                     "tutk_app_url": getattr(self.device, "tutk_app_url", None),
                 }
