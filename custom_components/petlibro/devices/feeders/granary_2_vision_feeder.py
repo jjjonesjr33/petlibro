@@ -10,9 +10,8 @@ _LOGGER = getLogger(__name__)
 class Granary2VisionFeeder(GranarySmartCameraFeeder):
     """Represents the Granary 2 Vision feeder.
 
-    Temporary subclass of GranarySmartCameraFeeder so the device loads and
-    reuses its entities while we confirm real API field names against a
-    live Granary 2 Vision unit. Split into a standalone class once verified.
+    Subclass of GranarySmartCameraFeeder so the device loads and
+    reuses its entities. Can be split into a standalone class if desired.
     """
 
     async def refresh(self):
