@@ -646,14 +646,35 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             should_report=lambda device: device.radar_sensing_level is not None
         ),
         PetLibroSensorEntityDescription[Granary2VisionFeeder](
-            key="smart_refill_max_weight",
-            translation_key="smart_refill_max_weight",
+            key="free_feeding_per_grain",
+            translation_key="free_feeding_per_grain",
+            icon="mdi:counter",
+            name="Free Feeding Per-Feed Amount",
+            should_report=lambda device: device.free_feeding_per_grain is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="free_feeding_daily_max",
+            translation_key="free_feeding_daily_max",
+            icon="mdi:counter",
+            name="Free Feeding Daily Max Count",
+            should_report=lambda device: device.free_feeding_daily_max is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="free_feeding_leftover_weight",
+            translation_key="free_feeding_leftover_weight",
             icon="mdi:scale",
-            name="Smart Refill Max Amount",
-            native_unit_of_measurement="g",
-            device_class=SensorDeviceClass.WEIGHT,
+            name="Free Feeding Leftover Threshold",
+            should_report=lambda device: device.free_feeding_leftover_weight is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="free_feeding_wait_seconds",
+            translation_key="free_feeding_wait_seconds",
+            icon="mdi:timer-outline",
+            name="Free Feeding Wait Time",
+            native_unit_of_measurement="s",
+            device_class=SensorDeviceClass.DURATION,
             state_class=SensorStateClass.MEASUREMENT,
-            should_report=lambda device: device.smart_refill_enabled is not None
+            should_report=lambda device: device.free_feeding_wait_seconds is not None
         ),
     ],
     OneRFIDSmartFeeder: [

@@ -437,13 +437,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.talk_channel_active is not None,
             name="Two-Way Talk Active"
         ),
-        PetLibroBinarySensorEntityDescription[Granary2VisionFeeder](
-            key="smart_refill_enabled",
-            translation_key="smart_refill_enabled",
-            icon="mdi:autorenew",
-            should_report=lambda device: device.smart_refill_enabled is not None,
-            name="Smart Refill Enabled"
-        ),
     ],
     OneRFIDSmartFeeder: [
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
