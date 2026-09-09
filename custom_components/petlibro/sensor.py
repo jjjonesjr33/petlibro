@@ -20,6 +20,7 @@ from .devices.feeders.feeder import Feeder
 from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
+from .devices.feeders.granary_2_vision_feeder import Granary2VisionFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
@@ -635,6 +636,25 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Video Recording Mode",
             should_report=lambda device: device.video_record_mode is not None
         )
+    ],
+    Granary2VisionFeeder: [
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="radar_sensing_level",
+            translation_key="radar_sensing_level",
+            icon="mdi:radar",
+            name="Radar Sensing Level",
+            should_report=lambda device: device.radar_sensing_level is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="smart_refill_max_weight",
+            translation_key="smart_refill_max_weight",
+            icon="mdi:scale",
+            name="Smart Refill Max Amount",
+            native_unit_of_measurement="g",
+            device_class=SensorDeviceClass.WEIGHT,
+            state_class=SensorStateClass.MEASUREMENT,
+            should_report=lambda device: device.smart_refill_enabled is not None
+        ),
     ],
     OneRFIDSmartFeeder: [
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
