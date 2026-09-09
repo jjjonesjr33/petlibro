@@ -36,6 +36,14 @@ class Granary2VisionFeeder(GranarySmartCameraFeeder):
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing TUTK camera info for Granary2VisionFeeder: {err}")
 
+        try:
+            data_real_info = await self.api.device_data_real_info(self.serial)
+            self.update_data({
+                "dataRealInfo": data_real_info or {},
+            })
+        except PetLibroAPIError as err:
+            _LOGGER.error(f"Error refreshing data real info for Granary2VisionFeeder: {err}")
+
     @property
     def night_vision(self) -> str:
         """Return the current night vision mode.
@@ -105,6 +113,11 @@ class Granary2VisionFeeder(GranarySmartCameraFeeder):
         """Return the wait time (seconds) Free Feeding uses between checks."""
         value = self._data.get("freeFeedingSetting", {}).get("freeWaitSeconds")
         return float(value) if isinstance(value, (int, float)) else None
+
+    @property
+    def feeding_mode(self) -> str | None:
+        """Return the device's current feeding mode: 'FREE' (Smart Feed) or 'PLAN' (schedule-based)."""
+        return self._data.get("dataRealInfo", {}).get("feedingMode")
 
     @property
     def camera_auth_info(self) -> str | None:

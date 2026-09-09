@@ -162,11 +162,13 @@ model - they only appear in `getAttributeSetting`'s response (see below), unlike
 
 ### POST /data/data/realInfo
 
-Extended real-time info (fountains, litter boxes).
+Extended real-time info (fountains, litter boxes; also used by Granary 2 Vision for
+`feedingMode`, which is not present on `/device/device/realInfo`).
 
 **Response includes all realInfo fields plus:**
 | Field | Type | Description |
 |---|---|---|
+| `feedingMode` | string | Current feeding mode (Granary 2 Vision): `"FREE"` (Smart Feed) or `"PLAN"` (schedule-based) |
 | `exceptionMessage` | string | Error message (e.g. `"Rotor stuck"`, `"Calibration error"`) |
 | `waterStopSwitch` | bool | Fountain water mode |
 | `lowWater` | int | Low water threshold (mL) |
@@ -357,9 +359,8 @@ Switch the device's active feeding mode. Confirmed via a live network capture of
 | `FREE` | Free Feeding / Smart Feed - device dispenses automatically based on the Free Feeding settings above |
 | `PLAN` | Schedule-based feeding - the device follows `/device/feedingPlan/list` entries |
 
-There is currently no known GET endpoint that reads back the *current* mode; it must be
-tracked from the last value written, or inferred (e.g. an empty `feedingPlan/list` combined
-with automatic `GRAIN_OUTPUT_SUCCESS` work records tagged `"mode":"{AUTO_MODE}"` suggests `FREE`).
+The current mode is read back via `feedingMode` on `POST /data/data/realInfo` (see below) -
+not on `POST /device/device/realInfo`, which doesn't carry this field.
 
 ## Water / Fountain Endpoints
 

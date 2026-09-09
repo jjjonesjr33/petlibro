@@ -651,6 +651,13 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     ],
     Granary2VisionFeeder: [
         PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="feeding_mode",
+            translation_key="feeding_mode",
+            icon="mdi:swap-horizontal",
+            name="Feeding Mode",
+            should_report=lambda device: device.feeding_mode is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
             key="radar_sensing_level",
             translation_key="radar_sensing_level",
             icon="mdi:radar",
