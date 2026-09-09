@@ -71,6 +71,7 @@ List all devices on the account.
 - `"Air Smart Feeder"` → `AirSmartFeeder`
 - `"Granary Smart Feeder"` → `GranarySmartFeeder`
 - `"Granary Smart Camera Feeder"` → `GranarySmartCameraFeeder`
+- `"Granary 2 Vision"` → `Granary2VisionFeeder` (PLAF205)
 - `"One RFID Smart Feeder"` → `OneRFIDSmartFeeder`
 - `"Polar Wet Food Feeder"` → `PolarWetFoodFeeder`
 - `"Dockstream Smart Fountain"` → `DockstreamSmartFountain`
@@ -142,13 +143,32 @@ Real-time device state.
 | `powerType` | int | Power type (2=battery, 3=AC) |
 | `powerState` | string | `"USING"`, `"CHARGING"`, `"CHARGED"` |
 
+**Additional fields seen on Granary 2 Vision (PLAF205):**
+| Field | Type | Description |
+|---|---|---|
+| `bowlMode` | string | `"SINGLE_BOWL"` or dual-tray mode |
+| `leftWarehouseSurplusGrain` | bool | Left grain warehouse has food (dual-tray) |
+| `rightWarehouseSurplusGrain` | bool | Right grain warehouse has food (dual-tray) |
+| `warehouseSurplusGrain` | string | Combined warehouse status, e.g. `"GOOD"` |
+| `cameraAuthInfo` | string | Kalay/TUTK per-device camera auth string |
+| `enableHumanDetection` | bool | AI human detection enabled |
+| `radarSensingLevel` | string | Radar sensing/trigger level, e.g. `"NearTrigger"` |
+| `talkChannelState` | bool | Whether a 2-way talk session is active |
+| `detThreshold` / `reidThreshold` | float | AI detection / re-identification confidence thresholds |
+
+Note: `nightVisionMode` and `petDetectionSwitch` are **not** present on `realInfo` for this
+model - they only appear in `getAttributeSetting`'s response (see below), unlike
+`nightVision`/`enableVideoRecord` on the older Granary Smart Camera Feeder.
+
 ### POST /data/data/realInfo
 
-Extended real-time info (fountains, litter boxes).
+Extended real-time info (fountains, litter boxes; also used by Granary 2 Vision for
+`feedingMode`, which is not present on `/device/device/realInfo`).
 
 **Response includes all realInfo fields plus:**
 | Field | Type | Description |
 |---|---|---|
+| `feedingMode` | string | Current feeding mode (Granary 2 Vision): `"FREE"` (Smart Feed) or `"PLAN"` (schedule-based) |
 | `exceptionMessage` | string | Error message (e.g. `"Rotor stuck"`, `"Calibration error"`) |
 | `waterStopSwitch` | bool | Fountain water mode |
 | `lowWater` | int | Low water threshold (mL) |
@@ -182,6 +202,13 @@ Device attribute settings.
 | `cleanMode` | string | `"AUTO"` or `"MANUAL"` |
 | `autoDelaySec` | int | Auto-clean delay |
 | `enableSleepMode` | bool | Sleep mode config |
+
+**Additional fields seen on Granary 2 Vision (PLAF205):**
+| Field | Type | Description |
+|---|---|---|
+| `nightVisionMode` | string | Active night vision mode, e.g. `"AUTO_BLACK_WHITE"` (authoritative source - `realInfo.nightVision` is always null on this model) |
+| `autoStopFeedSwitch` | bool | Unconfirmed - looked like a Smart Feed toggle but did not change when Smart Feed was toggled in the app. Real Smart Feed state lives in the feeding mode (see below), not here. |
+| `autoFeedMaxWeight` | int | Unconfirmed - unrelated to Free Feeding's `freeDailyMaxNum` (see below); meaning not yet verified. |
 
 ### POST /device/ota/getUpgrade
 
@@ -293,6 +320,47 @@ Stop manual feeding. Closes the lid.
 Rotate food bowl to next plate.
 
 **Request:** `{"deviceSn": "<sn>"}`
+
+### POST /device/device/getFreeFeedingSetting (Granary 2 Vision)
+
+Free Feeding ("Smart Feed" in the app) settings.
+
+**Request:** `{"id": "<deviceSn>", "deviceSn": "<deviceSn>"}`
+
+**Response:**
+```json
+{
+  "freePerGrainNum": 1,
+  "freeDailyMaxNum": 13,
+  "freeLeftoverWeight": 3,
+  "freeWaitSeconds": 3
+}
+```
+
+Values are per-device config (e.g. `freeDailyMaxNum` differed between two units on the same
+account: 13 vs 10). This endpoint returns settings regardless of which feeding mode is
+currently active - it is not itself a signal of whether Free Feeding is enabled.
+
+### POST /device/device/updateFeedingMode (Granary 2 Vision)
+
+Switch the device's active feeding mode. Confirmed via a live network capture of the app.
+
+**Request:**
+```json
+{
+  "deviceSn": "<sn>",
+  "mode": "FREE"
+}
+```
+
+**Known `mode` values:**
+| Value | Meaning |
+|---|---|
+| `FREE` | Free Feeding / Smart Feed - device dispenses automatically based on the Free Feeding settings above |
+| `PLAN` | Schedule-based feeding - the device follows `/device/feedingPlan/list` entries |
+
+The current mode is read back via `feedingMode` on `POST /data/data/realInfo` (see below) -
+not on `POST /device/device/realInfo`, which doesn't carry this field.
 
 ## Water / Fountain Endpoints
 
@@ -515,6 +583,27 @@ All endpoints below take a JSON body with `"deviceSn": "<serial>"` plus paramete
 
 ### POST /device/device/vacuum
 **Body:** `{"deviceSn": "<sn>", "vacuumMode": "auto", "requestId": "<uuid>"}`
+
+## Camera Credential Endpoints
+
+### POST /member/third/tutk/info
+
+Kalay/TUTK P2P camera credentials, account-scoped (not per-device despite taking a serial
+in the request). This is a credential layer only - it does not provide a video stream by
+itself. An external Kalay/TUTK-compatible client would need these plus the per-device
+`cameraAuthInfo` from `realInfo` to establish its own P2P session. See PetLibro/petlibro#269
+(upstream, unmerged as of this writing) for prior art exposing these attributes without
+attempting to build a full camera platform.
+
+**Request:** `{"id": "<deviceSn>", "deviceSn": "<deviceSn>"}`
+
+**Response:**
+```json
+{
+  "userToken": "RsOpmYHrliyPvA6p2BOa",
+  "appTutkUrl": "https://us-vsaasapi-tutk.kalayservice.com/vsaas/api/v1/be/"
+}
+```
 
 ## Member / Account Endpoints
 

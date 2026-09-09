@@ -543,6 +543,25 @@ class PetLibroAPI:
     async def device_wet_feeding_plan(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/wetFeedingPlan/wetListV3", serial)
 
+    async def device_get_free_feeding_setting(self, serial: str) -> Dict[str, Any]:
+        """Get Free Feeding (Smart Feed) mode settings: per-feed amount, daily max, leftover threshold, wait time."""
+        return await self.session.post_serial("/device/device/getFreeFeedingSetting", serial)
+
+    async def set_feeding_mode(self, serial: str, mode: str) -> None:
+        """Set the device's feeding mode (e.g. 'FREE' for Free/Smart Feeding)."""
+        await self.session.post("/device/device/updateFeedingMode", json={
+            "deviceSn": serial,
+            "mode": mode
+        })
+
+    async def device_tutk_info(self, serial: str) -> Dict[str, Any]:
+        """Get Kalay/TUTK P2P camera credentials (UID, auth token, app URL) for a camera-equipped device.
+
+        This is the credential layer only - it does not itself provide a video stream.
+        An external TUTK-compatible client/bridge is needed to actually pull video.
+        """
+        return await self.session.post_serial("/member/third/tutk/info", serial)
+
     async def device_get_bound_pets(self, device_sn: str) -> list[dict]:
         """Get pets bound to a device."""
         _LOGGER.debug("Requesting pets bound to device sn: %s", device_sn)

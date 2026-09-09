@@ -28,6 +28,7 @@ from .devices.feeders.feeder import Feeder
 from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
+from .devices.feeders.granary_2_vision_feeder import Granary2VisionFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
@@ -396,6 +397,45 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             device_class=BinarySensorDeviceClass.SOUND,
             should_report=lambda device: device.sound_detected is not None,
             name="Sound Detected"
+        ),
+    ],
+    Granary2VisionFeeder: [
+        PetLibroBinarySensorEntityDescription[Granary2VisionFeeder](
+            key="left_food_low",
+            translation_key="left_food_low",
+            icon="mdi:bowl-mix-outline",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.left_food_low is not None,
+            name="Left Food Status"
+        ),
+        PetLibroBinarySensorEntityDescription[Granary2VisionFeeder](
+            key="right_food_low",
+            translation_key="right_food_low",
+            icon="mdi:bowl-mix-outline",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.right_food_low is not None,
+            name="Right Food Status"
+        ),
+        PetLibroBinarySensorEntityDescription[Granary2VisionFeeder](
+            key="pet_detection_enabled",
+            translation_key="pet_detection_enabled",
+            icon="mdi:paw",
+            should_report=lambda device: device.pet_detection_enabled is not None,
+            name="AI Pet Detection"
+        ),
+        PetLibroBinarySensorEntityDescription[Granary2VisionFeeder](
+            key="human_detection_enabled",
+            translation_key="human_detection_enabled",
+            icon="mdi:human",
+            should_report=lambda device: device.human_detection_enabled is not None,
+            name="Human Detection"
+        ),
+        PetLibroBinarySensorEntityDescription[Granary2VisionFeeder](
+            key="talk_channel_active",
+            translation_key="talk_channel_active",
+            icon="mdi:phone-in-talk",
+            should_report=lambda device: device.talk_channel_active is not None,
+            name="Two-Way Talk Active"
         ),
     ],
     OneRFIDSmartFeeder: [

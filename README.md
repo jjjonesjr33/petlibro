@@ -36,6 +36,7 @@ If you enjoy this integration and want to support its development, please consid
 * Air Smart Feeder (PLAF108)
 * Polar Wet Food Feeder (PLAF109)
 * Granary Smart Camera Feeder (PLAF203)
+* Granary 2 Vision (PLAF205)
 * One RFID Smart Feeder (PLAF301)
 
 ### Fountains
@@ -66,7 +67,7 @@ If you enjoy this integration and want to support its development, please consid
 #### This is still a WIP integration, features may or may not be removed at any time. If you have suggestions please let me know.
 > [!NOTE]
   >* Tracking RFID per pet intance eat/drink - (PLWF305) - API Information gathered, working on implementation.
-  >* Live camera feed for Granary Smart Camera Feeder (PLAF203) - Currently missing the API to setup live stream. Seems to connect via Kalay TUTK, if you have any experience integrating with this platform, please reach out to help us implement this.
+  >* Live camera feed for Granary Smart Camera Feeder (PLAF203) and Granary 2 Vision (PLAF205) - Currently missing the API to setup live stream. Seems to connect via Kalay TUTK, if you have any experience integrating with this platform, please reach out to help us implement this. The Kalay/TUTK credential layer (userToken, appTutkUrl, cameraAuthInfo) is now exposed as attributes on the Wi-Fi SSID sensor for Granary 2 Vision for anyone wanting to build an external bridge.
 
 # NOTICE
 #### Alpha/Beta state notice for this plugin:

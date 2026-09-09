@@ -20,6 +20,7 @@ from .devices.feeders.feeder import Feeder
 from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
+from .devices.feeders.granary_2_vision_feeder import Granary2VisionFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
@@ -236,14 +237,26 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                     for unit in (Unit.CUPS, Unit.MILLILITERS)
                 }
             case key if key in (
-                "remaining_water", 
-                "today_drinking_amount", 
+                "remaining_water",
+                "today_drinking_amount",
                 "yesterday_drinking_amount"
             ):
                 key = "weight" if key == "remaining_water" else key
-                return { 
+                return {
                     unit.symbol: VolumeConverter.convert(getattr(self.device, key, 0), UnitOfVolume.MILLILITERS, unit.symbol)
                     for unit in VALID_UNIT_TYPES[API.WATER_UNIT] if unit
+                }
+            case "wifi_ssid":
+                # Kalay/TUTK camera credential layer (Granary2VisionFeeder only).
+                # Not a video stream itself - an external TUTK-compatible bridge
+                # would use these to establish its own P2P session.
+                camera_auth_info = getattr(self.device, "camera_auth_info", None)
+                if camera_auth_info is None:
+                    return super().extra_state_attributes
+                return {
+                    "camera_auth_info": camera_auth_info,
+                    "tutk_user_token": getattr(self.device, "tutk_user_token", None),
+                    "tutk_app_url": getattr(self.device, "tutk_app_url", None),
                 }
         return super().extra_state_attributes
 
@@ -635,6 +648,53 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Video Recording Mode",
             should_report=lambda device: device.video_record_mode is not None
         )
+    ],
+    Granary2VisionFeeder: [
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="feeding_mode",
+            translation_key="feeding_mode",
+            icon="mdi:swap-horizontal",
+            name="Feeding Mode",
+            should_report=lambda device: device.feeding_mode is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="radar_sensing_level",
+            translation_key="radar_sensing_level",
+            icon="mdi:radar",
+            name="Radar Sensing Level",
+            should_report=lambda device: device.radar_sensing_level is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="free_feeding_per_grain",
+            translation_key="free_feeding_per_grain",
+            icon="mdi:counter",
+            name="Free Feeding Per-Feed Amount",
+            should_report=lambda device: device.free_feeding_per_grain is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="free_feeding_daily_max",
+            translation_key="free_feeding_daily_max",
+            icon="mdi:counter",
+            name="Free Feeding Daily Max Count",
+            should_report=lambda device: device.free_feeding_daily_max is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="free_feeding_leftover_weight",
+            translation_key="free_feeding_leftover_weight",
+            icon="mdi:scale",
+            name="Free Feeding Leftover Threshold",
+            should_report=lambda device: device.free_feeding_leftover_weight is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2VisionFeeder](
+            key="free_feeding_wait_seconds",
+            translation_key="free_feeding_wait_seconds",
+            icon="mdi:timer-outline",
+            name="Free Feeding Wait Time",
+            native_unit_of_measurement="s",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
+            should_report=lambda device: device.free_feeding_wait_seconds is not None
+        ),
     ],
     OneRFIDSmartFeeder: [
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
