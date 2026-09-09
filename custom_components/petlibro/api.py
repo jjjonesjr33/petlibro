@@ -554,6 +554,14 @@ class PetLibroAPI:
             "mode": mode
         })
 
+    async def device_tutk_info(self, serial: str) -> Dict[str, Any]:
+        """Get Kalay/TUTK P2P camera credentials (UID, auth token, app URL) for a camera-equipped device.
+
+        This is the credential layer only - it does not itself provide a video stream.
+        An external TUTK-compatible client/bridge is needed to actually pull video.
+        """
+        return await self.session.post_serial("/member/third/tutk/info", serial)
+
     async def device_get_bound_pets(self, device_sn: str) -> list[dict]:
         """Get pets bound to a device."""
         _LOGGER.debug("Requesting pets bound to device sn: %s", device_sn)

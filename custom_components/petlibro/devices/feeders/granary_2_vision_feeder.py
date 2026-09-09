@@ -26,6 +26,16 @@ class Granary2VisionFeeder(GranarySmartCameraFeeder):
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing free feeding setting for Granary2VisionFeeder: {err}")
 
+        # Isolated in its own error handler: TUTK credential retrieval failing
+        # (e.g. no camera entitlement) shouldn't disrupt the rest of the refresh.
+        try:
+            tutk_info = await self.api.device_tutk_info(self.serial)
+            self.update_data({
+                "tutkInfo": tutk_info or {},
+            })
+        except PetLibroAPIError as err:
+            _LOGGER.error(f"Error refreshing TUTK camera info for Granary2VisionFeeder: {err}")
+
     @property
     def night_vision(self) -> str:
         """Return the current night vision mode.
@@ -95,6 +105,27 @@ class Granary2VisionFeeder(GranarySmartCameraFeeder):
         """Return the wait time (seconds) Free Feeding uses between checks."""
         value = self._data.get("freeFeedingSetting", {}).get("freeWaitSeconds")
         return float(value) if isinstance(value, (int, float)) else None
+
+    @property
+    def camera_id(self) -> str | None:
+        """Return the Kalay/TUTK camera UID, if this device has camera entitlement."""
+        return self._data.get("tutkInfo", {}).get("cameraId")
+
+    @property
+    def camera_auth_info(self) -> str | None:
+        """Return the Kalay/TUTK camera auth info string."""
+        value = self._data.get("tutkInfo", {}).get("cameraAuthInfo")
+        return value if value is not None else self._data.get("realInfo", {}).get("cameraAuthInfo")
+
+    @property
+    def tutk_user_token(self) -> str | None:
+        """Return the Kalay/TUTK user token used to establish a P2P session."""
+        return self._data.get("tutkInfo", {}).get("userToken")
+
+    @property
+    def tutk_app_url(self) -> str | None:
+        """Return the Kalay/TUTK app URL/endpoint for this account."""
+        return self._data.get("tutkInfo", {}).get("appUrl")
 
     async def set_free_feeding_mode(self) -> None:
         """Enable Free Feeding (Smart Feed) mode."""

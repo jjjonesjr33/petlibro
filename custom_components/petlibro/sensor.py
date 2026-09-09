@@ -237,14 +237,27 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                     for unit in (Unit.CUPS, Unit.MILLILITERS)
                 }
             case key if key in (
-                "remaining_water", 
-                "today_drinking_amount", 
+                "remaining_water",
+                "today_drinking_amount",
                 "yesterday_drinking_amount"
             ):
                 key = "weight" if key == "remaining_water" else key
-                return { 
+                return {
                     unit.symbol: VolumeConverter.convert(getattr(self.device, key, 0), UnitOfVolume.MILLILITERS, unit.symbol)
                     for unit in VALID_UNIT_TYPES[API.WATER_UNIT] if unit
+                }
+            case "wifi_ssid":
+                # Kalay/TUTK camera credential layer (Granary2VisionFeeder only).
+                # Not a video stream itself - an external TUTK-compatible bridge
+                # would use these to establish its own P2P session.
+                camera_id = getattr(self.device, "camera_id", None)
+                if camera_id is None:
+                    return super().extra_state_attributes
+                return {
+                    "camera_id": camera_id,
+                    "camera_auth_info": getattr(self.device, "camera_auth_info", None),
+                    "tutk_user_token": getattr(self.device, "tutk_user_token", None),
+                    "tutk_app_url": getattr(self.device, "tutk_app_url", None),
                 }
         return super().extra_state_attributes
 
