@@ -304,6 +304,18 @@
             },
             "today_fountain_drinking_time": {
                 "name": "Today's Fountain Drinking Time"
+            },
+            "today_bathroom_visits": {
+                "name": "Today's Bathroom Visits"
+            },
+            "today_bathroom_duration": {
+                "name": "Today's Bathroom Duration"
+            },
+            "today_bathroom_poop_count": {
+                "name": "Today's Poop Count"
+            },
+            "today_bathroom_pee_count": {
+                "name": "Today's Pee Count"
             }
         },
         "image": {
