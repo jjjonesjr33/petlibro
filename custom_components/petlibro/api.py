@@ -522,6 +522,20 @@ class PetLibroAPI:
     async def device_drink_water(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/data/deviceDrinkWater/todayDrinkData", serial)
 
+    async def device_potty_today(self, serial: str, pet_id: int) -> Dict[str, Any]:
+        # Cached by device serial only (not pet_id) — this endpoint returns ALL
+        # pets' data in one response regardless of which pet_id is sent; pet_id
+        # just needs to be non-empty. Caching avoids calling once per pet.
+        now = utcnow()
+        cache_key = f"{serial}_pottyToday"
+        last_call_time = self._last_api_call_times.get(cache_key)
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            return self._cached_responses.get(cache_key, {})
+        result = await self.session.post_serial("/data/pet/potty/today", serial, json={"petId": pet_id})
+        self._last_api_call_times[cache_key] = now
+        self._cached_responses[cache_key] = result
+        return result
+
     async def device_attribute_settings(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/setting/getAttributeSetting", serial)
 
