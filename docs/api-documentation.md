@@ -341,6 +341,39 @@ Values are per-device config (e.g. `freeDailyMaxNum` differed between two units 
 account: 13 vs 10). This endpoint returns settings regardless of which feeding mode is
 currently active - it is not itself a signal of whether Free Feeding is enabled.
 
+`freeLeftoverWeight` is reported in grams.
+
+### Granary 2 Vision bowl telemetry
+
+`POST /data/data/realInfo` also reports the current bowl contents and the capacity used by
+automatic feeding:
+
+| Field | Type | Description |
+|---|---|---|
+| `bowlMode` | string | Bowl layout, confirmed value `"SINGLE_BOWL"`; other values use the left/right fields |
+| `remainingGrain` | number | Current food in a single bowl, in grams |
+| `leftRemainingGrain` | number | Current food in the left bowl, in grams |
+| `rightRemainingGrain` | number | Current food in the right bowl, in grams |
+| `autoFeedMaxWeight` | number | Automatic feeding maximum, in grams |
+| `maxFeedable` | number | Additional portions currently feedable into a single bowl |
+| `leftMaxFeedable` | number | Additional portions currently feedable into the left bowl |
+| `rightMaxFeedable` | number | Additional portions currently feedable into the right bowl |
+| `portionToGramRatio` | number | Grams represented by one feeder portion |
+| `autoStopFeedSwitch` | bool | Whether automatic feeding stops at the configured maximum |
+
+For the captured single-bowl PLAF205 device, the values were:
+
+```text
+remainingGrain = 16 g
+maxFeedable = 3 portions
+portionToGramRatio = 8 g/portion
+autoFeedMaxWeight = 40 g
+```
+
+They satisfy `16 + 3 * 8 = 40 g`, and `16 g` is displayed by the PETLIBRO app as
+`0.56 oz`. The `remainingGrainNum` variants were all zero in the same response and their
+meaning is not yet confirmed, so the integration does not expose them.
+
 ### POST /device/device/updateFeedingMode (Granary 2 Vision)
 
 Switch the device's active feeding mode. Confirmed via a live network capture of the app.

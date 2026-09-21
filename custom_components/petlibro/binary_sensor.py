@@ -46,6 +46,7 @@ class PetLibroBinarySensorEntityDescription(BinarySensorEntityDescription, PetLi
 
     device_class_fn: Callable[[_DeviceT], BinarySensorDeviceClass | None] = lambda _: None
     should_report: Callable[[_DeviceT], bool] = lambda _: True
+    available_fn: Callable[[_DeviceT], bool] = lambda _: True
     device_class: Optional[BinarySensorDeviceClass] = None
     # Optional override for is_on — use when the entity key differs from the device property
     value_fn: Callable | None = None
@@ -60,6 +61,11 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
     def device_class(self) -> BinarySensorDeviceClass | None:
         """Return the device class to use in the frontend, if any."""
         return self.entity_description.device_class
+
+    @property
+    def available(self) -> bool:
+        """Return whether this binary sensor has a current API value."""
+        return super().available and self.entity_description.available_fn(self.device)
 
     @property
     def is_on(self) -> bool:
@@ -436,6 +442,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:phone-in-talk",
             should_report=lambda device: device.talk_channel_active is not None,
             name="Two-Way Talk Active"
+        ),
+        PetLibroBinarySensorEntityDescription[Granary2VisionFeeder](
+            key="auto_stop_feed_enabled",
+            translation_key="auto_stop_feed_enabled",
+            icon="mdi:food-off",
+            should_report=lambda device: device.auto_stop_feed_enabled is not None,
+            available_fn=lambda device: device.auto_stop_feed_enabled is not None,
+            name="Auto Stop Feed"
         ),
     ],
     OneRFIDSmartFeeder: [
