@@ -29,7 +29,12 @@ from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFI
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
 from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
-from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
+from .entity import (
+    PetLibroEntity,
+    PetLibroEntityDescription,
+    _DeviceT,
+    disable_unsupported_entity_entries,
+)
 from .pets.entity import PL_PetSensorEntity
 
 
@@ -50,6 +55,7 @@ def icon_for_gauge_level(gauge_level: int | None = None, offset: int = 0) -> str
 class PetLibroSensorEntityDescription(SensorEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device sensor entities."""
     should_report: Callable[[_DeviceT], bool] = lambda _: True
+    supported_fn: Callable[[_DeviceT], bool] = lambda _: True
     petlibro_unit: API | str | None = None
 
 
@@ -118,6 +124,21 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                         self._last_sensor_state[self.key] = val
                     return val
         return super().native_value
+
+    @property
+    def available(self) -> bool:
+        """Return whether this sensor is supported by the device."""
+        return super().available and self.entity_description.supported_fn(self.device)
+
+    @property
+    def entity_registry_enabled_default(self) -> bool:
+        """Return whether this sensor should be enabled when first added."""
+        return self.entity_description.supported_fn(self.device)
+
+    @property
+    def entity_registry_visible_default(self) -> bool:
+        """Return whether this sensor should be visible when first added."""
+        return self.entity_description.supported_fn(self.device)
 
     @property
     def icon(self) -> str | None:
@@ -732,6 +753,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             native_unit_of_measurement=UnitOfMass.GRAMS,
             device_class=SensorDeviceClass.WEIGHT,
             state_class=SensorStateClass.MEASUREMENT,
+            supported_fn=lambda device: device.supports_single_bowl,
             should_report=lambda device: device.remaining_food_weight is not None
         ),
         PetLibroSensorEntityDescription[Granary2VisionFeeder](
@@ -742,6 +764,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             native_unit_of_measurement=UnitOfMass.GRAMS,
             device_class=SensorDeviceClass.WEIGHT,
             state_class=SensorStateClass.MEASUREMENT,
+            supported_fn=lambda device: device.supports_dual_bowl,
             should_report=lambda device: device.left_remaining_food_weight is not None
         ),
         PetLibroSensorEntityDescription[Granary2VisionFeeder](
@@ -752,6 +775,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             native_unit_of_measurement=UnitOfMass.GRAMS,
             device_class=SensorDeviceClass.WEIGHT,
             state_class=SensorStateClass.MEASUREMENT,
+            supported_fn=lambda device: device.supports_dual_bowl,
             should_report=lambda device: device.right_remaining_food_weight is not None
         ),
         PetLibroSensorEntityDescription[Granary2VisionFeeder](
@@ -773,6 +797,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             native_unit_of_measurement="portions",
             state_class=SensorStateClass.MEASUREMENT,
             entity_category=EntityCategory.DIAGNOSTIC,
+            supported_fn=lambda device: device.supports_single_bowl,
             should_report=lambda device: device.max_feedable is not None
         ),
         PetLibroSensorEntityDescription[Granary2VisionFeeder](
@@ -783,6 +808,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             native_unit_of_measurement="portions",
             state_class=SensorStateClass.MEASUREMENT,
             entity_category=EntityCategory.DIAGNOSTIC,
+            supported_fn=lambda device: device.supports_dual_bowl,
             should_report=lambda device: device.left_max_feedable is not None
         ),
         PetLibroSensorEntityDescription[Granary2VisionFeeder](
@@ -793,6 +819,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             native_unit_of_measurement="portions",
             state_class=SensorStateClass.MEASUREMENT,
             entity_category=EntityCategory.DIAGNOSTIC,
+            supported_fn=lambda device: device.supports_dual_bowl,
             should_report=lambda device: device.right_max_feedable is not None
         ),
         PetLibroSensorEntityDescription[Granary2VisionFeeder](
@@ -1673,6 +1700,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     ],
 }
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -1712,6 +1740,7 @@ async def async_setup_entry(
                 for description in entity_descriptions
             ]
         )
+        disable_unsupported_entity_entries(hass, Platform.SENSOR, entities)
 
     if not entities:
         _LOGGER.warning("No device sensors added, entities list is empty!")

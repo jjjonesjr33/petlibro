@@ -374,6 +374,12 @@ They satisfy `16 + 3 * 8 = 40 g`, and `16 g` is displayed by the PETLIBRO app as
 `0.56 oz`. The `remainingGrainNum` variants were all zero in the same response and their
 meaning is not yet confirmed, so the integration does not expose them.
 
+The integration treats `bowlMode` as a fixed product capability. A `SINGLE_BOWL` product
+enables only the combined **Food in Bowl** and **Feedable Portions** entities. Products
+that report separate left/right bowl telemetry enable only the corresponding left/right
+entities. The same capability check applies to the left/right food-status binary sensors.
+Unused counterparts are disabled and hidden by the integration.
+
 ### POST /device/device/updateFeedingMode (Granary 2 Vision)
 
 Switch the device's active feeding mode. Confirmed via a live network capture of the app.

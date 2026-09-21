@@ -64,6 +64,8 @@ class Granary2VisionFeeder(GranarySmartCameraFeeder):
     @property
     def left_food_low(self) -> bool | None:
         """Return True if the left grain warehouse is low, or None if this unit doesn't report it."""
+        if not self.supports_dual_bowl:
+            return None
         value = self._data.get("realInfo", {}).get("leftWarehouseSurplusGrain")
         if value is None:
             return None
@@ -72,6 +74,8 @@ class Granary2VisionFeeder(GranarySmartCameraFeeder):
     @property
     def right_food_low(self) -> bool | None:
         """Return True if the right grain warehouse is low, or None if this unit doesn't report it."""
+        if not self.supports_dual_bowl:
+            return None
         value = self._data.get("realInfo", {}).get("rightWarehouseSurplusGrain")
         if value is None:
             return None
@@ -129,27 +133,39 @@ class Granary2VisionFeeder(GranarySmartCameraFeeder):
     @property
     def bowl_mode(self) -> str | None:
         """Return the configured bowl mode."""
-        value = self._data.get("dataRealInfo", {}).get("bowlMode")
+        value = self._data.get("bowlMode")
+        if not isinstance(value, str):
+            value = self._data.get("dataRealInfo", {}).get("bowlMode")
         return value if isinstance(value, str) else None
+
+    @property
+    def supports_single_bowl(self) -> bool:
+        """Return whether this product uses combined single-bowl telemetry."""
+        return self.bowl_mode == "SINGLE_BOWL"
+
+    @property
+    def supports_dual_bowl(self) -> bool:
+        """Return whether this product reports separate left/right bowl telemetry."""
+        return self.bowl_mode not in (None, "SINGLE_BOWL")
 
     @property
     def remaining_food_weight(self) -> float | None:
         """Return the food remaining in a single bowl, in grams."""
-        if self.bowl_mode != "SINGLE_BOWL":
+        if not self.supports_single_bowl:
             return None
         return _numeric_value(self._data.get("dataRealInfo", {}).get("remainingGrain"))
 
     @property
     def left_remaining_food_weight(self) -> float | None:
         """Return the food remaining in the left bowl, in grams."""
-        if self.bowl_mode in (None, "SINGLE_BOWL"):
+        if not self.supports_dual_bowl:
             return None
         return _numeric_value(self._data.get("dataRealInfo", {}).get("leftRemainingGrain"))
 
     @property
     def right_remaining_food_weight(self) -> float | None:
         """Return the food remaining in the right bowl, in grams."""
-        if self.bowl_mode in (None, "SINGLE_BOWL"):
+        if not self.supports_dual_bowl:
             return None
         return _numeric_value(self._data.get("dataRealInfo", {}).get("rightRemainingGrain"))
 
@@ -161,21 +177,21 @@ class Granary2VisionFeeder(GranarySmartCameraFeeder):
     @property
     def max_feedable(self) -> float | None:
         """Return the number of additional portions feedable into a single bowl."""
-        if self.bowl_mode != "SINGLE_BOWL":
+        if not self.supports_single_bowl:
             return None
         return _numeric_value(self._data.get("dataRealInfo", {}).get("maxFeedable"))
 
     @property
     def left_max_feedable(self) -> float | None:
         """Return the number of additional portions feedable into the left bowl."""
-        if self.bowl_mode in (None, "SINGLE_BOWL"):
+        if not self.supports_dual_bowl:
             return None
         return _numeric_value(self._data.get("dataRealInfo", {}).get("leftMaxFeedable"))
 
     @property
     def right_max_feedable(self) -> float | None:
         """Return the number of additional portions feedable into the right bowl."""
-        if self.bowl_mode in (None, "SINGLE_BOWL"):
+        if not self.supports_dual_bowl:
             return None
         return _numeric_value(self._data.get("dataRealInfo", {}).get("rightMaxFeedable"))
 
