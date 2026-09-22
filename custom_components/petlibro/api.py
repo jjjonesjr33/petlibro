@@ -223,6 +223,7 @@ class PetLibroAPI:
 
         self._last_api_call_times = {}  # To store last call time per device
         self._cached_responses = {}  # To store cached responses for short periods
+        self._inflight_requests: dict[str, asyncio.Task] = {}  # Dedupe concurrent identical requests
 
         if "PL_PetAPI" not in sys.modules:
             from .pets.api import PL_PetAPI
@@ -548,16 +549,32 @@ class PetLibroAPI:
     async def device_potty_today(self, serial: str, pet_id: int) -> Dict[str, Any]:
         # Cached by device serial only (not pet_id) — this endpoint returns ALL
         # pets' data in one response regardless of which pet_id is sent; pet_id
-        # just needs to be non-empty. Caching avoids calling once per pet.
-        now = utcnow()
+        # just needs to be non-empty. Concurrent pet refreshes (via asyncio.gather)
+        # share one in-flight request per device instead of each firing their own.
         cache_key = f"{serial}_pottyToday"
+        now = utcnow()
+
         last_call_time = self._last_api_call_times.get(cache_key)
         if last_call_time and (now - last_call_time) < timedelta(seconds=10):
             return self._cached_responses.get(cache_key, {})
-        result = await self.session.post_serial("/data/pet/potty/today", serial, json={"petId": pet_id})
-        self._last_api_call_times[cache_key] = now
-        self._cached_responses[cache_key] = result
-        return result
+
+        if cache_key in self._inflight_requests:
+            return await self._inflight_requests[cache_key]
+
+        async def _fetch() -> Dict[str, Any]:
+            result = await self.session.post_serial(
+                "/data/pet/potty/today", serial, json={"petId": pet_id},
+            )
+            self._last_api_call_times[cache_key] = utcnow()
+            self._cached_responses[cache_key] = result
+            return result
+
+        task = asyncio.create_task(_fetch())
+        self._inflight_requests[cache_key] = task
+        try:
+            return await task
+        finally:
+            self._inflight_requests.pop(cache_key, None)
 
     async def device_attribute_settings(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/setting/getAttributeSetting", serial)
