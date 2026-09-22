@@ -67,6 +67,7 @@ If you enjoy this integration and want to support its development, please consid
 > [!NOTE]
   >* Tracking RFID per pet intance eat/drink - (PLWF305) - API Information gathered, working on implementation.
   >* Live camera feed for Granary Smart Camera Feeder (PLAF203) - Currently missing the API to setup live stream. Seems to connect via Kalay TUTK, if you have any experience integrating with this platform, please reach out to help us implement this.
+  >* The Granary Smart Camera Feeder exposes the TUTK/Kalay camera credentials (`camera_id`, `camera_auth_info`, `tutk_user_token`, `tutk_app_url`) as sensor attributes. These can be used with external TUTK clients (e.g. go2rtc) to stream the feed locally.
 
 # NOTICE
 #### Alpha/Beta state notice for this plugin:
