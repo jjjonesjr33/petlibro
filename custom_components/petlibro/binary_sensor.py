@@ -9,6 +9,7 @@ from functools import cached_property
 from typing import Optional
 import logging
 from .const import DOMAIN, Unit, APIKey as API, VALID_UNIT_TYPES
+from homeassistant.const import Platform
 from homeassistant.util.dt import now as ha_now
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
@@ -37,7 +38,12 @@ from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFI
 from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
 from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
-from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
+from .entity import (
+    PetLibroEntity,
+    PetLibroEntityDescription,
+    _DeviceT,
+    disable_unsupported_entity_entries,
+)
 
 
 @dataclass(frozen=True)
@@ -46,6 +52,8 @@ class PetLibroBinarySensorEntityDescription(BinarySensorEntityDescription, PetLi
 
     device_class_fn: Callable[[_DeviceT], BinarySensorDeviceClass | None] = lambda _: None
     should_report: Callable[[_DeviceT], bool] = lambda _: True
+    available_fn: Callable[[_DeviceT], bool] = lambda _: True
+    supported_fn: Callable[[_DeviceT], bool] = lambda _: True
     device_class: Optional[BinarySensorDeviceClass] = None
     # Optional override for is_on — use when the entity key differs from the device property
     value_fn: Callable | None = None
@@ -60,6 +68,25 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
     def device_class(self) -> BinarySensorDeviceClass | None:
         """Return the device class to use in the frontend, if any."""
         return self.entity_description.device_class
+
+    @property
+    def available(self) -> bool:
+        """Return whether this binary sensor has a current API value."""
+        return (
+            super().available
+            and self.entity_description.supported_fn(self.device)
+            and self.entity_description.available_fn(self.device)
+        )
+
+    @property
+    def entity_registry_enabled_default(self) -> bool:
+        """Return whether this binary sensor should be enabled when first added."""
+        return self.entity_description.supported_fn(self.device)
+
+    @property
+    def entity_registry_visible_default(self) -> bool:
+        """Return whether this binary sensor should be visible when first added."""
+        return self.entity_description.supported_fn(self.device)
 
     @property
     def is_on(self) -> bool:
@@ -405,6 +432,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             translation_key="left_food_low",
             icon="mdi:bowl-mix-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
+            supported_fn=lambda device: device.supports_dual_bowl,
             should_report=lambda device: device.left_food_low is not None,
             name="Left Food Status"
         ),
@@ -413,6 +441,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             translation_key="right_food_low",
             icon="mdi:bowl-mix-outline",
             device_class=BinarySensorDeviceClass.PROBLEM,
+            supported_fn=lambda device: device.supports_dual_bowl,
             should_report=lambda device: device.right_food_low is not None,
             name="Right Food Status"
         ),
@@ -436,6 +465,14 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:phone-in-talk",
             should_report=lambda device: device.talk_channel_active is not None,
             name="Two-Way Talk Active"
+        ),
+        PetLibroBinarySensorEntityDescription[Granary2VisionFeeder](
+            key="auto_stop_feed_enabled",
+            translation_key="auto_stop_feed_enabled",
+            icon="mdi:food-off",
+            should_report=lambda device: device.auto_stop_feed_enabled is not None,
+            available_fn=lambda device: device.auto_stop_feed_enabled is not None,
+            name="Auto Stop Feed"
         ),
     ],
     OneRFIDSmartFeeder: [
@@ -892,6 +929,7 @@ async def async_setup_entry(
         if isinstance(device, device_type)
         for description in entity_descriptions
     ]
+    disable_unsupported_entity_entries(hass, Platform.BINARY_SENSOR, entities)
 
     if not entities:
         _LOGGER.warning("No binary sensors added, entities list is empty!")

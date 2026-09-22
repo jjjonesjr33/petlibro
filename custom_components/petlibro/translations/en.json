@@ -304,6 +304,51 @@
             },
             "today_fountain_drinking_time": {
                 "name": "Today's Fountain Drinking Time"
+            },
+            "feeding_mode": {
+                "name": "Feeding Mode"
+            },
+            "radar_sensing_level": {
+                "name": "Radar Sensing Level"
+            },
+            "free_feeding_per_grain": {
+                "name": "Free Feeding Per-Feed Amount"
+            },
+            "free_feeding_daily_max": {
+                "name": "Free Feeding Daily Max Count"
+            },
+            "free_feeding_leftover_weight": {
+                "name": "Free Feeding Leftover Threshold"
+            },
+            "free_feeding_wait_seconds": {
+                "name": "Free Feeding Wait Time"
+            },
+            "bowl_mode": {
+                "name": "Bowl Mode"
+            },
+            "remaining_food_weight": {
+                "name": "Food in Bowl"
+            },
+            "left_remaining_food_weight": {
+                "name": "Food in Left Bowl"
+            },
+            "right_remaining_food_weight": {
+                "name": "Food in Right Bowl"
+            },
+            "auto_feed_max_weight": {
+                "name": "Auto Feed Maximum"
+            },
+            "max_feedable": {
+                "name": "Feedable Portions"
+            },
+            "left_max_feedable": {
+                "name": "Left Feedable Portions"
+            },
+            "right_max_feedable": {
+                "name": "Right Feedable Portions"
+            },
+            "portion_to_gram_ratio": {
+                "name": "Grams per Portion"
             }
         },
         "image": {
@@ -411,6 +456,12 @@
             },
             "feeding_plan_today_disable_all": {
                 "name": "Disable Today's Feeding Schedule"
+            },
+            "free_feeding_mode": {
+                "name": "Enable Free Feeding (Smart Feed)"
+            },
+            "plan_feeding_mode": {
+                "name": "Enable Feeding Plan Mode"
             }
         },
         "binary_sensor": {
@@ -464,6 +515,24 @@
             },
             "feeding_schedule": {
                 "name": "Feeding Schedule"
+            },
+            "left_food_low": {
+                "name": "Left Food Status"
+            },
+            "right_food_low": {
+                "name": "Right Food Status"
+            },
+            "pet_detection_enabled": {
+                "name": "AI Pet Detection"
+            },
+            "human_detection_enabled": {
+                "name": "Human Detection"
+            },
+            "talk_channel_active": {
+                "name": "Two-Way Talk Active"
+            },
+            "auto_stop_feed_enabled": {
+                "name": "Auto Stop Feed"
             }
         },
         "number": {
