@@ -97,11 +97,44 @@ class Pet(Event):
             except Exception:
                 _LOGGER.warning("Failed to fetch wearListV2 for fountain %s", device_sn)
 
+        # NEW: collect this pet's bathroom activity from any bound Luma litter boxes.
+        # These endpoints need this pet's own ID in the request (unlike the fountain's
+        # wearListV2, which returns every pet at once and gets filtered client-side).
+        bathroom_activity = {"todayBathroomVisits": 0, "todayBathroomDuration": 0,
+                             "todayBathroomPoopCount": 0, "todayBathroomPeeCount": 0}
+
+        litterbox_sns = set()
+        for d in (bound_devices or []):
+            if d.get("productName") == "Luma Smart Litter Box":
+                sn = d.get("deviceSn")
+                if sn:
+                    litterbox_sns.add(sn)
+
+        if self.hub and self.hub.devices:
+            from ..devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
+            for device in self.hub.devices.values():
+                if isinstance(device, LumaSmartLitterBox):
+                    litterbox_sns.add(device.serial)
+
+        for device_sn in litterbox_sns:
+            try:
+                potty_today = await self.api.device_potty_today(device_sn, self.id)
+                for entry in (potty_today.get("petList") or []):
+                    if entry.get("id") == self.id:
+                        bathroom_activity["todayBathroomVisits"] += (entry.get("times") or 0)
+                        bathroom_activity["todayBathroomDuration"] += (entry.get("duration") or 0)
+                        bathroom_activity["todayBathroomPoopCount"] += (entry.get("poopTimes") or 0)
+                        bathroom_activity["todayBathroomPeeCount"] += (entry.get("peeTimes") or 0)
+                        break
+            except Exception:
+                _LOGGER.warning("Failed to fetch potty/today for litter box %s", device_sn)
+
         self.update_data(
             {
                 **pet_details,
                 "boundDevices": bound_devices,
                 **fountain_drinking,
+                **bathroom_activity,
             }
         )
 
@@ -350,3 +383,25 @@ class Pet(Event):
     def today_fountain_drinking_time(self) -> int:
         """Total seconds spent drinking at RFID fountains today."""
         return self._data.get("todayFountainDrinkingTime") or 0
+
+    # --- Bathroom Activity (from Luma litter box potty/today)
+
+    @property
+    def today_bathroom_visits(self) -> int:
+        """Number of litter box visits today."""
+        return self._data.get("todayBathroomVisits") or 0
+
+    @property
+    def today_bathroom_duration(self) -> int:
+        """Total seconds spent in the litter box today."""
+        return self._data.get("todayBathroomDuration") or 0
+
+    @property
+    def today_bathroom_poop_count(self) -> int:
+        """Number of poop events in the litter box today."""
+        return self._data.get("todayBathroomPoopCount") or 0
+
+    @property
+    def today_bathroom_pee_count(self) -> int:
+        """Number of pee events in the litter box today."""
+        return self._data.get("todayBathroomPeeCount") or 0
