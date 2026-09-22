@@ -210,6 +210,12 @@
             "remaining_cleaning_days": {
                 "name": "Remaining Cleaning Days"
             },
+            "last_clean_date": {
+                "name": "Last Clean Date"
+            },
+            "next_clean_date": {
+                "name": "Next Clean Date"
+            },
             "resolution": {
                 "name": "Camera Resolution"
             },
