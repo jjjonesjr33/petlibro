@@ -285,18 +285,27 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                     unit.symbol: VolumeConverter.convert(getattr(self.device, key, 0), UnitOfVolume.MILLILITERS, unit.symbol)
                     for unit in VALID_UNIT_TYPES[API.WATER_UNIT] if unit
                 }
-            case "wifi_ssid":
-                # Kalay/TUTK camera credential layer (Granary2VisionFeeder only).
-                # Not a video stream itself - an external TUTK-compatible bridge
-                # would use these to establish its own P2P session.
-                camera_auth_info = getattr(self.device, "camera_auth_info", None)
-                if camera_auth_info is None:
-                    return super().extra_state_attributes
-                return {
-                    "camera_auth_info": camera_auth_info,
-                    "tutk_user_token": getattr(self.device, "tutk_user_token", None),
-                    "tutk_app_url": getattr(self.device, "tutk_app_url", None),
-                }
+        if self.key == "wifi_ssid" and (
+            isinstance(self.device, GranarySmartCameraFeeder)
+            or getattr(self.device, "camera_auth_info", None) is not None
+        ):
+            # Kalay/TUTK camera credential layer. Not a video stream itself;
+            # an external TUTK-compatible bridge would use these to establish
+            # its own P2P session.
+            camera_attributes = {
+                attr: getattr(self.device, attr, None)
+                for attr in (
+                    "camera_id",
+                    "camera_auth_info",
+                    "tutk_user_token",
+                    "tutk_app_url",
+                    "enable_camera",
+                    "camera_switch",
+                    "motion_detection_switch",
+                    "sound_detection_switch",
+                )
+            }
+            return {**(super().extra_state_attributes or {}), **camera_attributes}
         return super().extra_state_attributes
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
@@ -1029,6 +1038,29 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:rotate-3d-variant",
             name="Plate Position",
             should_report=lambda device: device.plate_position is not None,
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="remaining_cleaning_days",
+            translation_key="remaining_cleaning_days",
+            icon="mdi:package",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Remaining Cleaning Days"
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="last_clean_date",
+            translation_key="last_clean_date",
+            icon="mdi:calendar-check",
+            name="Last Clean Date",
+            device_class=SensorDeviceClass.TIMESTAMP,
+        ),
+        PetLibroSensorEntityDescription[PolarWetFoodFeeder](
+            key="next_clean_date",
+            translation_key="next_clean_date",
+            icon="mdi:calendar-clock",
+            name="Next Clean Date",
+            device_class=SensorDeviceClass.TIMESTAMP,
         ),
     ],
     SpaceSmartFeeder: [
