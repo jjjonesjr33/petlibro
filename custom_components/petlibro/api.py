@@ -22,7 +22,7 @@ from typing import Any, Dict, List, TypeAlias
 from datetime import timedelta
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util.dt import utcnow
-from .exceptions import PetLibroAPIError
+from .exceptions import PetLibroAPIError, PetLibroInvalidAuth
 from aiohttp import ClientSession
 
 import aiohttp
@@ -133,6 +133,9 @@ class PetLibroSession:
                 retry_data = await retry_resp.json()
                 _LOGGER.debug(f"Retry response: {retry_data}")
                 return retry_data.get("data")
+
+        if data.get("code") == 1102:  # ILLEGAL_PASSWORD error code
+            raise PetLibroInvalidAuth(f"Code: {data.get('code')}, Message: {data.get('msg')}")
 
         if data.get("code") != 0:
             raise PetLibroAPIError(f"Code: {data.get('code')}, Message: {data.get('msg')}")
@@ -260,6 +263,9 @@ class PetLibroAPI:
             _LOGGER.debug("Login successful")
             return self.session.token
 
+        except PetLibroInvalidAuth as e:
+            _LOGGER.error(f"Login failed: {e}")
+            raise
         except Exception as e:
             _LOGGER.error(f"Login failed: {e}")
             raise PetLibroAPIError(f"Login attempt failed: {e}")

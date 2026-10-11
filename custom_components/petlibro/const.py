@@ -17,6 +17,8 @@ CONF_PASSWORD = "password"
 CONF_API_TOKEN = "api_token"
 CONF_REGION = "region"
 
+PASSWORD_MAX_LENGTH = 18  # PETLIBRO rejects longer passwords with ILLEGAL_PASSWORD
+
 # Supported platforms
 PLATFORMS = ["sensor", "switch", "button", "binary_sensor", "number", "select", "text", "date", "image", "update"]  # Add any other platforms as needed
 

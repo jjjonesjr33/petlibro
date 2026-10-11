@@ -19,7 +19,8 @@
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
-      "unknown": "[%key:common::config_flow::error::unknown%]"
+      "unknown": "[%key:common::config_flow::error::unknown%]",
+      "password_too_long": "PETLIBRO rejected the password. Passwords longer than 18 characters are not accepted by the PETLIBRO API, even if the app accepts them. Change your PETLIBRO password to 18 characters or fewer and try again."
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
