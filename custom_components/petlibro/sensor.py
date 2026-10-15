@@ -76,6 +76,9 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     def native_value(self) -> float | datetime | str | None:
         """Return the state."""        
         match self.key:
+            case "recent_activity":
+                records = self.device.work_records
+                return datetime.fromisoformat(records[0]["time"]) if records else None
             case "today_eating_time":
                 return getattr(self.device, self.key, 0)
             case "today_drinking_time":
@@ -206,6 +209,8 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     def extra_state_attributes(self):
         """Return entity specific state attributes."""        
         match self.key:
+            case "recent_activity":
+                return {"records": self.device.work_records}
             case "next_feed_time":
                 next_feed = self.device.get_next_feed
                 next_feed_data = self.device.feeding_plan_data.get(str(next_feed.get("id")), {})
@@ -494,6 +499,13 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
         )
     ],
     GranarySmartCameraFeeder: [
+        PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
+            key="recent_activity",
+            translation_key="recent_activity",
+            icon="mdi:format-list-bulleted",
+            name="Recent Activity",
+            device_class=SensorDeviceClass.TIMESTAMP,
+        ),
         PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
             key="wifi_ssid",
             translation_key="wifi_ssid",
@@ -986,6 +998,13 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
         ),
     ],
     DockstreamSmartFountain: [
+        PetLibroSensorEntityDescription[DockstreamSmartFountain](
+            key="recent_activity",
+            translation_key="recent_activity",
+            icon="mdi:format-list-bulleted",
+            name="Recent Activity",
+            device_class=SensorDeviceClass.TIMESTAMP,
+        ),
         PetLibroSensorEntityDescription[DockstreamSmartFountain](
             key="wifi_ssid",
             translation_key="wifi_ssid",

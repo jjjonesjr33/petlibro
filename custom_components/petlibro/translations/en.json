@@ -171,6 +171,9 @@
             "last_feed_time": {
                 "name": "Last Feed Time"
             },
+            "recent_activity": {
+                "name": "Recent Activity"
+            },
             "last_feed_quantity_weight": {
                 "name": "Last Feed Quantity (Weight)"
             },
