@@ -1,5 +1,7 @@
 # Error Mode - Used for pulling API for new devices. Enable Error Mode and Disable Debug Mode.
 
+from datetime import datetime, timezone
+import json
 from logging import getLogger
 import sys
 from typing import cast
@@ -26,6 +28,35 @@ class Device(Event):
         self.max_feed_portions = DEFAULT_MAX_FEED_PORTIONS
 
         self.update_data(data)
+
+    @property
+    def work_records(self) -> list[dict]:
+        """The device's activity log from the cloud (feedings, drinks, ...), newest first, as plain fields.
+
+        workRecord/list returns every record type of the device whatever type is asked for,
+        grouped by day: [{..., "workRecords": [...]}, ...].
+        """
+        out = []
+        for day in self._data.get("workRecord") or []:
+            records = day.get("workRecords") if isinstance(day, dict) else None
+            for r in records or []:
+                if not isinstance(r, dict) or not r.get("recordTime"):
+                    continue
+                try:
+                    params = json.loads(r.get("params") or "{}")
+                except (TypeError, ValueError):
+                    params = {}
+                out.append({
+                    "time": datetime.fromtimestamp(r["recordTime"] / 1000, timezone.utc).isoformat(),
+                    "type": r.get("type"),
+                    "event": r.get("eventType"),
+                    "ml": r.get("totalMl"),
+                    "seconds": r.get("drinkTime"),
+                    "portions": r.get("actualGrainNum"),
+                    "expected_portions": r.get("expectGrainNum"),
+                    "plan_id": params.get("planId"),
+                })
+        return sorted(out, key=lambda x: x["time"], reverse=True)
 
     def update_data(self, data: dict) -> None:
         """Save the device info from a data dictionary."""
