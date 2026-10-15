@@ -29,7 +29,10 @@ from .const import (
     Gender,
     Unit,
     IntegrationSetting,
+    CONF_CAMERA_HOST,
+    CONF_CAMERA_STREAM_URL,
 )
+from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .exceptions import PetLibroCannotConnect, PetLibroInvalidAuth
 from .hub import PetLibroHub
 from .member import Member
@@ -236,12 +239,20 @@ class PetlibroOptionsFlow(OptionsFlow):
         user_input = user_input or {}
         
         if user_input:
-            # --- Extract updates
+            # --- Extract updates (settings never saved before compare against their default)
+            settings = self._integration_settings()
             updates = self.collect_updates(
-                fields=IntegrationSetting,
+                fields=settings,
                 user_input=user_input,
-                local_data=self.entry.options,
+                local_data=MappingProxyType(
+                    {setting.value: self.entry.options.get(setting, setting.default) for setting in settings}
+                ),
             )
+            camera_keys = (CONF_CAMERA_HOST, CONF_CAMERA_STREAM_URL) if self._has_camera_feeder else ()
+            for key in camera_keys:
+                value = (user_input.get(key) or "").strip()
+                if value != self.entry.options.get(key, ""):
+                    updates[key] = value
 
             # --- Nothing changed
             if not updates:
@@ -262,6 +273,9 @@ class PetlibroOptionsFlow(OptionsFlow):
                     auto_reload = True
                 else:
                     _LOGGER.debug("No Manual Feed entities found — nothing to reload.")
+
+            if IntegrationSetting.CAMERA_STREAM in updates or any(key in updates for key in camera_keys):
+                manual_reload = True
 
             if IntegrationSetting.ENABLE_SHARED_PETS in updates:
                 if updates[IntegrationSetting.ENABLE_SHARED_PETS]:
@@ -411,19 +425,36 @@ class PetlibroOptionsFlow(OptionsFlow):
     # Form Builders
     # ------------------------------
     
+    @property
+    def _has_camera_feeder(self) -> bool:
+        return any(isinstance(device, GranarySmartCameraFeeder) for device in self.hub.devices.values())
+
+    def _integration_settings(self) -> list[IntegrationSetting]:
+        """Integration settings that apply to this account's devices."""
+        return [
+            setting
+            for setting in IntegrationSetting
+            if setting != IntegrationSetting.CAMERA_STREAM or self._has_camera_feeder
+        ]
+
     def _show_integration_settings_form(self, user_input: dict[str, Any]) -> ConfigFlowResult:
         """Build and show the integration settings form."""
 
+        schema: dict[Any, Any] = {
+            vol.Required(
+                setting.value,
+                default=self.entry.options.get(setting, setting.default),
+            ): selector({"boolean": {}})
+            for setting in self._integration_settings()
+        }
+        if self._has_camera_feeder:
+            for key in (CONF_CAMERA_HOST, CONF_CAMERA_STREAM_URL):
+                schema[
+                    vol.Optional(key, description={"suggested_value": self.entry.options.get(key, "")})
+                ] = selector({"text": {}})
+
         return self.async_show_form(
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        setting.value,
-                        default=self.entry.options.get(setting, setting.default),
-                    ): selector({"boolean": {}})
-                    for setting in IntegrationSetting
-                }
-            ),
+            data_schema=vol.Schema(schema),
             description_placeholders={
                 "uom": getattr(self.member, API.FEED_UNIT, DEFAULT_FEED).symbol
             },

@@ -18,7 +18,7 @@ CONF_API_TOKEN = "api_token"
 CONF_REGION = "region"
 
 # Supported platforms
-PLATFORMS = ["sensor", "switch", "button", "binary_sensor", "number", "select", "text", "date", "image", "update"]  # Add any other platforms as needed
+PLATFORMS = ["sensor", "switch", "button", "binary_sensor", "number", "select", "text", "date", "image", "update", "camera"]  # Add any other platforms as needed
 
 # Update interval for device data in seconds
 UPDATE_INTERVAL_SECONDS = 60  # You can adjust this value based on your needs
@@ -182,11 +182,17 @@ WATER_MAPPING = {
 }
 
 
+# Optional camera feeder settings (free text, so outside IntegrationSetting).
+CONF_CAMERA_HOST = "camera_host"
+CONF_CAMERA_STREAM_URL = "camera_stream_url"
+
+
 class IntegrationSetting(StrEnum):
     """Integration settings and their default values."""
     
     MANUAL_FEED_PORTIONS = "manual_feed_portions", False
     ENABLE_SHARED_PETS = "enable_shared_pets", True
+    CAMERA_STREAM = "camera_stream", True
 
     def __new__(cls, value: str, default: bool):
         obj = str.__new__(cls, value)
