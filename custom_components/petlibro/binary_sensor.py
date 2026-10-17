@@ -72,18 +72,19 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
 
         state = getattr(self.device, self.entity_description.key, None)
 
-        last_state = getattr(self, '_last_state', None)
-        initial_log_done = getattr(self, '_initial_log_done', False)
+        # Only the connectivity sensor says whether the device is online. Other
+        # sensors (a lid, a door, food low...) turning off must not be logged as
+        # the device going offline. Compare as booleans, like the entity state.
+        if self.entity_description.key == "online":
+            is_online = bool(state)
+            last_online = getattr(self, '_last_online', None)
+            if last_online is not None and last_online != is_online:
+                if is_online:
+                    _LOGGER.info(f"Device {self.device.name} is online.")
+                else:
+                    _LOGGER.warning(f"Device {self.device.name} is offline.")
+            self._last_online = is_online
 
-        if not initial_log_done:
-            self._initial_log_done = True
-        elif last_state != state:
-            if state:
-                _LOGGER.info(f"Device {self.device.name} is online.")
-            else:
-                _LOGGER.warning(f"Device {self.device.name} is offline.")
-
-        self._last_state = state
         return bool(state)
 
     @property
