@@ -226,7 +226,7 @@ class PetlibroOptionsFlow(OptionsFlow):
         _LOGGER.debug(
             "Started Petlibro options flow for account %s", self.entry.data[CONF_EMAIL]
         )
-        return self.async_show_menu(menu_options=["integration_settings", "account_settings", "change_credentials"])
+        return self.async_show_menu(step_id="init", menu_options=["integration_settings", "account_settings", "change_credentials"])
 
     async def async_step_integration_settings(
         self, user_input: dict[str, Any] | None = None
@@ -415,6 +415,7 @@ class PetlibroOptionsFlow(OptionsFlow):
         """Build and show the integration settings form."""
 
         return self.async_show_form(
+            step_id="integration_settings",
             data_schema=vol.Schema(
                 {
                     vol.Required(
@@ -433,6 +434,7 @@ class PetlibroOptionsFlow(OptionsFlow):
         """Build and show the account settings form."""
 
         return self.async_show_form(
+            step_id="account_settings",
             data_schema=vol.Schema(
                 {
                     vol.Optional(
