@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import date
 from functools import cached_property
 from logging import getLogger
@@ -31,7 +32,6 @@ from homeassistant.components.select import SelectEntity, SelectEntityDescriptio
 from homeassistant.components.sensor import (
     SensorEntity,
     SensorEntityDescription,
-    dataclass,
 )
 from homeassistant.components.sensor.const import SensorDeviceClass, SensorStateClass
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
