@@ -551,6 +551,16 @@ class PetLibroAPI:
     async def device_events(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/data/event/deviceEventsV2", serial)
 
+    async def device_messages(self) -> list[dict[str, Any]]:
+        """Fetch the app's message center (newest first), account-wide.
+
+        GET /device/msg/list returns motion/sound alerts as DETECTION_MOVE /
+        DETECTION_SOUND entries; each carries the device serial in its JSON
+        ``param``. Reading the list does not mark messages as read.
+        """
+        data = await self.session.get("/device/msg/list")
+        return data if isinstance(data, list) else []
+
     async def tutk_info(self) -> Dict[str, Any]:
         """Fetch the TUTK/Kalay session info (userToken + appTutkUrl) for the account.
 
