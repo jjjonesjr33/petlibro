@@ -1,8 +1,9 @@
+import json
 import ast
 from zoneinfo import ZoneInfo
 import aiohttp
 
-from typing import cast
+from typing import Any, cast
 from logging import getLogger
 from ...exceptions import PetLibroAPIError
 from ..device import Device
@@ -10,6 +11,9 @@ from datetime import datetime, timedelta, time
 from homeassistant.util import dt as dt_util
 
 _LOGGER = getLogger(__name__)
+
+# How long the motion/sound binary sensors stay on after the latest alert.
+DETECTION_ACTIVE_WINDOW = timedelta(minutes=2)
 
 class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
     def __init__(self, *args, **kwargs):
@@ -37,6 +41,11 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
             except PetLibroAPIError as err:
                 _LOGGER.warning(f"Error fetching TUTK info for GranarySmartCameraFeeder: {err}")
                 get_tutk_info = {}
+            try:
+                get_messages = await self.api.device_messages()
+            except PetLibroAPIError as err:
+                _LOGGER.warning(f"Error fetching message center for GranarySmartCameraFeeder: {err}")
+                get_messages = self._data.get("messages", [])
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
@@ -48,6 +57,7 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
                 "workRecord": get_work_record or [],
                 "getDeviceEvents": get_device_events or {},
                 "tutkInfo": get_tutk_info or {},
+                "messages": get_messages,
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for GranarySmartCameraFeeder: {err}")
@@ -225,15 +235,60 @@ class GranarySmartCameraFeeder(Device):  # Inherit directly from Device
         """Return the current video recording mode."""
         return self._data.get("realInfo", {}).get("videoRecordMode", "unknown")
 
+    def _detections(self, event_key: str) -> list[dict[str, Any]]:
+        """Message-center detections for this feeder, newest first.
+
+        The message feed is account-wide, so entries are matched to this device
+        by the deviceSn inside each message's JSON ``param``.
+        """
+        detections: list[dict[str, Any]] = []
+        for msg in self._data.get("messages") or []:
+            if msg.get("eventKey") != event_key:
+                continue
+            try:
+                param = json.loads(msg.get("param") or "{}")
+            except (TypeError, ValueError):
+                param = {}
+            timestamp = msg.get("timestamp")
+            if param.get("deviceSn") != self.serial or not isinstance(timestamp, (int, float)):
+                continue
+            detections.append({
+                "id": msg.get("id"),
+                "timestamp": int(timestamp),
+                "time": dt_util.utc_from_timestamp(timestamp / 1000),
+            })
+        detections.sort(key=lambda d: d["timestamp"], reverse=True)
+        return detections
+
+    @property
+    def motion_detections(self) -> list[dict[str, Any]]:
+        """Motion detections from the message center, newest first."""
+        return self._detections("DETECTION_MOVE")
+
+    @property
+    def sound_detections(self) -> list[dict[str, Any]]:
+        """Sound detections from the message center, newest first."""
+        return self._detections("DETECTION_SOUND")
+
+    @staticmethod
+    def _detected_recently(detections: list[dict[str, Any]]) -> bool:
+        return bool(detections) and dt_util.utcnow() - detections[0]["time"] < DETECTION_ACTIVE_WINDOW
+
     @property
     def motion_detected(self) -> bool:
+        """True for DETECTION_ACTIVE_WINDOW after the latest motion alert."""
         events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
-        return any(event.get("eventKey") == "MOTION_DETECTED" for event in events)
+        return self._detected_recently(self.motion_detections) or any(
+            event.get("eventKey") == "MOTION_DETECTED" for event in events
+        )
 
     @property
     def sound_detected(self) -> bool:
+        """True for DETECTION_ACTIVE_WINDOW after the latest sound alert."""
         events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
-        return any(event.get("eventKey") == "SOUND_DETECTED" for event in events)
+        return self._detected_recently(self.sound_detections) or any(
+            event.get("eventKey") == "SOUND_DETECTED" for event in events
+        )
 
     @property
     def camera_id(self) -> str:
