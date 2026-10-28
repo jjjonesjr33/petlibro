@@ -1348,25 +1348,16 @@ class PetLibroAPI:
                 "requestId": request_id,  # Use dynamic request ID
                 "timeout": 5000
             })
-
-            # Check if response is already parsed (since response is an integer here)
-            if isinstance(response, int):
-                _LOGGER.debug(f"Machine cleaning reset set successfully, returned code: {response}")
-                return response
-            
-            # If response is a dictionary (JSON), handle it
-            response_data = await response.json()
-            _LOGGER.debug(f"Machine cleaning reset response data: {response_data}")
-            
-            # Check if the response indicates success
-            if response.status != 200 or response_data.get("code") != 0:
-                raise PetLibroAPIError(f"Failed to trigger machine cleaning reset: {response_data.get('msg')}")
-
-            return response_data
-
+        except PetLibroAPIError as err:
+            _LOGGER.error(f"Failed to trigger machine cleaning reset: {err}")
+            raise
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger machine cleaning reset for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering machine cleaning reset: {err}")
+
+        # session.post already returns the parsed "data" payload and raises on a non-zero code
+        _LOGGER.debug(f"Machine cleaning reset set successfully, response data: {response}")
+        return response
 
     async def set_filter_reset(self, serial: str) -> JSON:
         """Trigger machine cleaning reset for a specific device."""
@@ -1382,25 +1373,16 @@ class PetLibroAPI:
                 "requestId": request_id,  # Use dynamic request ID
                 "timeout": 5000
             })
-
-            # Check if response is already parsed (since response is an integer here)
-            if isinstance(response, int):
-                _LOGGER.debug(f"Filter reset set successfully, returned code: {response}")
-                return response
-            
-            # If response is a dictionary (JSON), handle it
-            response_data = await response.json()
-            _LOGGER.debug(f"Machine cleaning reset response data: {response_data}")
-            
-            # Check if the response indicates success
-            if response.status != 200 or response_data.get("code") != 0:
-                raise PetLibroAPIError(f"Failed to trigger machine cleaning reset: {response_data.get('msg')}")
-
-            return response_data
-
+        except PetLibroAPIError as err:
+            _LOGGER.error(f"Failed to trigger machine filter reset: {err}")
+            raise
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger machine cleaning reset for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering machine cleaning reset: {err}")
+
+        # session.post already returns the parsed "data" payload and raises on a non-zero code
+        _LOGGER.debug(f"Filter reset set successfully, response data: {response}")
+        return response
 
     async def set_manual_lid_open(self, serial: str):
         """Trigger manual lid opening for a specific device."""
