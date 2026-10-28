@@ -68,6 +68,9 @@ class Pet(Event):
         fountain_drinking = {"todayFountainDrinkingCount": 0,
                              "todayFountainDrinkingAmount": 0,
                              "todayFountainDrinkingTime": 0}
+        bathroom_stats = {"todayBathroomVisits": 0,
+                          "todayBathroomPeeVisits": 0,
+                          "todayBathroomPooVisits": 0}
 
         # Collect RFID fountain serial numbers from bound devices and hub devices
         fountain_sns = set()
@@ -97,11 +100,41 @@ class Pet(Event):
             except Exception:
                 _LOGGER.warning("Failed to fetch wearListV2 for fountain %s", device_sn)
 
+        # Fetch today's per-pet bathroom totals from loaded Luma litter boxes.
+        # This device-scoped endpoint works for shared accounts.
+        luma_sns = set()
+
+        if self.hub and self.hub.devices:
+            from ..devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
+
+            for device in self.hub.devices.values():
+                if isinstance(device, LumaSmartLitterBox):
+                    luma_sns.add(device.serial)
+
+        for device_sn in luma_sns:
+            try:
+                potty_today = await self.api.device_potty_today(device_sn)
+                for entry in potty_today.get("petList") or []:
+                    if entry.get("id") != self.id:
+                        continue
+
+                    bathroom_stats["todayBathroomVisits"] += entry.get("times") or 0
+                    bathroom_stats["todayBathroomPeeVisits"] += entry.get("peeTimes") or 0
+                    bathroom_stats["todayBathroomPooVisits"] += entry.get("poopTimes") or 0
+                    break
+            except Exception:
+                _LOGGER.warning(
+                    "Failed potty-today fetch for pet %s on %s",
+                    self.id,
+                    device_sn,
+                )
+
         self.update_data(
             {
                 **pet_details,
                 "boundDevices": bound_devices,
                 **fountain_drinking,
+                **bathroom_stats,
             }
         )
 
@@ -350,3 +383,20 @@ class Pet(Event):
     def today_fountain_drinking_time(self) -> int:
         """Total seconds spent drinking at RFID fountains today."""
         return self._data.get("todayFountainDrinkingTime") or 0
+
+    # --- Bathroom Visits (from Luma bathroom history)
+
+    @property
+    def today_bathroom_visits(self) -> int:
+        """Number of Luma litter-box visits today."""
+        return self._data.get("todayBathroomVisits") or 0
+
+    @property
+    def today_bathroom_pee_visits(self) -> int:
+        """Number of urination visits recorded by Luma litter boxes today."""
+        return self._data.get("todayBathroomPeeVisits") or 0
+
+    @property
+    def today_bathroom_poo_visits(self) -> int:
+        """Number of defecation visits recorded by Luma litter boxes today."""
+        return self._data.get("todayBathroomPooVisits") or 0

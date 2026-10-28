@@ -614,6 +614,44 @@ class PetLibroAPI:
         except Exception as e:
             _LOGGER.error(f"Error fetching wearListV2 for device {device_sn}: {e}")
             raise PetLibroAPIError(f"Error fetching wearListV2 for device {device_sn}: {e}")
+    async def pet_bathroom_history(
+        self,
+        device_sn: str,
+        pet_id: int,
+        start_time: int,
+        end_time: int,
+    ) -> dict:
+        """Get detailed bathroom history for one pet on a Luma litter box.
+
+        Note: Petlibro appears to return empty data for shared accounts.
+        """
+        response = await self.session.request(
+            "POST",
+            "/data/petCare/bathroom/history",
+            headers={"timezone": "UTC"},
+            json={
+                "deviceSn": device_sn,
+                "petId": pet_id,
+                "startTime": start_time,
+                "endTime": end_time,
+                "dimensionParam": 1,
+            },
+        )
+        return response if isinstance(response, dict) else {}
+
+    async def device_potty_today(self, device_sn: str) -> dict:
+        """Get today's per-pet potty totals for a Luma litter box.
+
+        This device-scoped endpoint works for shared accounts.
+        """
+        response = await self.session.request(
+            "POST",
+            "/data/pet/potty/today",
+            json={
+                "deviceSn": device_sn,
+            },
+        )
+        return response if isinstance(response, dict) else {}
 
     # Support for new switch functions
     async def set_feeding_plan(self, serial: str, enable: bool):
