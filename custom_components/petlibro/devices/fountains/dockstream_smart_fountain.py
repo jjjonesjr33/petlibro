@@ -1,3 +1,4 @@
+import asyncio
 import aiohttp
 
 from aiohttp import ClientSession, ClientError
@@ -10,30 +11,53 @@ _LOGGER = getLogger(__name__)
 class DockstreamSmartFountain(Device):
     """Represents the Dockstream Smart Fountain device."""
 
+    async def _safe_fetch(self, name: str, coro) -> tuple | None:
+        """Fetch a single endpoint, returning (name, value) or None on failure.
+
+        Catches both API errors and network-level errors so one failing
+        endpoint never takes down the whole refresh or loses other data.
+        """
+        try:
+            return (name, await coro)
+        except (PetLibroAPIError, aiohttp.ClientError, asyncio.TimeoutError) as err:
+            _LOGGER.warning(f"Error fetching {name} for DockstreamSmartFountain: {err}")
+            return None
+
     async def refresh(self):
         """Refresh the device data from the API."""
         try:
-            await super().refresh()  # Call the refresh method from the parent class (Device)
-        
-            # Fetch real info from the API
-            real_info = await self.api.device_real_info(self.serial)
-            data_real_info = await self.api.device_data_real_info(self.serial)
-            attribute_settings = await self.api.device_attribute_settings(self.serial)
-            get_upgrade = await self.api.get_device_upgrade(self.serial)
-            get_work_record = await self.api.get_device_work_record(self.serial)
-            get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
-            get_drink_water = await self.api.get_device_drink_water(self.serial)
+            await super().refresh()
 
-            # Update internal data with fetched API data
-            self.update_data({
-                "realInfo": real_info or {},
-                "dataRealInfo": data_real_info or {},
-                "getDrinkWater": get_drink_water or {},
-                "getAttributeSetting": attribute_settings or {},
-                "getUpgrade": get_upgrade or {},
-                "getfeedingplantoday": get_feeding_plan_today or {},
-                "workRecord": get_work_record if get_work_record is not None else []
-            })
+            fetches = await asyncio.gather(
+                self._safe_fetch("realInfo", self.api.device_real_info(self.serial)),
+                self._safe_fetch("dataRealInfo", self.api.device_data_real_info(self.serial)),
+                self._safe_fetch("attributeSettings", self.api.device_attribute_settings(self.serial)),
+                self._safe_fetch("getUpgrade", self.api.get_device_upgrade(self.serial)),
+                self._safe_fetch("workRecord", self.api.get_device_work_record(self.serial)),
+                self._safe_fetch("feedingPlanToday", self.api.device_feeding_plan_today_new(self.serial)),
+                self._safe_fetch("drinkWater", self.api.get_device_drink_water(self.serial)),
+            )
+
+            # Only update keys that were fetched successfully so a transient
+            # failure doesn't overwrite previously-good data with empty values.
+            fetched = {name: value for name, value in fetches if value is not None}
+            update_data = {}
+            if "realInfo" in fetched:
+                update_data["realInfo"] = fetched["realInfo"]
+            if "dataRealInfo" in fetched:
+                update_data["dataRealInfo"] = fetched["dataRealInfo"]
+            if "drinkWater" in fetched:
+                update_data["getDrinkWater"] = fetched["drinkWater"]
+            if "attributeSettings" in fetched:
+                update_data["getAttributeSetting"] = fetched["attributeSettings"]
+            if "getUpgrade" in fetched:
+                update_data["getUpgrade"] = fetched["getUpgrade"]
+            if "feedingPlanToday" in fetched:
+                update_data["getfeedingplantoday"] = fetched["feedingPlanToday"]
+            if "workRecord" in fetched:
+                update_data["workRecord"] = fetched["workRecord"] if fetched["workRecord"] is not None else []
+
+            self.update_data(update_data)
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for DockstreamSmartFountain: {err}")
 

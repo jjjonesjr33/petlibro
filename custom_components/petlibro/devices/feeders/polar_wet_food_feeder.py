@@ -7,6 +7,7 @@ from ...exceptions import PetLibroAPIError
 from ..device import Device
 from typing import cast
 from logging import getLogger
+from homeassistant.util import dt as dt_util
 
 _LOGGER = getLogger(__name__)
 
@@ -125,6 +126,7 @@ class PolarWetFoodFeeder(Device):
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._rotating = False
         self._manual_feed_active = False
 
     @property
@@ -158,6 +160,46 @@ class PolarWetFoodFeeder(Device):
         celsius = self._data.get("realInfo", {}).get("temperature", 0.0)
         fahrenheit = celsius * 9 / 5 + 32
         return round(fahrenheit, 1)  # Round to 1 decimal place
+
+    @property
+    def remaining_cleaning_days(self) -> float | None:
+        """Get the remaining cleaning days."""
+        value = self._data.get("realInfo", {}).get("remainingCleaningDays")
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
+
+    @property
+    def last_clean_date(self) -> datetime | None:
+        """Return the timestamp of the last machine cleaning as a datetime object (UTC)."""
+        timestamp_ms = self._data.get("realInfo", {}).get("machineCleaningTime")
+        if not timestamp_ms:
+            return None
+        try:
+            return dt_util.utc_from_timestamp(timestamp_ms / 1000)
+        except (TypeError, ValueError, OverflowError, OSError):
+            return None
+
+    @property
+    def next_clean_date(self) -> datetime | None:
+        """Return the timestamp of the next machine cleaning as a datetime object (UTC)."""
+        timestamp_ms = self._data.get("realInfo", {}).get("machineNextCleaningTime")
+        if not timestamp_ms:
+            return None
+        try:
+            return dt_util.utc_from_timestamp(timestamp_ms / 1000)
+        except (TypeError, ValueError, OverflowError, OSError):
+            return None
+
+    async def set_cleaning_reset(self) -> None:
+        _LOGGER.debug(f"Triggering machine cleaning reset for {self.serial}")
+        try:
+            await self.api.set_cleaning_reset(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger machine cleaning reset for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering machine cleaning reset: {err}")
 
     @property
     def unit_type(self) -> int:
@@ -201,7 +243,7 @@ class PolarWetFoodFeeder(Device):
                     _LOGGER.warning("No manual feed ID available to stop for %s", self.serial)
                 else:
                     await self.api.set_stop_feed_now(self.serial, self.manual_feed_id)
-            
+
             self._manual_feed_active = start
             await self.refresh()
         except aiohttp.ClientError as err:
@@ -210,41 +252,52 @@ class PolarWetFoodFeeder(Device):
     
     async def set_plate_position(self, value: str | int) -> None:
         """Rotate bowl to requested plate (1-3)"""
+        if self._rotating:
+            _LOGGER.warning("Rotation already in progress for %s", self.serial)
+            return
         try:
             target = int(value)
         except (TypeError, ValueError):
             raise PetLibroAPIError(f"Invalid plate value: {value!r}")
         if target not in (1, 2, 3):
-            # Raise an error if plate count somehow became less than 1 or more than 3.
             raise PetLibroAPIError(f"Plate must be 1, 2, or 3, got {target}")
 
-        # Ensure we know current position
-        if not self.plate_position:
+        # Acquire the lock before the first await so concurrent calls can't
+        # both pass the guard above (TOCTOU).
+        self._rotating = True
+        try:
+            if not self.plate_position:
+                await self.refresh()
+            curr = self.plate_position or 1
+
+            steps = (target - curr) % 3
+            _LOGGER.debug("Rotate-to-plate: curr=%s target=%s steps=%s for %s", curr, target, steps, self.serial)
+
+            ROTATE_COOLDOWN = 2.0
+            for _ in range(steps):
+                await self.api.set_rotate_food_bowl(self.serial)
+                await asyncio.sleep(ROTATE_COOLDOWN)
+                await self.refresh()
+
             await self.refresh()
-        curr = self.plate_position or 1
-
-        steps = (target - curr) % 3
-        _LOGGER.debug("Rotate-to-plate: curr=%s target=%s steps=%s for %s", curr, target, steps, self.serial)
-
-        # didnt test other cooldowns, may be able reduce.
-        ROTATE_COOLDOWN = 0.6
-        for _ in range(steps):
-            await self.api.set_rotate_food_bowl(self.serial)
-            await asyncio.sleep(ROTATE_COOLDOWN)
-            await self.refresh()
-
-        # Final refresh so sensor/current_option show the target
-        await self.refresh()
+        finally:
+            self._rotating = False
 
     async def rotate_food_bowl(self) -> None:
+        if self._rotating:
+            _LOGGER.warning("Rotation already in progress for %s", self.serial)
+            return
         _LOGGER.debug(f"Triggering rotate food bowl for {self.serial}")
 
+        self._rotating = True
         try:
             await self.api.set_rotate_food_bowl(self.serial)
-            await self.refresh()  # Refresh the state after the action
+            await self.refresh()
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger rotate food bowl for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering rotate food bowl: {err}")
+        finally:
+            self._rotating = False
 
     async def feed_audio(self) -> None:
         _LOGGER.debug(f"Triggering feed audio for {self.serial}")

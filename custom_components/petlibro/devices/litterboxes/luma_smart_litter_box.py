@@ -472,6 +472,24 @@ class LumaSmartLitterBox(Device):
         except Exception as err:
             _LOGGER.error(f"Failed to set deodorization switch for {self.serial}: {err}")
 
+    async def set_cleaning_reset(self) -> None:
+        """Reset the machine-cleaning countdown (remainingCleaningDays / cleanState)."""
+        _LOGGER.debug(f"Triggering machine cleaning reset for {self.serial}")
+        try:
+            await self.api.set_cleaning_reset(self.serial)
+            await self.refresh()
+        except Exception as err:
+            _LOGGER.error(f"Failed to trigger machine cleaning reset for {self.serial}: {err}")
+
+    async def set_filter_reset(self) -> None:
+        """Reset the filter-replacement countdown (remainingReplacementDays / filterState)."""
+        _LOGGER.debug(f"Triggering filter reset for {self.serial}")
+        try:
+            await self.api.set_filter_reset(self.serial)
+            await self.refresh()
+        except Exception as err:
+            _LOGGER.error(f"Failed to trigger filter reset for {self.serial}: {err}")
+
     async def set_clean_mode(self, mode: str) -> None:
         """Set clean mode (AUTO/MANUAL)."""
         _LOGGER.debug(f"Setting clean mode to {mode} for {self.serial}")
