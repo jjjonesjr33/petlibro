@@ -60,12 +60,18 @@
                 "data": {
                     "manual_feed_portions": "Set Manual Feed amount by Portions",
                     "pet_feed_quantity_no_rfid": "Include non-RFID Pet Consumption",
-                    "enable_shared_pets": "Show Pets from Shared Devices"
+                    "enable_shared_pets": "Show Pets from Shared Devices",
+                    "camera_stream": "Stream Camera Feeders",
+                    "camera_host": "Camera Feeder IP Address",
+                    "camera_stream_url": "Custom Camera Stream URL"
                 },
                 "data_description": {
                     "manual_feed_portions": "Default: Set by your chosen unit for pet feed ({uom}).",
                     "pet_feed_quantity_no_rfid": "Pet consumption will include non-RFID devices when only one pet is assigned to them.",
-                    "enable_shared_pets": "Access pets from other accounts that are linked to device(s) they share with you."
+                    "enable_shared_pets": "Access pets from other accounts that are linked to device(s) they share with you.",
+                    "camera_stream": "Show live video from Granary Smart Camera Feeders over your local network. Downloads a small go2rtc helper on first use.",
+                    "camera_host": "Optional. Only needed if the feeder is on a different network or VLAN and no device tracker reports its IP address.",
+                    "camera_stream_url": "Optional. Use a stream from your own go2rtc or bridge instead of the built-in one."
                 }
             },
             "change_credentials": {
