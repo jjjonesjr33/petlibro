@@ -175,9 +175,7 @@ class Pet(Event):
 
     def set_device_id(self) -> None:
         """Update Pet object data with it's Home Assistant device ID."""
-        device = self.hub.device_register.async_get_device(
-            identifiers=self.device_identifiers
-        )
+        device = self.hub.get_device_entry(self.device_identifiers)
         if device and getattr(device, "id", False):
             self.update_data({"device_id": device.id})
 
