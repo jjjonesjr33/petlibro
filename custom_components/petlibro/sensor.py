@@ -1491,6 +1491,12 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Waste Bin State"
         ),
         PetLibroSensorEntityDescription[LumaSmartLitterBox](
+            key="warehouse_surplus_grain",
+            translation_key="warehouse_surplus_grain",
+            icon="mdi:sack",
+            name="Litter Level"
+        ),
+        PetLibroSensorEntityDescription[LumaSmartLitterBox](
             key="running_state",
             translation_key="running_state",
             icon="mdi:state-machine",
