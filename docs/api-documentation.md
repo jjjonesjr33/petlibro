@@ -401,6 +401,27 @@ Switch the device's active feeding mode. Confirmed via a live network capture of
 The current mode is read back via `feedingMode` on `POST /data/data/realInfo` (see below) -
 not on `POST /device/device/realInfo`, which doesn't carry this field.
 
+### Granary 2 (PLAF105)
+
+The camera-less Granary 2 (`productName` "Granary 2", `productIdentifier` PLAF105,
+firmware 1.0.33 as of 2026-11-01) shares the bowl-scale and feeding-mode layer of the
+Granary 2 Vision: `/data/data/realInfo` carries `feedingMode`, `remainingGrain`,
+`remainingGrainNum`, `maxFeedable`, `autoFeedMaxWeight`, `autoStopFeedSwitch`,
+`portionToGramRatio`, `mealCallSwitch`, `powerState`, `cleanState`, `desiccantState`,
+`remainingCleaningDays` and the four `free*` settings, and
+`/device/device/getFreeFeedingSetting` and `/device/device/updateFeedingMode` work as
+documented above. It has no camera, so `/member/third/tutk/info` is not used.
+
+Two differences from the older Granary feeders, observed on the device:
+
+* `/device/feedingPlan/todayNew` answers `{"plans": [], "allExpired": true, "allSkipped": true}`
+  and `/device/feedingPlan/list` answers `[]` even while a schedule is active. The next
+  feed the cloud exposes is the `nextFeedingDay` + `nextFeedingTime` pair (device-local
+  time) on the device's `/device/device/list` entry, so the integration re-reads that
+  entry on each refresh.
+* `/device/device/getDefaultMatrix` is not relied on; each per-device call is isolated so
+  one unanswered endpoint does not drop the whole refresh.
+
 ## Water / Fountain Endpoints
 
 ### POST /data/deviceDrinkWater/todayDrinkData

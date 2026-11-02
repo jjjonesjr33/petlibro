@@ -27,6 +27,7 @@ from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.granary_2_vision_feeder import Granary2VisionFeeder
+from .devices.feeders.granary_2_feeder import Granary2Feeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
@@ -368,6 +369,22 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             name="Enable Free Feeding (Smart Feed)"
         ),
         PetLibroButtonEntityDescription[Granary2VisionFeeder](
+            key="plan_feeding_mode",
+            translation_key="plan_feeding_mode",
+            icon="mdi:calendar-clock",
+            set_fn=lambda device: device.set_plan_feeding_mode(),
+            name="Enable Feeding Plan Mode"
+        ),
+    ],
+    Granary2Feeder: [
+        PetLibroButtonEntityDescription[Granary2Feeder](
+            key="free_feeding_mode",
+            translation_key="free_feeding_mode",
+            icon="mdi:autorenew",
+            set_fn=lambda device: device.set_free_feeding_mode(),
+            name="Enable Free Feeding (Smart Feed)"
+        ),
+        PetLibroButtonEntityDescription[Granary2Feeder](
             key="plan_feeding_mode",
             translation_key="plan_feeding_mode",
             icon="mdi:calendar-clock",

@@ -355,6 +355,21 @@
             },
             "portion_to_gram_ratio": {
                 "name": "Grams per Portion"
+            },
+            "remaining_food_portions": {
+                "name": "Food in Bowl (Portions)"
+            },
+            "hopper_state": {
+                "name": "Hopper State"
+            },
+            "power_state": {
+                "name": "Power State"
+            },
+            "clean_state": {
+                "name": "Cleaning State"
+            },
+            "desiccant_state": {
+                "name": "Desiccant State"
             }
         },
         "image": {
@@ -539,6 +554,9 @@
             },
             "auto_stop_feed_enabled": {
                 "name": "Auto Stop Feed"
+            },
+            "meal_call_enabled": {
+                "name": "Meal Call"
             }
         },
         "number": {
