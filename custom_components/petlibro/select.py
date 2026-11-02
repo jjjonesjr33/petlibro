@@ -416,9 +416,13 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
                 else
                 _apply_with_cached_schedule(d, lambda interval, duration, off: d.api.set_new_water_mode_intermittent(d.serial, interval, duration, currently_off=off)) if opt == "Intermittent Water (Scheduled)"
                 else
+                _apply_with_cached_schedule(d, lambda interval, duration, off: d.api.set_water_mode_radar_near(d.serial, interval, duration, currently_off=off)) if opt == "Sensor-Activated (Near)"
+                else
+                _apply_with_cached_schedule(d, lambda interval, duration, off: d.api.set_water_mode_radar_far(d.serial, interval, duration, currently_off=off)) if opt == "Sensor-Activated (Far)"
+                else
                 _apply_with_cached_schedule(d, lambda interval, duration, off: d.api.set_new_water_mode_constant(d.serial, interval, duration, currently_off=off))
             ),
-            options=['Flowing Water (Constant)','Intermittent Water (Scheduled)','Off'],
+            options=['Flowing Water (Constant)','Intermittent Water (Scheduled)','Sensor-Activated (Near)','Sensor-Activated (Far)','Off'],
             name="Water Dispensing Mode"
         ),
     ],

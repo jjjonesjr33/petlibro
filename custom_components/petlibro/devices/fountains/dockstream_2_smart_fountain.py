@@ -120,6 +120,7 @@ class Dockstream2SmartFountain(Device):
         # raw values as received
         stop_raw = real.get("waterStopSwitch")
         mode_raw = real.get("useWaterType")
+        radar = real.get("radarSensingLevel")
 
         # coerce to the types we expect
         stop = bool(stop_raw)
@@ -135,6 +136,13 @@ class Dockstream2SmartFountain(Device):
             label = "Flowing Water (Constant)"
         elif mode == 1:
             label = "Intermittent Water (Scheduled)"
+        elif mode == 2:
+            if radar == "NearTrigger":
+                label = "Sensor-Activated (Near)"
+            elif radar == "FarTrigger":
+                label = "Sensor-Activated (Far)"
+            else:
+                label = "Unknown"  # waiting for radar to land
         else:
             label = "Unknown"
 
