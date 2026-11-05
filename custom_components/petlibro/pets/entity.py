@@ -595,6 +595,27 @@ PET_ENTITY_MAP: dict[PL_PetEntity, tuple[PL_PetEntityDescription]] = {
             device_class=SensorDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
         ),
+        PL_PetSensorEntityDescription(
+            key="today_bathroom_visits",
+            translation_key="today_bathroom_visits",
+            name="Today's Litter Box Visits",
+            icon="mdi:cat",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+        ),
+        PL_PetSensorEntityDescription(
+            key="today_bathroom_pee_visits",
+            translation_key="today_bathroom_pee_visits",
+            name="Today's Pee Visits",
+            icon="mdi:water",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+        ),
+        PL_PetSensorEntityDescription(
+            key="today_bathroom_poo_visits",
+            translation_key="today_bathroom_poo_visits",
+            name="Today's Poo Visits",
+            icon="mdi:emoticon-poop",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+        ),
     ),
     PL_PetImageEntity: (
         PL_PetImageEntityDescription(
