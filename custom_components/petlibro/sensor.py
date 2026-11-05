@@ -21,6 +21,7 @@ from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.granary_2_vision_feeder import Granary2VisionFeeder
+from .devices.feeders.granary_2_feeder import Granary2Feeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
@@ -841,6 +842,154 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             state_class=SensorStateClass.MEASUREMENT,
             entity_category=EntityCategory.DIAGNOSTIC,
             should_report=lambda device: device.portion_to_gram_ratio is not None
+        ),
+    ],
+    Granary2Feeder: [
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="feeding_mode",
+            translation_key="feeding_mode",
+            icon="mdi:swap-horizontal",
+            name="Feeding Mode",
+            should_report=lambda device: device.feeding_mode is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="remaining_food_weight",
+            translation_key="remaining_food_weight",
+            icon="mdi:scale",
+            name="Food in Bowl",
+            native_unit_of_measurement=UnitOfMass.GRAMS,
+            device_class=SensorDeviceClass.WEIGHT,
+            state_class=SensorStateClass.MEASUREMENT,
+            should_report=lambda device: device.remaining_food_weight is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="remaining_food_portions",
+            translation_key="remaining_food_portions",
+            icon="mdi:bowl",
+            name="Food in Bowl (Portions)",
+            native_unit_of_measurement="portions",
+            state_class=SensorStateClass.MEASUREMENT,
+            should_report=lambda device: device.remaining_food_portions is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="max_feedable",
+            translation_key="max_feedable",
+            icon="mdi:counter",
+            name="Feedable Portions",
+            native_unit_of_measurement="portions",
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            should_report=lambda device: device.max_feedable is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="auto_feed_max_weight",
+            translation_key="auto_feed_max_weight",
+            icon="mdi:scale-balance",
+            name="Auto Feed Maximum",
+            native_unit_of_measurement=UnitOfMass.GRAMS,
+            device_class=SensorDeviceClass.WEIGHT,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            should_report=lambda device: device.auto_feed_max_weight is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="portion_to_gram_ratio",
+            translation_key="portion_to_gram_ratio",
+            icon="mdi:scale",
+            name="Grams per Portion",
+            native_unit_of_measurement=UnitOfMass.GRAMS,
+            device_class=SensorDeviceClass.WEIGHT,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            should_report=lambda device: device.portion_to_gram_ratio is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="free_feeding_per_grain",
+            translation_key="free_feeding_per_grain",
+            icon="mdi:counter",
+            name="Free Feeding Per-Feed Amount",
+            native_unit_of_measurement="portions",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            should_report=lambda device: device.free_feeding_per_grain is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="free_feeding_daily_max",
+            translation_key="free_feeding_daily_max",
+            icon="mdi:counter",
+            name="Free Feeding Daily Max Count",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            should_report=lambda device: device.free_feeding_daily_max is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="free_feeding_leftover_weight",
+            translation_key="free_feeding_leftover_weight",
+            icon="mdi:scale",
+            name="Free Feeding Leftover Threshold",
+            native_unit_of_measurement=UnitOfMass.GRAMS,
+            device_class=SensorDeviceClass.WEIGHT,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            should_report=lambda device: device.free_feeding_leftover_weight is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="free_feeding_wait_seconds",
+            translation_key="free_feeding_wait_seconds",
+            icon="mdi:timer-outline",
+            name="Free Feeding Wait Time",
+            native_unit_of_measurement="s",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            should_report=lambda device: device.free_feeding_wait_seconds is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="bowl_mode",
+            translation_key="bowl_mode",
+            icon="mdi:bowl",
+            name="Bowl Mode",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            should_report=lambda device: device.bowl_mode is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="hopper_state",
+            translation_key="hopper_state",
+            icon="mdi:silo",
+            name="Hopper State",
+            should_report=lambda device: device.hopper_state is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="power_state",
+            translation_key="power_state",
+            icon="mdi:power-plug",
+            name="Power State",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            should_report=lambda device: device.power_state is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="remaining_cleaning_days",
+            translation_key="remaining_cleaning_days",
+            icon="mdi:spray-bottle",
+            name="Remaining Cleaning Days",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
+            should_report=lambda device: device.remaining_cleaning_days is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="clean_state",
+            translation_key="clean_state",
+            icon="mdi:spray-bottle",
+            name="Cleaning State",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            should_report=lambda device: device.clean_state is not None
+        ),
+        PetLibroSensorEntityDescription[Granary2Feeder](
+            key="desiccant_state",
+            translation_key="desiccant_state",
+            icon="mdi:package",
+            name="Desiccant State",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            should_report=lambda device: device.desiccant_state is not None
         ),
     ],
     OneRFIDSmartFeeder: [

@@ -30,6 +30,7 @@ from .devices.feeders.air_smart_feeder import AirSmartFeeder
 from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.granary_2_vision_feeder import Granary2VisionFeeder
+from .devices.feeders.granary_2_feeder import Granary2Feeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
@@ -473,6 +474,24 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.auto_stop_feed_enabled is not None,
             available_fn=lambda device: device.auto_stop_feed_enabled is not None,
             name="Auto Stop Feed"
+        ),
+    ],
+    Granary2Feeder: [
+        PetLibroBinarySensorEntityDescription[Granary2Feeder](
+            key="auto_stop_feed_enabled",
+            translation_key="auto_stop_feed_enabled",
+            icon="mdi:food-off",
+            should_report=lambda device: device.auto_stop_feed_enabled is not None,
+            available_fn=lambda device: device.auto_stop_feed_enabled is not None,
+            name="Auto Stop Feed"
+        ),
+        PetLibroBinarySensorEntityDescription[Granary2Feeder](
+            key="meal_call_enabled",
+            translation_key="meal_call_enabled",
+            icon="mdi:bullhorn",
+            should_report=lambda device: device.meal_call_enabled is not None,
+            available_fn=lambda device: device.meal_call_enabled is not None,
+            name="Meal Call"
         ),
     ],
     OneRFIDSmartFeeder: [

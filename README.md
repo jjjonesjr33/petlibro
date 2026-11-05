@@ -32,6 +32,7 @@ If you enjoy this integration and want to support its development, please consid
 
 ### Feeders
 * Granary Smart Feeder (PLAF103) | Version 2
+* Granary 2 (PLAF105)
 * Space Smart Feeder (PLAF107)
 * Air Smart Feeder (PLAF108)
 * Polar Wet Food Feeder (PLAF109)
