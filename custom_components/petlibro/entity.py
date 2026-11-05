@@ -5,10 +5,18 @@ from __future__ import annotations
 from typing import Generic, TypeVar
 from functools import cached_property
 
+from homeassistant.const import Platform
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, DeviceInfo
 from homeassistant.helpers.entity import EntityDescription
+from homeassistant.helpers.entity_registry import (
+    RegistryEntryDisabler,
+    RegistryEntryHider,
+    async_get as async_get_entity_registry,
+)
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 
+from .const import DOMAIN
 from .devices import Device
 from .devices.event import EVENT_UPDATE
 from .hub import PetLibroHub
@@ -62,3 +70,37 @@ class PetLibroEntity(
 
 class PetLibroEntityDescription(EntityDescription, Generic[_DeviceT]):
     """PETLIBRO Entity description"""
+
+
+def disable_unsupported_entity_entries(
+    hass: HomeAssistant,
+    platform: Platform,
+    entities: list[PetLibroEntity],
+) -> None:
+    """Disable existing registry entries for unsupported fixed capabilities."""
+    entity_registry = async_get_entity_registry(hass)
+
+    for entity in entities:
+        supported_fn = getattr(entity.entity_description, "supported_fn", None)
+        if supported_fn is None or supported_fn(entity.device):
+            continue
+
+        entity_id = entity_registry.async_get_entity_id(
+            platform,
+            DOMAIN,
+            entity.unique_id,
+        )
+        if entity_id is None:
+            continue
+
+        registry_entry = entity_registry.async_get(entity_id)
+        if registry_entry is None:
+            continue
+
+        changes = {}
+        if registry_entry.disabled_by is None:
+            changes["disabled_by"] = RegistryEntryDisabler.INTEGRATION
+        if registry_entry.hidden_by is None:
+            changes["hidden_by"] = RegistryEntryHider.INTEGRATION
+        if changes:
+            entity_registry.async_update_entity(entity_id, **changes)
