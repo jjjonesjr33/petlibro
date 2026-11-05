@@ -25,6 +25,7 @@ from .const import (
     DEFAULT_WATER,
     DEFAULT_WEIGHT,
     DOMAIN,
+    PASSWORD_MAX_LENGTH,
     APIKey as API,
     Gender,
     Unit,
@@ -43,6 +44,16 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
         vol.Required(CONF_PASSWORD): str,
     }
 )
+
+
+def _invalid_auth_error(password: str) -> str:
+    """Return the error key for a rejected password.
+
+    PETLIBRO rejects passwords over 18 characters even though the app may accept them.
+    """
+    if len(password) > PASSWORD_MAX_LENGTH:
+        return "password_too_long"
+    return "invalid_auth"
 
 class PetlibroConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Petlibro."""
@@ -180,7 +191,7 @@ class PetlibroConfigFlow(ConfigFlow, domain=DOMAIN):
         except PetLibroCannotConnect:
             return "cannot_connect"
         except PetLibroInvalidAuth:
-            return "invalid_auth"
+            return _invalid_auth_error(self.password)
         except Exception as e:
             _LOGGER.exception("Unexpected exception during validation: %s", e)
             return "unknown"
@@ -378,7 +389,7 @@ class PetlibroOptionsFlow(OptionsFlow):
                 )
                 new_token = await api.login(new_email, new_password)
             except PetLibroInvalidAuth:
-                errors["base"] = "invalid_auth"
+                errors["base"] = _invalid_auth_error(new_password)
             except PetLibroCannotConnect:
                 errors["base"] = "cannot_connect"
             except Exception:

@@ -8,7 +8,8 @@
         "error": {
             "cannot_connect": "Failed to connect",
             "invalid_auth": "Invalid authentication",
-            "unknown": "Unexpected error"
+            "unknown": "Unexpected error",
+            "password_too_long": "PETLIBRO rejected the password. Passwords longer than 18 characters are not accepted by the PETLIBRO API, even if the app accepts them. Change your PETLIBRO password to 18 characters or fewer and try again."
         },
         "step": {
             "user": {
@@ -45,7 +46,8 @@
         "error": {
             "cannot_connect": "Failed to connect",
             "invalid_auth": "Invalid authentication",
-            "unknown": "Unexpected error"
+            "unknown": "Unexpected error",
+            "password_too_long": "PETLIBRO rejected the password. Passwords longer than 18 characters are not accepted by the PETLIBRO API, even if the app accepts them. Change your PETLIBRO password to 18 characters or fewer and try again."
         },
 		"step": {
 			"init": {
