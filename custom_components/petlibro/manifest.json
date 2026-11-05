@@ -11,5 +11,5 @@
   "issue_tracker": "https://github.com/jjjonesjr33/petlibro/issues",
   "loggers": ["petlibro"],
   "categories": ["pets"],
-  "version": "1.3"
+  "version": "1.4"
 }
