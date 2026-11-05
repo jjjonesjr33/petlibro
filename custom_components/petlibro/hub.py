@@ -11,7 +11,11 @@ from homeassistant.const import CONF_REGION, CONF_API_TOKEN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from homeassistant.helpers.device_registry import async_get as async_get_device_register
+from homeassistant.helpers.device_registry import (
+    DeviceEntry,
+    async_entries_for_config_entry,
+    async_get as async_get_device_register,
+)
 from homeassistant.util.dt import utcnow
 from .api import PetLibroAPI  # Use a relative import if inside the same package
 from .const import CONF_EMAIL, CONF_PASSWORD, IntegrationSetting
@@ -393,6 +397,21 @@ class PetLibroHub:
         if not pet:
             _LOGGER.debug("Pet with id %s not found.", id)
         return pet
+
+    def get_registered_device(self, identifiers: set) -> DeviceEntry | None:
+        """Return this config entry's registered device matching the identifiers.
+
+        DeviceRegistry.async_get_device is deprecated and stops working in HA 2027.8.
+        Its replacement, async_get_device_by_identifier, only exists since HA 2026.8,
+        while hacs.json still allows HA 2025.1, so look through the devices of this
+        config entry instead, which works on all of those versions.
+        """
+        for device in async_entries_for_config_entry(
+            self.device_register, self.entry.entry_id
+        ):
+            if device.identifiers & identifiers:
+                return device
+        return None
 
     def update_options(self, new_options: Mapping[str, Any]) -> None:
         """Update config entry options."""

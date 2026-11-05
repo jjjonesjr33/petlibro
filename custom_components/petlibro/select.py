@@ -21,6 +21,7 @@ from homeassistant.core import callback
 from homeassistant.const import Platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
+from homeassistant.helpers.restore_state import RestoreEntity
 from .hub import PetLibroHub  # Adjust the import path as necessary
 
 from .devices import Device
@@ -71,7 +72,7 @@ class PetLibroSelectEntityDescription(SelectEntityDescription, PetLibroEntityDes
     current_selection: Callable[[_DeviceT], str] | None = lambda _: None  # Default to None
     petlibro_unit: APIKey | str | None = None
 
-class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
+class PetLibroSelectEntity(PetLibroEntity[_DeviceT], RestoreEntity, SelectEntity):
     """PETLIBRO select entity."""
 
     entity_description: PetLibroSelectEntityDescription[_DeviceT]
@@ -82,6 +83,27 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
 
         if (unit_type := self.entity_description.petlibro_unit) and unit_type == APIKey.FEED_UNIT:
             self.hub.unit_entities.feed_number_unique_ids[Platform.SELECT].append(self._attr_unique_id)
+
+    async def async_added_to_hass(self) -> None:
+        """Restore last state on startup."""
+        await super().async_added_to_hass()
+        if self.key != "manual_feed_quantity_cups":
+            return
+        last_state = await self.async_get_last_state()
+        if last_state is not None and last_state.state not in ("unknown", "unavailable"):
+            try:
+                restored_option = last_state.state
+                opts = self.options
+                if restored_option in opts:
+                    self.device.manual_feed_quantity = opts.index(restored_option) + 1
+                else:
+                    _LOGGER.debug(
+                        "Saved option %s no longer available for %s, skipping restore",
+                        restored_option,
+                        self.device.name,
+                    )
+            except (TypeError, ValueError) as err:
+                _LOGGER.warning("Failed to restore manual_feed_quantity: %s", err)
 
     @property
     def options(self) -> list[str]:
