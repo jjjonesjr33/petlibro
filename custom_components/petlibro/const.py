@@ -20,7 +20,7 @@ CONF_REGION = "region"
 PASSWORD_MAX_LENGTH = 18  # PETLIBRO rejects longer passwords with ILLEGAL_PASSWORD
 
 # Supported platforms
-PLATFORMS = ["sensor", "switch", "button", "binary_sensor", "number", "select", "text", "date", "image", "update", "camera"]  # Add any other platforms as needed
+PLATFORMS = ["sensor", "switch", "button", "binary_sensor", "number", "select", "text", "date", "image", "update", "event", "camera"]  # Add any other platforms as needed
 
 # Update interval for device data in seconds
 UPDATE_INTERVAL_SECONDS = 60  # You can adjust this value based on your needs

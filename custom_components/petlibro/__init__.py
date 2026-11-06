@@ -68,7 +68,8 @@ PLATFORMS_BY_TYPE = {
         Platform.SELECT,
         Platform.TEXT,
         Platform.UPDATE,
-        Platform.CAMERA
+        Platform.EVENT,
+        Platform.CAMERA,
     ),
     OneRFIDSmartFeeder: (
         Platform.SENSOR,
