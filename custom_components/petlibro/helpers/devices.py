@@ -37,10 +37,7 @@ class DevicesHelper:
 
     def _remove_device(self, device_id: str) -> None:
         """Remove a device entry from Home Assistant."""
-        self.hub.device_register.async_update_device(
-            device_id=device_id,
-            remove_config_entry_id=self.handler,
-        )
+        self.hub.remove_device_entry(device_id)
         _LOGGER.debug("Removed device: %s", device_id)
 
     def _sync_cache(self, new_devices_cache: dict) -> None:

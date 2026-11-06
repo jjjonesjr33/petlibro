@@ -413,6 +413,21 @@ class PetLibroHub:
                 return device
         return None
 
+    def remove_device_entry(self, device_id: str) -> None:
+        """Remove a device registry entry that belongs to this config entry."""
+        # Since HA 2026.8 a device belongs to one config entry, so removing the
+        # entry from it means removing the device. Check the owner first: a device
+        # shared with another PetLibro account has a separate entry per account.
+        if hasattr(self.device_register, "async_get_device_by_identifier"):
+            device = self.device_register.async_get(device_id)
+            if device and device.config_entry_id == self.entry.entry_id:
+                self.device_register.async_remove_device(device_id)
+        else:
+            self.device_register.async_update_device(
+                device_id=device_id,
+                remove_config_entry_id=self.entry.entry_id,
+            )
+
     def update_options(self, new_options: Mapping[str, Any]) -> None:
         """Update config entry options."""
         self.hass.config_entries.async_update_entry(
