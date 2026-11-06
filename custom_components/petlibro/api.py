@@ -22,7 +22,7 @@ from typing import Any, Dict, List, TypeAlias
 from datetime import timedelta
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util.dt import utcnow
-from .exceptions import PetLibroAPIError
+from .exceptions import PetLibroAPIError, PetLibroInvalidAuth
 from aiohttp import ClientSession
 
 import aiohttp
@@ -133,6 +133,9 @@ class PetLibroSession:
                 retry_data = await retry_resp.json()
                 _LOGGER.debug(f"Retry response: {retry_data}")
                 return retry_data.get("data")
+
+        if data.get("code") == 1102:  # ILLEGAL_PASSWORD error code
+            raise PetLibroInvalidAuth(f"Code: {data.get('code')}, Message: {data.get('msg')}")
 
         if data.get("code") != 0:
             raise PetLibroAPIError(f"Code: {data.get('code')}, Message: {data.get('msg')}")
@@ -260,6 +263,9 @@ class PetLibroAPI:
             _LOGGER.debug("Login successful")
             return self.session.token
 
+        except PetLibroInvalidAuth as e:
+            _LOGGER.error(f"Login failed: {e}")
+            raise
         except Exception as e:
             _LOGGER.error(f"Login failed: {e}")
             raise PetLibroAPIError(f"Login attempt failed: {e}")
@@ -586,6 +592,25 @@ class PetLibroAPI:
     async def device_wet_feeding_plan(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/wetFeedingPlan/wetListV3", serial)
 
+    async def device_get_free_feeding_setting(self, serial: str) -> Dict[str, Any]:
+        """Get Free Feeding (Smart Feed) mode settings: per-feed amount, daily max, leftover threshold, wait time."""
+        return await self.session.post_serial("/device/device/getFreeFeedingSetting", serial)
+
+    async def set_feeding_mode(self, serial: str, mode: str) -> None:
+        """Set the device's feeding mode (e.g. 'FREE' for Free/Smart Feeding)."""
+        await self.session.post("/device/device/updateFeedingMode", json={
+            "deviceSn": serial,
+            "mode": mode
+        })
+
+    async def device_tutk_info(self, serial: str) -> Dict[str, Any]:
+        """Get Kalay/TUTK P2P camera credentials (UID, auth token, app URL) for a camera-equipped device.
+
+        This is the credential layer only - it does not itself provide a video stream.
+        An external TUTK-compatible client/bridge is needed to actually pull video.
+        """
+        return await self.session.post_serial("/member/third/tutk/info", serial)
+
     async def device_get_bound_pets(self, device_sn: str) -> list[dict]:
         """Get pets bound to a device."""
         _LOGGER.debug("Requesting pets bound to device sn: %s", device_sn)
@@ -624,6 +649,44 @@ class PetLibroAPI:
         except Exception as e:
             _LOGGER.error(f"Error fetching wearListV2 for device {device_sn}: {e}")
             raise PetLibroAPIError(f"Error fetching wearListV2 for device {device_sn}: {e}")
+    async def pet_bathroom_history(
+        self,
+        device_sn: str,
+        pet_id: int,
+        start_time: int,
+        end_time: int,
+    ) -> dict:
+        """Get detailed bathroom history for one pet on a Luma litter box.
+
+        Note: Petlibro appears to return empty data for shared accounts.
+        """
+        response = await self.session.request(
+            "POST",
+            "/data/petCare/bathroom/history",
+            headers={"timezone": "UTC"},
+            json={
+                "deviceSn": device_sn,
+                "petId": pet_id,
+                "startTime": start_time,
+                "endTime": end_time,
+                "dimensionParam": 1,
+            },
+        )
+        return response if isinstance(response, dict) else {}
+
+    async def device_potty_today(self, device_sn: str) -> dict:
+        """Get today's per-pet potty totals for a Luma litter box.
+
+        This device-scoped endpoint works for shared accounts.
+        """
+        response = await self.session.request(
+            "POST",
+            "/data/pet/potty/today",
+            json={
+                "deviceSn": device_sn,
+            },
+        )
+        return response if isinstance(response, dict) else {}
 
     # Support for new switch functions
     async def set_feeding_plan(self, serial: str, enable: bool):
@@ -1358,25 +1421,16 @@ class PetLibroAPI:
                 "requestId": request_id,  # Use dynamic request ID
                 "timeout": 5000
             })
-
-            # Check if response is already parsed (since response is an integer here)
-            if isinstance(response, int):
-                _LOGGER.debug(f"Machine cleaning reset set successfully, returned code: {response}")
-                return response
-            
-            # If response is a dictionary (JSON), handle it
-            response_data = await response.json()
-            _LOGGER.debug(f"Machine cleaning reset response data: {response_data}")
-            
-            # Check if the response indicates success
-            if response.status != 200 or response_data.get("code") != 0:
-                raise PetLibroAPIError(f"Failed to trigger machine cleaning reset: {response_data.get('msg')}")
-
-            return response_data
-
+        except PetLibroAPIError as err:
+            _LOGGER.error(f"Failed to trigger machine cleaning reset: {err}")
+            raise
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger machine cleaning reset for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering machine cleaning reset: {err}")
+
+        # session.post already returns the parsed "data" payload and raises on a non-zero code
+        _LOGGER.debug(f"Machine cleaning reset set successfully, response data: {response}")
+        return response
 
     async def set_filter_reset(self, serial: str) -> JSON:
         """Trigger machine cleaning reset for a specific device."""
@@ -1392,25 +1446,16 @@ class PetLibroAPI:
                 "requestId": request_id,  # Use dynamic request ID
                 "timeout": 5000
             })
-
-            # Check if response is already parsed (since response is an integer here)
-            if isinstance(response, int):
-                _LOGGER.debug(f"Filter reset set successfully, returned code: {response}")
-                return response
-            
-            # If response is a dictionary (JSON), handle it
-            response_data = await response.json()
-            _LOGGER.debug(f"Machine cleaning reset response data: {response_data}")
-            
-            # Check if the response indicates success
-            if response.status != 200 or response_data.get("code") != 0:
-                raise PetLibroAPIError(f"Failed to trigger machine cleaning reset: {response_data.get('msg')}")
-
-            return response_data
-
+        except PetLibroAPIError as err:
+            _LOGGER.error(f"Failed to trigger machine filter reset: {err}")
+            raise
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger machine cleaning reset for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering machine cleaning reset: {err}")
+
+        # session.post already returns the parsed "data" payload and raises on a non-zero code
+        _LOGGER.debug(f"Filter reset set successfully, response data: {response}")
+        return response
 
     async def set_manual_lid_open(self, serial: str):
         """Trigger manual lid opening for a specific device."""
