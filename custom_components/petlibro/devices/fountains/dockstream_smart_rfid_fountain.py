@@ -100,6 +100,58 @@ class DockstreamSmartRFIDFountain(Device):
             return float(value) if value is not None else None
         except (TypeError, ValueError):
             return None
+
+    @property
+    def water_tank_status(self) -> str | None:
+        """Water tank state from realInfo.waterBoxStatus.
+
+        0 (WATER_BOX_LEAVE_ERROR in the app) means the tank is empty or has
+        been lifted off the base; 1 means it is seated. Offline, missing or
+        unrecognised values return None.
+        """
+        real_info = self._data.get("realInfo") or {}
+        if not real_info.get("online", False):
+            return None
+        try:
+            status = int(real_info.get("waterBoxStatus"))
+        except (TypeError, ValueError):
+            return None
+        if status == 0:
+            return "empty_or_removed"
+        if status == 1:
+            return "present"
+        return None
+
+    @property
+    def water_tank_problem(self) -> bool | None:
+        """True when the tank is empty or removed, None when unknown."""
+        status = self.water_tank_status
+        if status is None:
+            return None
+        return status == "empty_or_removed"
+
+    @property
+    def water_level_state(self) -> str | None:
+        """Water level tier from realInfo.weightState.
+
+        NORMAL, LOW_WATER (~30%, pump still running) or LACK_WATER (~12%,
+        pump stops). The value stays at its last reading while the tank is
+        off the base, so it is only reported while the tank is seated.
+        """
+        if self.water_tank_status != "present":
+            return None
+        state = (self._data.get("realInfo") or {}).get("weightState")
+        if state in ("NORMAL", "LOW_WATER", "LACK_WATER"):
+            return state.lower()
+        return None
+
+    @property
+    def low_water(self) -> bool | None:
+        """True when the water level is LOW_WATER or LACK_WATER, None when unknown."""
+        state = self.water_level_state
+        if state is None:
+            return None
+        return state != "normal"
     
     @property
     def vacuum_state(self) -> bool:

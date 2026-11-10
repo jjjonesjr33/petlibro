@@ -363,6 +363,21 @@
             },
             "portion_to_gram_ratio": {
                 "name": "Grams per Portion"
+            },
+            "water_tank_status": {
+                "name": "Water Tank Status",
+                "state": {
+                    "present": "Present",
+                    "empty_or_removed": "Empty or removed"
+                }
+            },
+            "water_level_state": {
+                "name": "Water Level",
+                "state": {
+                    "normal": "Normal",
+                    "low_water": "Low",
+                    "lack_water": "Too low (pump stopped)"
+                }
             }
         },
         "image": {
@@ -547,6 +562,12 @@
             },
             "auto_stop_feed_enabled": {
                 "name": "Auto Stop Feed"
+            },
+            "water_tank_problem": {
+                "name": "Water Tank"
+            },
+            "low_water": {
+                "name": "Low Water"
             }
         },
         "number": {
