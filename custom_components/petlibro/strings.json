@@ -73,6 +73,13 @@
       },
       "portion_to_gram_ratio": {
         "name": "Grams per Portion"
+      },
+      "water_tank_status": {
+        "name": "Water Tank Status",
+        "state": {
+          "present": "Present",
+          "empty_or_removed": "Empty or removed"
+        }
       }
     },
     "binary_sensor": {
@@ -93,6 +100,9 @@
       },
       "auto_stop_feed_enabled": {
         "name": "Auto Stop Feed"
+      },
+      "water_tank_problem": {
+        "name": "Water Tank"
       }
     },
     "button": {
