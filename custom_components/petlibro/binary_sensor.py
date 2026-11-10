@@ -771,6 +771,15 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             value_fn=lambda device: device.water_tank_problem,
             name="Water Tank"
         ),
+        PetLibroBinarySensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="low_water",
+            translation_key="low_water",
+            icon="mdi:water-alert",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            available_fn=lambda device: device.low_water is not None,
+            value_fn=lambda device: device.low_water,
+            name="Low Water"
+        ),
     ],
     Dockstream2SmartCordlessFountain: [
         PetLibroBinarySensorEntityDescription[Dockstream2SmartCordlessFountain](

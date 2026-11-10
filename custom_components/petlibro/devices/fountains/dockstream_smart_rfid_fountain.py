@@ -129,6 +129,29 @@ class DockstreamSmartRFIDFountain(Device):
         if status is None:
             return None
         return status == "empty_or_removed"
+
+    @property
+    def water_level_state(self) -> str | None:
+        """Water level tier from realInfo.weightState.
+
+        NORMAL, LOW_WATER (~30%, pump still running) or LACK_WATER (~12%,
+        pump stops). The value stays at its last reading while the tank is
+        off the base, so it is only reported while the tank is seated.
+        """
+        if self.water_tank_status != "present":
+            return None
+        state = (self._data.get("realInfo") or {}).get("weightState")
+        if state in ("NORMAL", "LOW_WATER", "LACK_WATER"):
+            return state.lower()
+        return None
+
+    @property
+    def low_water(self) -> bool | None:
+        """True when the water level is LOW_WATER or LACK_WATER, None when unknown."""
+        state = self.water_level_state
+        if state is None:
+            return None
+        return state != "normal"
     
     @property
     def vacuum_state(self) -> bool:

@@ -1375,6 +1375,14 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             options=["present", "empty_or_removed"],
             name="Water Tank Status"
         ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="water_level_state",
+            translation_key="water_level_state",
+            icon="mdi:water-percent-alert",
+            device_class=SensorDeviceClass.ENUM,
+            options=["normal", "low_water", "lack_water"],
+            name="Water Level"
+        ),
     ],
     Dockstream2SmartCordlessFountain: [
         PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](

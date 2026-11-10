@@ -80,6 +80,14 @@
           "present": "Present",
           "empty_or_removed": "Empty or removed"
         }
+      },
+      "water_level_state": {
+        "name": "Water Level",
+        "state": {
+          "normal": "Normal",
+          "low_water": "Low",
+          "lack_water": "Too low (pump stopped)"
+        }
       }
     },
     "binary_sensor": {
@@ -103,6 +111,9 @@
       },
       "water_tank_problem": {
         "name": "Water Tank"
+      },
+      "low_water": {
+        "name": "Low Water"
       }
     },
     "button": {
