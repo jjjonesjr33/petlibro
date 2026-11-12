@@ -1261,20 +1261,9 @@ class PetLibroAPI:
                 "requestId": request_id  # Use dynamic request ID
             })
 
-            # Check if response is already parsed (since response is an integer here)
-            if isinstance(response, int):
-                _LOGGER.debug(f"Manual feeding successful, returned code: {response}")
-                return response
-            
-            # If response is a dictionary (JSON), handle it
-            response_data = await response.json()
-            _LOGGER.debug(f"Manual feeding response data: {response_data}")
-            
-            # Check if the response indicates success
-            if response.status != 200 or response_data.get("code") != 0:
-                raise PetLibroAPIError(f"Failed to trigger manual feeding: {response_data.get('msg')}")
-
-            return response_data
+            # session.post already returns the parsed "data" payload and raises on a non-zero code
+            _LOGGER.debug(f"Manual feeding triggered successfully, response data: {response}")
+            return response
 
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger manual feeding for device {serial}: {err}")
